@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+/**
+ * One committed look, deliberately.
+ *
+ * Dark, near-black, very high contrast. A lot of this gets used at 2 AM on a
+ * cheap phone, and a single scheme removes a whole class of theme bugs from
+ * demo day. Colour is rationed: amber belongs to the meter, red belongs to the
+ * interrupt, and everything else is monochrome. If something is coloured on
+ * this site, it is because it matters.
+ *
+ * Nothing here imitates a government portal. No emblem, no national colours,
+ * no .gov.in typography. It must be impossible to mistake this for the real
+ * thing.
+ */
+
+@theme {
+  --color-ink: #0a0a0b;
+  --color-surface: #151517;
+  --color-raised: #1d1d21;
+  --color-line: #2e2e33;
+  --color-line-strong: #45454d;
+  --color-text: #fafaf9;
+  --color-muted: #a8a8b3;
+  --color-faint: #838390; /* 5.3:1 on ink — the floor for small print */
+
+  /**
+   * The meter. The only thing on the site that moves.
+   * --color-mark is the validated data-mark step: OKLCH L 0.60, inside the
+   * dark-mode band, 5.8:1 against the card surface. --color-amber is brighter
+   * and is reserved for focus rings, where visibility beats palette rules.
+   */
+  --color-mark: #c58419;
+  --color-mark-track: #40300f;
+  --color-amber: #f0a93b;
+
+  /* The interrupt. Nothing else gets to use this. */
+  --color-danger: #ff5c5c;
+  --color-danger-dim: #4a1d1d;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Noto Sans", "Noto Sans Devanagari", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+html {
+  background: var(--color-ink);
+  /* Large by default. Fraud does not preferentially target people with good eyes. */
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100dvh;
+  text-rendering: optimizeLegibility;
+}
+
+/* Visible focus everywhere. Non-negotiable. */
+:focus-visible {
+  outline: 3px solid var(--color-amber);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/**
+ * These resets MUST live in @layer base.
+ *
+ * Unlayered CSS outranks every layered rule regardless of specificity, so an
+ * unlayered `button { color: inherit }` silently beats any Tailwind colour
+ * utility applied to a button — which renders a white-on-white primary action.
+ * Layering puts them back under the utilities where they belong.
+ */
+@layer base {
+  button,
+  a[role="button"],
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::placeholder {
+    color: var(--color-faint);
+  }
+}
+
+/**
+ * The single moving element is a number counting down. Honour the OS setting
+ * anyway — a decaying counter with no motion still tells the truth, it just
+ * updates without transitions.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@utility field-input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.875rem;
+  background: var(--color-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  color: var(--color-text);
+}
+
+@utility field-input-missing {
+  border-style: dashed;
+  border-color: var(--color-line-strong);
+}
+
+/**
+ * The one primary action on any screen.
+ *
+ * The disabled state is a real style rather than reduced opacity: dimming dark
+ * text on a light fill drops it under 3:1 and the label stops being readable,
+ * which on the send button would mean the most important word on the site
+ * disappears exactly when someone is looking for it.
+ */
+@utility btn-primary {
+  display: flex;
+  min-height: 3.5rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding-inline: 1rem;
+  background: var(--color-text);
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:disabled {
+    background: var(--color-raised);
+    border-color: var(--color-line-strong);
+    color: var(--color-muted);
+  }
+}
