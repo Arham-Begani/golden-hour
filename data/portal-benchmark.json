@@ -1,0 +1,71 @@
+{
+  "_README": [
+    "The comparison against the live portal. You must fill this in by hand.",
+    "",
+    "Nothing here may be estimated, inferred, or filled in by a model. A fabricated",
+    "benchmark discredits every other honest thing on the site. Every row stays",
+    "null until a human has actually observed it, and /evidence renders unfilled",
+    "rows as 'not yet counted' rather than hiding them.",
+    "",
+    "How to fill it:",
+    "  1. Open cybercrime.gov.in on a phone. Start a 'Financial Fraud' report.",
+    "  2. Count every field that must be filled before the FIRST submission that",
+    "     could reach a bank. Count an OTP screen as a step, not a field.",
+    "  3. Time the same task end to end. Do it three times, record the median.",
+    "  4. Set verified to true and fill measuredBy / measuredOn.",
+    "",
+    "If you cannot get through the portal to count, leave it null and say so on",
+    "the page. 'We could not measure this' is a fine thing to show a judge.",
+    "'We guessed' is not."
+  ],
+
+  "verified": false,
+  "measuredBy": null,
+  "measuredOn": null,
+  "portalVersionNote": null,
+
+  "rows": [
+    {
+      "metric": "Fields required before the first submission",
+      "portal": null,
+      "goldenHour": 0,
+      "goldenHourNote": "No field blocks dispatch. A packet with holes is sent as a packet with holes.",
+      "source": null
+    },
+    {
+      "metric": "Fields collected before the first submission",
+      "portal": null,
+      "goldenHour": 9,
+      "goldenHourNote": "The nine freeze fields in FREEZE_FIELDS, most of them lifted off a screenshot.",
+      "source": null
+    },
+    {
+      "metric": "Screens before the first submission",
+      "portal": null,
+      "goldenHour": 2,
+      "goldenHourNote": "Intake, then confirm.",
+      "source": null
+    },
+    {
+      "metric": "Account registration or OTP required first",
+      "portal": null,
+      "goldenHour": "No",
+      "goldenHourNote": "An OTP is a delay, and on a phone with a live screen-share it is a hazard.",
+      "source": null
+    },
+    {
+      "metric": "Median seconds to first submission",
+      "portal": null,
+      "goldenHour": null,
+      "goldenHourNote": "Measured live from real runs — see the measured section of /evidence.",
+      "source": null
+    },
+    {
+      "metric": "Must the user classify the fraud themselves first",
+      "portal": null,
+      "goldenHour": "No",
+      "goldenHourNote": "The category is inferred from what they wrote. It is never asked.",
+      "source": null
+    }
+  ]
+}
