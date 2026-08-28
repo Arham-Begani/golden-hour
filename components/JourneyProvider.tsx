@@ -33,6 +33,15 @@ export type JourneyState = {
   corrected: string[];
   source: "model" | "fixture" | "manual" | null;
   interruptShown: boolean;
+  /**
+   * When the clock started, persisted alongside the rest of the journey.
+   *
+   * It lived only in a ref until a refresh on /confirm was found to drop the
+   * run entirely: the ref reset to null, elapsedMs() returned null, and the
+   * dispatch was never recorded. A run that silently vanishes biases the
+   * distribution in a direction nobody can see afterwards.
+   */
+  startedAt: number | null;
 };
 
 const EMPTY: JourneyState = {
@@ -42,6 +51,7 @@ const EMPTY: JourneyState = {
   corrected: [],
   source: null,
   interruptShown: false,
+  startedAt: null,
 };
 
 type JourneyContext = {
@@ -88,19 +98,6 @@ export function JourneyProvider({
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setFullState(readStored()), []);
 
-  const startedAt = useRef<number | null>(null);
-
-  const markStart = useCallback(() => {
-    // The clock starts when the user first does something, not when the page
-    // loaded. Timing from page load would flatter the number.
-    startedAt.current ??= Date.now();
-  }, []);
-
-  const elapsedMs = useCallback(
-    () => (startedAt.current === null ? null : Date.now() - startedAt.current),
-    [],
-  );
-
   const setState = useCallback((next: Partial<JourneyState>) => {
     setFullState((current) => {
       const merged = { ...current, ...next };
@@ -112,6 +109,32 @@ export function JourneyProvider({
       return merged;
     });
   }, []);
+
+  const startedAt = useRef<number | null>(null);
+
+  const markStart = useCallback(
+    () => {
+      // The clock starts when the user first does something, not when the page
+      // loaded. Timing from page load would flatter the number.
+      //
+      // The ref is the idempotence guard rather than the state, because
+      // setState is async and markStart fires twice in a row on a paste
+      // (onChange then onPaste). Checking state would let the second call
+      // through and restart the clock.
+      if (startedAt.current !== null) return;
+      const now = Date.now();
+      startedAt.current = now;
+      setState({ startedAt: now });
+    },
+    [setState],
+  );
+
+  const elapsedMs = useCallback(() => {
+    // Ref first, stored value second: the ref is authoritative within a page
+    // life, and the stored value is what survives a refresh.
+    const at = startedAt.current ?? state.startedAt;
+    return at === null ? null : Date.now() - at;
+  }, [state.startedAt]);
 
   const reset = useCallback(() => {
     startedAt.current = null;
@@ -130,8 +153,9 @@ export function JourneyProvider({
     document.cookie = `gh_lang=${next}; path=/; max-age=31536000; samesite=lax`;
   }, []);
 
-  // The clock is deliberately absent from this object: a ref read during
-  // render would be captured stale, and callers only ever need elapsedMs().
+  // The clock is still not exposed directly: a ref read during render would be
+  // captured stale, and callers only ever need elapsedMs(). It is persisted in
+  // state so it survives a refresh, but read through the closure either way.
   const value = useMemo<JourneyContext>(
     () => ({ lang, setLang, copy: t(lang), state, setState, reset, markStart, elapsedMs }),
     [lang, setLang, state, setState, reset, markStart, elapsedMs],
