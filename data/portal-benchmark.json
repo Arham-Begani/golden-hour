@@ -16,13 +16,32 @@
     "",
     "If you cannot get through the portal to count, leave it null and say so on",
     "the page. 'We could not measure this' is a fine thing to show a judge.",
-    "'We guessed' is not."
+    "'We guessed' is not.",
+    "",
+    "STATUS: not counted, and not guessed. A documentary route was tried first --",
+    "the portal publishes citizen manuals at cybercrime.gov.in/Webform/Citizen_Manual.aspx,",
+    "but the financial-fraud one covers the 1930 helpline route (and is marked Delhi",
+    "only), and the general reporting manual is a scanned deck of screenshots with no",
+    "text layer and no field enumeration. Counting fields off screenshots of a form",
+    "that is not the financial-fraud form would be inference, which this file forbids.",
+    "So the portal column stays null until someone opens the live portal and counts."
   ],
 
   "verified": false,
   "measuredBy": null,
   "measuredOn": null,
   "portalVersionNote": null,
+
+  "_sourcingAttempt": {
+    "date": "2026-08-28",
+    "outcome": "no documentary source found for the web form's field count",
+    "checked": [
+      "https://cybercrime.gov.in/Webform/Citizen_Manual.aspx",
+      "https://cybercrime.gov.in/UploadMedia/instructions_citizenreportingcyberfrauds.pdf",
+      "https://cybercrime.gov.in/UploadMedia/MHA-CitizenManualReportOtherCyberCrime-v10.pdf"
+    ],
+    "note": "The financial-fraud instructions cover the 1930 helpline route and are marked 'For Delhi Only'. The general reporting manual is image-only. Neither enumerates the web form's fields."
+  },
 
   "rows": [
     {

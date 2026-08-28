@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ANCHORS, anchorsFullySourced } from "@/lib/decay";
+import { SOURCES, claimsFullySourced } from "@/lib/decay";
 import benchmark from "@/data/portal-benchmark.json";
 
 /**
@@ -22,6 +22,8 @@ type Timings = {
   slowest_ms: number | null;
   under_60s: number;
   runs: number[];
+  /** Demo replays, counted but never mixed into the claim above. */
+  demo: { count: number; median_ms: number | null; runs: number[] };
 };
 
 const seconds = (ms: number | null) => (ms === null ? "—" : `${(ms / 1000).toFixed(1)}s`);
@@ -36,7 +38,7 @@ export default function EvidencePage() {
       .catch(() => setTimings(null));
   }, []);
 
-  const sourced = anchorsFullySourced();
+  const sourced = claimsFullySourced();
 
   return (
     <div className="flex flex-col gap-8 pb-8">
@@ -63,8 +65,11 @@ export default function EvidencePage() {
       <section>
         <h2 className="text-xl font-semibold">Measured</h2>
         <p className="mt-1 text-sm text-muted">
-          Every recorded run from first interaction to dispatch, unfiltered. The median
-          includes the slow ones; a best-case number would not mean anything.
+          Every recorded <strong>human</strong> run from first interaction to dispatch,
+          unfiltered. The median includes the slow ones; a best-case number would not mean
+          anything. Demo replays are counted separately and excluded — they serve a cached
+          extraction and start their clock at the fixture click, so they measure review
+          time, not the task.
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -82,8 +87,22 @@ export default function EvidencePage() {
         {timings && timings.count > 0 ? (
           <RunStrip runs={timings.runs} />
         ) : (
-          <p className="mt-4 rounded-lg border border-dashed border-line-strong px-4 py-3 text-sm text-muted">
-            No runs recorded yet. Complete a report and this fills in.
+          <p className="mt-4 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+            <strong>Not yet measured.</strong> No human run has been recorded, so the
+            sixty-second claim above is unproven. It stays unproven here rather than being
+            filled in with demo replays — the same rule this page applies to the portal
+            column below, applied to our own headline number.
+          </p>
+        )}
+
+        {timings && timings.demo.count > 0 && (
+          <p className="mt-3 text-xs leading-relaxed text-faint">
+            {timings.demo.count} demo and scripted{" "}
+            {timings.demo.count === 1 ? "run" : "runs"} recorded separately
+            {timings.demo.median_ms === null
+              ? ""
+              : ` (median ${(timings.demo.median_ms / 1000).toFixed(1)}s)`}
+            . Not evidence for the claim, and not counted toward it.
           </p>
         )}
       </section>
@@ -98,11 +117,27 @@ export default function EvidencePage() {
         </p>
 
         {!benchmark.verified && (
-          <p className="mt-3 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm">
-            <strong>Not yet counted.</strong> The portal column is empty until someone has
-            actually opened the live portal and counted it. See{" "}
-            <code className="text-muted">data/portal-benchmark.json</code>.
-          </p>
+          <div className="mt-3 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+            <p>
+              <strong>Not counted, and not guessed.</strong> The portal column is empty
+              because nobody has opened the live portal and counted it. We tried the
+              documentary route first: the portal&rsquo;s own{" "}
+              <a
+                href="https://cybercrime.gov.in/Webform/Citizen_Manual.aspx"
+                className="underline underline-offset-2"
+              >
+                citizen manuals
+              </a>{" "}
+              do not enumerate this form — the financial-fraud one covers the 1930 helpline
+              route and is marked &ldquo;For Delhi Only&rdquo;, and the general reporting
+              manual is a deck of screenshots with no text layer.
+            </p>
+            <p className="mt-2">
+              Counting fields off screenshots of a different form would be inference. So
+              this stays empty. <em>We could not measure this</em> is a fine thing to show
+              you; <em>we guessed</em> is not.
+            </p>
+          </div>
         )}
 
         <div className="mt-4 overflow-x-auto">
@@ -148,42 +183,101 @@ export default function EvidencePage() {
 
       {/* ---------------------------------------------------------------- */}
 
-      <section id="curve" className="scroll-mt-4">
-        <h2 className="text-xl font-semibold">The curve</h2>
+      <section>
+        <h2 className="text-xl font-semibold">The sequence already exists</h2>
         <p className="mt-1 text-sm text-muted">
-          The meter interpolates in log-time between these anchors. It is computed from the
-          fraud&rsquo;s timestamp, never from when the page loaded.
+          The strongest evidence for this product&rsquo;s argument is that the government
+          already runs it — on the phone, just not on the web.
         </p>
+
+        <div className="mt-3 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+          <p>
+            The portal&rsquo;s own instructions for reporting a financial cyber fraud
+            through 1930 describe a two-part sequence. A short list of facts first —
+            mobile number, bank or wallet, the account or UPI ID debited, transaction ID,
+            transaction date, card number where relevant, a screenshot if there is one.
+            Then:
+          </p>
+          <blockquote className="mt-2 border-l-2 border-line-strong pl-3 text-muted">
+            &ldquo;the complainant will get a system generated Log-in
+            Id/acknowledgement number through SMS/Mail. Using the above Log-in
+            Id/acknowledgement number, the complainant must complete registration of
+            complaint on National Cybercrime Reporting Portal
+            (www.cybercrime.gov.in) within 24 hours.&rdquo;
+          </blockquote>
+          <p className="mt-2">
+            Minimal packet, acknowledgement number, full statement afterwards against that
+            number. That is exactly the re-sequencing this prototype argues for, and it is
+            already official procedure for the helpline. Golden Hour&rsquo;s claim is only
+            that the web route should work the same way.
+          </p>
+          <p className="mt-2 text-xs text-faint">
+            <a
+              href="https://cybercrime.gov.in/UploadMedia/instructions_citizenreportingcyberfrauds.pdf"
+              className="underline underline-offset-2"
+            >
+              Citizen Financial Cyber Frauds Reporting and Management System
+            </a>{" "}
+            — MHA / I4C. Marked &ldquo;For Delhi Only&rdquo;, which is a limit of the
+            document, not of the argument.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+
+      <section id="curve" className="scroll-mt-4">
+        <h2 className="text-xl font-semibold">The clock</h2>
+        <p className="mt-1 text-sm text-muted">
+          The meter shows how long ago the fraud happened, counted from the timestamp the
+          user gave us and never from when the page loaded. It does not show a recovery
+          percentage, and the reason is worth stating in full.
+        </p>
+
+        <div className="mt-3 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+          <p>
+            <strong>There is no published recovery curve, so we do not draw one.</strong>{" "}
+            An earlier version of this meter showed a falling percentage — 50% within an
+            hour, 10% within a day, 2% after a week — taken from the project brief. Those
+            figures could not be traced to any primary source.
+          </p>
+          <p className="mt-2">
+            In{" "}
+            <a
+              href="https://www.mha.gov.in/MHA1/Par2017/pdfs/par2026-pdfs/RS11022026/1349.pdf"
+              className="underline underline-offset-2"
+            >
+              Rajya Sabha Unstarred Question 1349
+            </a>{" "}
+            of 11 February 2026, the Ministry of Home Affairs was asked for
+            &ldquo;details of total amount recovered vis-&agrave;-vis losses incurred,
+            year-wise&rdquo;. The answer does not contain the word{" "}
+            <em>recovered</em>. The percentages that circulate in the press are police
+            statements, not published statistics.
+          </p>
+          <p className="mt-2">
+            A decaying counter whose number nobody can source is urgency theatre — the
+            exact thing this product claims not to be. So the number is gone and the clock
+            stayed. The direction is real and sourced; the magnitude is not claimed.
+          </p>
+        </div>
 
         {!sourced && (
           <p className="mt-3 rounded-lg border border-danger bg-danger-dim/40 px-4 py-3 text-sm leading-relaxed">
-            <strong>Unverified.</strong> These figures came from the project brief and have
-            not been traced to a primary source. A first search pass also found a published
-            claim that appears to contradict the 24-hour anchor. Until this is resolved the
-            meter should not be presented as cited — see <code>CITATIONS.md</code>, which
-            records what was found and the three ways out.
+            <strong>Unverified.</strong> A claim on this page has lost its source. Until it
+            is restored the meter should not be presented as cited — see{" "}
+            <code>CITATIONS.md</code>.
           </p>
         )}
 
-        <ul className="mt-4 flex flex-col gap-2">
-          {ANCHORS.map((anchor) => (
-            <li
-              key={anchor.minutes}
-              className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-2 last:border-b-0"
-            >
-              <span className="text-sm">{anchor.label}</span>
-              <span className="flex items-baseline gap-3">
-                <span className="tabular-nums">{(anchor.probability * 100).toFixed(0)}%</span>
-                {anchor.source ? (
-                  <a href={anchor.source} className="text-xs text-muted underline">
-                    source
-                  </a>
-                ) : (
-                  <span className="text-xs text-faint">
-                    {anchor.cited ? "unsourced" : "interpolation"}
-                  </span>
-                )}
-              </span>
+        <h3 className="mt-5 text-base font-semibold">What is cited, and for what</h3>
+        <ul className="mt-2 flex flex-col gap-3">
+          {SOURCES.map((source) => (
+            <li key={source.id} className="border-b border-line pb-3 last:border-b-0">
+              <a href={source.url} className="text-sm underline underline-offset-2">
+                {source.title}
+              </a>
+              <p className="mt-1 text-xs leading-relaxed text-muted">{source.supports}</p>
             </li>
           ))}
         </ul>
