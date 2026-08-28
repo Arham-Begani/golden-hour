@@ -71,6 +71,10 @@ Vercel project environment.
 | Interrupt gate | `lib/interrupt.ts` | Conservative: `ACTIVE` **and** a quoted hard signal |
 | Store | `lib/store.ts` | Upstash, or in-memory for local dev. 24h TTL |
 | Demo cases | `lib/fixtures.ts` | Cached extractions, run through the real validation path |
+| Triage | `lib/triage.ts`, `/api/triage` | The interrupt signals on their own, for a description that arrives after extraction |
+| Prompts | `lib/prompts.ts` | One `TRIAGE_INSTRUCTION`, composed into both model calls, so the eval scores what ships |
+| Honesty | `lib/honesty.ts` | The single source for `/honesty` **and** `HONESTY.md`; a test fails if they drift |
+| Judge harness | `app/judge/page.tsx` | Seeded scenario, stopwatch, the real product in a frame, honesty strip pinned |
 
 ### The three ideas worth reading the code for
 
@@ -109,10 +113,38 @@ everyone to dismiss the real ones.
 
 ```bash
 npm run verify     # typecheck + unit tests + production build
-npm run test       # 50 unit tests: clock and bands, validation, interrupt gate, schema, run provenance
+npm run test       # 85 unit tests: clock and bands, validation, interrupt gate, schema, run provenance,
+                   #   triage gate, honesty/HONESTY.md sync, judge scenario safety
+npm run eval       # scores the interrupt against 22 labelled cases; needs a running server
 npm run shots      # screenshots at 360px; fails if any page scrolls sideways
 npm run journey    # drives all four demo cases end to end in a real browser
+npm run docs:honesty  # regenerate HONESTY.md after editing lib/honesty.ts
 ```
+
+### The eval
+
+`npm run eval` measures the number that justifies the interrupt existing: **the
+false-positive rate on the COMPLETED cases** — how often the product stops a report for
+someone whose incident is already over.
+
+```bash
+npm run build && npx next start     # the eval needs a live server and a model key
+npm run eval
+```
+
+Currently **0% on 14 COMPLETED cases** (0/14), 0% false negatives on 8 ACTIVE cases, median
+triage latency 1332ms. Every case runs through the real `/api/triage` route, the real model
+call and the real gate — nothing is stubbed. Cases live in `data/triage-eval.json`, the run
+writes `data/triage-eval-result.json`, and `/honesty` reads its figures from that file rather
+than from anything hand-typed.
+
+The run exits non-zero on a false positive and zero on a false negative, on purpose:
+tightening the gate until every ACTIVE case fires is exactly the change that would make the
+false-positive rate worse.
+
+**What that 0% does not mean** is set out on `/honesty` and in [`HONESTY.md`](./HONESTY.md).
+Short version: the same person wrote the gate and the cases, 22 cases is a small sample, and
+it is all English prose.
 
 `npm run journey` is the one that matters. It walks intake → interrupt → confirm →
 receipt → statement for each case and asserts the interrupt fires only where it should,

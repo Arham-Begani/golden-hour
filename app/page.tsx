@@ -18,10 +18,14 @@ import { useJourney } from "@/components/JourneyProvider";
  * cannot tell from an input field why a form was rebuilt. The sequence is the
  * whole idea, so the sequence is what gets drawn.
  *
- * The palette rule from globals.css holds here. This page is monochrome except
- * for one amber node — the first step, the one with the clock on it. Nothing
- * else is allowed colour, because nothing else here matters in the way the
- * meter and the interrupt do.
+ * The palette rule from globals.css holds here, and holds strictly: this page
+ * is monochrome throughout. Step one is emphasised with weight and contrast
+ * instead of colour.
+ *
+ * The accent is rationed to the meter and the interrupt, the two places where
+ * colour carries an instruction rather than a label. Spending it on a diagram
+ * node here would teach the reader that the colour means "look at this", and
+ * the interrupt needs it to mean "stop".
  */
 
 type Timings = { count: number; median_ms: number | null };
@@ -131,9 +135,17 @@ export default function LandingPage() {
                 <span
                   aria-hidden
                   className={`z-10 flex size-8 shrink-0 items-center justify-center rounded-full border font-mono text-sm ${
-                    // The clock lives on step one, so the mark colour does too.
+                    /**
+                     * Step one is emphasised with weight and contrast, not
+                     * colour. The accent is rationed to the meter and the
+                     * interrupt — the two places where colour carries an
+                     * instruction rather than a label. A coloured node in a
+                     * diagram on the front page spends that budget on
+                     * decoration, and every later use of it reads as decoration
+                     * too.
+                     */
                     first
-                      ? "border-mark bg-mark-track text-text"
+                      ? "border-text bg-raised font-semibold text-text"
                       : "border-line bg-surface text-muted"
                   }`}
                 >
@@ -145,7 +157,7 @@ export default function LandingPage() {
                     <h3 className="text-lg font-medium">{step.title}</h3>
                     <span
                       className={`rounded border px-1.5 py-0.5 text-xs ${
-                        first ? "border-mark text-mark" : "border-line text-faint"
+                        first ? "border-text text-text" : "border-line text-faint"
                       }`}
                     >
                       {step.aside}

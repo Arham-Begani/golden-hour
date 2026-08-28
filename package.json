@@ -13,7 +13,8 @@
     "shots": "node scripts/shoot.mjs",
     "journey": "node scripts/journey.mjs",
     "verify": "npm run typecheck && npm run test && npm run build",
-    "eval": "node scripts/eval.mjs"
+    "eval": "node scripts/eval.mjs",
+    "docs:honesty": "vitest run -u lib/honesty.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.18.0",

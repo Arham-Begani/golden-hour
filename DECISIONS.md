@@ -200,3 +200,93 @@ bucket and leave the real distribution untouched.
 
 `/evidence` reads "not yet measured" until real runs exist, and whatever the real median
 turns out to be is what the site will claim — including if it lands above sixty seconds.
+
+---
+
+## 9. The honesty document has one source, not two
+
+**Chosen:** `lib/honesty.ts` holds the content as data. `app/honesty/page.tsx` renders it to
+the screen, `lib/honesty-doc.ts` renders it to markdown, and `lib/honesty.test.ts` writes
+`HONESTY.md` through a vitest file snapshot — so the test run fails when the committed file
+and the page disagree.
+
+**Rejected:** Writing the page and the markdown separately and keeping them in sync by hand,
+which is what the brief describes.
+
+Two hand-maintained copies of a document stay in sync for about a week. On most documents
+that decays into mild inaccuracy. On this one it is fatal: a page claiming to be the honest
+account of the project, contradicted by a file claiming to be the honest account of the
+project, is worse evidence than having neither.
+
+This is the same argument as `UNREADABLE` being enforced in `validate.ts` rather than
+requested in a prompt, and the same argument as `TRIAGE_INSTRUCTION` being one constant.
+Where a property matters, assert it in code rather than intend it.
+
+**The measured numbers are read from `data/triage-eval-result.json`**, which the eval run
+writes. The figure on the page is therefore the figure that was measured, and re-running the
+eval moves the page. Nobody can type in a remembered number.
+
+**Rejected: translating `/honesty` into Hindi.** Every other screen has Hindi and the Hindi
+is unreviewed. The one page whose entire job is to be believed is the worst place for a
+translation nobody has checked, so it is English only and says so at the top.
+
+---
+
+## 10. `/judge` does not pre-fill the scenario
+
+**Chosen:** The judge reads the scenario off the screen and types or pastes it into the real
+intake themselves. The run is a real run and counts toward the measured median.
+
+**Rejected:** Seeding the intake with a fixture and starting the clock.
+
+Pre-filling would have been three lines and would have produced a meaningless number. A
+seeded run measures how long someone takes to *review* a filled form — which is precisely
+why demo replays are already excluded from the timing distribution (`run_kind: "demo"`,
+decision 8). Building a judging harness that commits the exact error the storage layer was
+designed to prevent would have been an odd way to demonstrate the product's honesty.
+
+The cost is that a timed run needs a live model call and a working key, where a seeded one
+would not. That is the right trade: the number is the deliverable.
+
+**The product runs in an iframe rather than by navigation**, because the brief asks for the
+stopwatch and the honesty strip to stay on screen and they cannot if the judge navigates
+away. The harness detects completion by reading the framed page's own pathname — same
+origin, so this is allowed — rather than having `/receipt` post a message. That keeps the
+timed flow completely unmodified: the product does not know it is being measured, which is
+the only way the measurement means anything.
+
+**The stopwatch measures more than the app's own clock, deliberately.** It runs from the
+moment the judge presses start, including the time spent reading the scenario; the app's
+clock starts at first interaction with the intake. The judge's figure is therefore always
+the larger, and it is the one displayed, because a harness should not report the more
+flattering of two available numbers.
+
+---
+
+## 11. Non-negotiable 5 was dropped, not violated
+
+The original brief said: no landing page, no hero, no title card — the first screen *is* the
+intake, with the meter already running. The product now has a landing page at `/` and the
+intake at `/start`.
+
+**The reasoning for the original rule is still correct for the user it describes.** Someone
+whose money left their account four minutes ago does not need a pitch, and every tap between
+them and the text box is a real cost. That is why 1930 and cybercrime.gov.in sit above every
+word of explanation on the landing page, and why the intake is the first tappable thing on
+it rather than the last.
+
+**What the rule did not account for is the second audience.** The argument this project makes
+— that the portal collapses two clocks into one form and paces both at the slower one — is
+not self-evident from a text box. Anyone who opens the product cold and is not mid-fraud sees
+an input field and no case for it.
+
+Recorded here, and on `/honesty` under "Where this departs from its own brief", because a
+constraint quietly abandoned is indistinguishable from one that was never noticed. The other
+two departures are listed in the same place: the ground is dark rather than paper-white, and
+the model is Gemini rather than OpenAI.
+
+**The accent rule survived intact.** Colour is still rationed — the mark on the meter, red on
+the interrupt, and nothing else. The landing page's step-one node was originally given the
+accent and is now monochrome, emphasised with weight and contrast instead: a coloured node in
+a diagram teaches the reader that the colour means "look at this", and the interrupt needs it
+to mean "stop".

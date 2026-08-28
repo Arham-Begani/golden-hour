@@ -215,3 +215,115 @@ covers the common case, and adding a second call to the intake would spend part 
 sixty seconds to catch a signal that is usually already caught. Right now the route exists
 and the client does not call it, which is a defensible place to stop but is not obviously
 the final answer.
+
+---
+
+## Step 6 — `/judge` and `/honesty` — 2026-08-28
+
+Built on a branch (`step-6-judge-honesty`) in a separate git worktree, because another
+session was writing to the shared working directory at the same time and had already left
+the tree failing typecheck once mid-step.
+
+### `/honesty`, and the problem the brief handed me
+
+The brief asks for two artefacts that must agree: a `/honesty` route, and a `HONESTY.md`
+that mirrors it and is "kept in sync with what is actually real in the code at that moment".
+
+Writing both by hand is the obvious reading and it is a trap. Two copies of a document stay
+in sync for about a week. On most documents that decays into mild inaccuracy; on this one it
+is fatal, because the failure mode is a page claiming to be the honest account of the project
+being contradicted by a file claiming to be the honest account of the project. That is worse
+evidence than having neither.
+
+So there is one copy. `lib/honesty.ts` holds the content as typed data; the page renders it
+to the screen and `lib/honesty-doc.ts` renders it to markdown. The sync is enforced by a
+vitest **file snapshot** — `expect(renderHonestyMarkdown()).toMatchFileSnapshot("../HONESTY.md")`
+— so `npm test` fails when the two disagree and `npm run docs:honesty` regenerates.
+
+I tried a standalone `scripts/honesty-doc.mjs` first and threw it away. A plain node script
+cannot import a `.ts` module without a loader, and `lib/honesty.ts` imports the eval result
+JSON, which in Node 22 needs an import attribute that complicates the TypeScript side. Vitest
+already runs TypeScript and already has exactly this feature. Reaching for the tool that was
+in the room was the right answer and it took me one detour to notice.
+
+**The measured numbers are read from `data/triage-eval-result.json`**, which the eval writes.
+The number on the page is the number that was measured; re-running the eval moves the page.
+Nobody can type in a remembered figure.
+
+**English only, and it says so.** Every other screen has Hindi and the Hindi is unreviewed.
+The one page whose entire job is to be believed is the worst possible place to put a
+translation nobody has read.
+
+The page has no client JavaScript at all. It makes assertions about what the product does and
+does not do; it should not itself be doing anything.
+
+### `/judge`, and the decision the whole page turns on
+
+Seeding the intake with a fixture and starting a clock would have been about three lines. It
+would also have produced a meaningless number: a pre-filled run measures how long someone
+takes to *review* a filled form.
+
+That is not a hypothetical objection — it is the exact error the storage layer was already
+built to prevent. `run_kind: "demo"` exists in `lib/schema.ts` precisely so that replayed
+runs stay out of the timing distribution. Building the judging harness on top of the mistake
+the schema was designed to catch would have been a strange way to demonstrate the product's
+honesty.
+
+So `/judge` shows the scenario the way a phone would show it, and the judge types or pastes
+it into the real intake themselves. `lib/judge-scenarios.ts` holds raw inputs only — no
+cached extraction, unlike `lib/fixtures.ts`. The model reads it live, the run is a real run,
+and it counts toward the measured median that `/evidence` still reports as unmeasured. That
+is the point: this page is how that number gets its first data.
+
+**The product runs in an iframe.** The brief wants the stopwatch and the honesty strip on
+screen throughout, which is impossible if the judge navigates away. Completion is detected by
+polling the framed page's own `location.pathname` for `/receipt/` — same origin, so this is
+permitted. The alternative was a `postMessage` from the receipt screen, which would have
+meant editing a product screen so it could participate in being measured. The flow being
+timed is completely unmodified and does not know the harness exists.
+
+**The stopwatch deliberately reports the worse number.** It runs from the press of start,
+including the seconds spent reading the scenario; the app's own clock starts at first
+interaction with the intake. The judge's figure is always the larger of the two, and it is the
+one displayed, with a note explaining why. A harness that picks the more flattering of two
+available numbers is not a harness.
+
+Verified end to end in a real browser: the stopwatch runs, the frame loads the shipped
+intake, driving the frame to a receipt stops the clock, captures the acknowledgement number
+and offers a re-run.
+
+### Non-negotiable 6, and where the stopwatch sits with it
+
+Exactly one element animates. On every product screen that is the decay meter and nothing
+else, unchanged. `/judge` is an instrument rather than a product screen and the brief asks
+for a stopwatch on it by name; the running digits are the only moving thing there, and the
+meter is not on that page.
+
+### The landing page
+
+Escalated rather than resolved unilaterally, because it contradicts non-negotiable 5. The
+decision came back to keep it and drop the constraint, so it is now recorded as a deliberate
+departure in `DECISIONS.md` and on `/honesty` itself, next to the two others — the dark
+ground and the choice of Gemini over OpenAI. A constraint quietly abandoned is
+indistinguishable from one that was never noticed, which is the whole reason that section
+exists.
+
+The one change I did make to it: the step-one node in the sequence diagram carried the accent
+colour and now does not. A coloured node in a diagram teaches the reader that the colour means
+"look at this", and the interrupt needs it to mean "stop".
+
+### Quality floor
+
+Both new routes pass the 360px overflow check and are wired into `npm run shots`. 85 unit
+tests, typecheck clean, production build clean.
+
+The scenario block is a `<pre>` with `whitespace-pre-wrap break-words` rather than a scrolling
+block: a sideways-scrolling element inside a 360px page is the exact failure `npm run shots`
+asserts against, and a bank SMS is long enough to trip it.
+
+### Uncertain
+
+Whether the iframe survives contact with a real judge on a real phone. It is same-origin and
+tested at 360px, but a 70vh frame on a small screen means two scrollbars in the same gesture
+space, and the "open it full screen" escape hatch exists because I do not fully trust it. If
+one thing on this page needs a human to try it before demo day, it is that.
