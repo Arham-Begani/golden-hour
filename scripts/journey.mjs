@@ -56,6 +56,29 @@ async function clickByText(page, text) {
 
 mkdirSync(OUT, { recursive: true });
 
+/**
+ * Timings before the run, so we can prove afterwards that driving four demo
+ * cases did not move the real distribution.
+ *
+ * Every case here goes through the demo strip, so the server's fixture
+ * fingerprint should bucket all four as demo replays. That is a property of the
+ * code rather than of this script — which is exactly why it is worth asserting.
+ * If someone edits a fixture summary and the fingerprint stops matching, the
+ * scripted runs quietly start counting toward the sixty-second claim, and
+ * nothing else would notice.
+ */
+const readTimings = async () => {
+  try {
+    const response = await fetch(`${BASE}/api/timings`);
+    const result = await response.json();
+    return { real: result.count ?? 0, demo: result.demo?.count ?? 0 };
+  } catch {
+    return null;
+  }
+};
+
+const before = await readTimings();
+
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true });
 let failures = 0;
 
@@ -144,5 +167,32 @@ for (const testCase of CASES) {
 }
 
 await browser.close();
+
+const after = await readTimings();
+if (before && after) {
+  const realAdded = after.real - before.real;
+  const demoAdded = after.demo - before.demo;
+
+  if (realAdded !== 0) {
+    console.log(
+      `FAIL timings: ${realAdded} scripted run(s) landed in the REAL distribution. ` +
+        "Demo replays must never count toward the sixty-second claim.",
+    );
+    failures++;
+  }
+  if (demoAdded !== CASES.length) {
+    console.log(
+      `FAIL timings: expected ${CASES.length} demo timings, got ${demoAdded}. ` +
+        "The fixture fingerprint may have stopped matching.",
+    );
+    failures++;
+  }
+  if (realAdded === 0 && demoAdded === CASES.length) {
+    console.log(`\nok   timings  real +0, demo +${demoAdded}`);
+  }
+} else {
+  console.log("\nwarn timings  could not read /api/timings; provenance not checked");
+}
+
 console.log(failures === 0 ? "\nall journeys passed" : `\n${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
