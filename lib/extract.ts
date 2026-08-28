@@ -91,9 +91,21 @@ function buildParts(input: ExtractInput, now: Date) {
   return parts;
 }
 
-/** True when the failure is Gemini rejecting a config key rather than a real fault. */
-const isThinkingConfigError = (error: unknown) =>
-  /thinking/i.test(error instanceof Error ? error.message : String(error));
+/**
+ * True when the failure looks like Gemini rejecting the thinking config rather
+ * than a real fault.
+ *
+ * Matching only /thinking/ was not enough. gemini-3.5-flash-lite rejects
+ * `thinkingBudget: 0` with the entirely generic "Request contains an invalid
+ * argument." and a 400 — the word "thinking" appears nowhere — so the retry
+ * below never fired and every live extraction failed. A bare 400 is enough of a
+ * signal here: the retry drops one optional config key and calls again, and if
+ * the fault was something else the second call fails with the real error.
+ */
+const isThinkingConfigError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  return /thinking/i.test(message) || /INVALID_ARGUMENT|\b400\b/.test(message);
+};
 
 async function callGemini(input: ExtractInput, now: Date): Promise<string> {
   const ai = getGemini();
@@ -106,7 +118,10 @@ async function callGemini(input: ExtractInput, now: Date): Promise<string> {
     responseSchema: extractionResponseSchema(),
   };
 
-  const budget = Number(process.env.GEMINI_THINKING_BUDGET ?? 0);
+  // Opt-in, not opt-out. Not every model tier accepts a thinking budget, and
+  // sending one it rejects costs a wasted round trip on a clock that matters.
+  const raw = process.env.GEMINI_THINKING_BUDGET?.trim();
+  const budget = raw ? Number(raw) : Number.NaN;
   const withThinking = Number.isFinite(budget)
     ? { ...config, thinkingConfig: { thinkingBudget: budget } }
     : config;
