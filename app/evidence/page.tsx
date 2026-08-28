@@ -49,7 +49,7 @@ export default function EvidencePage() {
           the same task on the live portal.
         </p>
 
-        <div className="mt-4 rounded-xl border border-line-strong bg-raised p-4 sm:p-5">
+        <div className="card-strong mt-4">
           <h2 className="text-base font-semibold">What this does not claim</h2>
           <p className="mt-2 text-sm leading-relaxed">
             It does not freeze anyone&rsquo;s money. There is no bank integration and no
@@ -274,7 +274,10 @@ export default function EvidencePage() {
         <ul className="mt-2 flex flex-col gap-3">
           {SOURCES.map((source) => (
             <li key={source.id} className="border-b border-line pb-3 last:border-b-0">
-              <a href={source.url} className="text-sm underline underline-offset-2">
+              <a
+                href={source.url}
+                className="text-sm underline underline-offset-2 transition-colors hover:text-mark"
+              >
                 {source.title}
               </a>
               <p className="mt-1 text-xs leading-relaxed text-muted">{source.supports}</p>
@@ -289,7 +292,7 @@ export default function EvidencePage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-line bg-surface p-3">
-      <p className="text-xs text-muted">{label}</p>
+      <p className="eyebrow">{label}</p>
       <p className="mt-0.5 text-2xl font-semibold">{value}</p>
     </div>
   );

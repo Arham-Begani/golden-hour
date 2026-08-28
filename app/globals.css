@@ -20,6 +20,11 @@
   --color-raised: #1d1d21;
   --color-line: #2e2e33;
   --color-line-strong: #45454d;
+
+  /* Hover steps. One notch up the same ladder — the surfaces already are the
+     hierarchy, so hover moves along it rather than introducing a new colour. */
+  --color-surface-hover: #1d1d21;
+  --color-raised-hover: #26262b;
   --color-text: #fafaf9;
   --color-muted: #a8a8b3;
   --color-faint: #838390; /* 5.3:1 on ink — the floor for small print */
@@ -116,6 +121,11 @@ body {
   border: 1px solid var(--color-line);
   border-radius: 0.5rem;
   color: var(--color-text);
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-line-strong);
+  }
 }
 
 @utility field-input-missing {
@@ -145,10 +155,106 @@ body {
   font-size: 1.125rem;
   font-weight: 600;
   text-decoration: none;
+  transition: background-color 120ms ease, transform 60ms ease;
+
+  &:hover:not(:disabled) {
+    background: #ffffff;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
 
   &:disabled {
     background: var(--color-raised);
     border-color: var(--color-line-strong);
     color: var(--color-muted);
   }
+}
+
+/**
+ * Everything below is presentation only.
+ *
+ * The rule the palette comment states is enforced here rather than left to
+ * each page: hover moves one step up the surface ladder and never introduces a
+ * colour, so a hover state can never be mistaken for the meter or the
+ * interrupt. Transitions are short enough to read as response rather than
+ * animation, and the reduced-motion block above flattens them anyway.
+ */
+
+/** The second action on a screen. Never competes with btn-primary. */
+@utility btn-secondary {
+  display: flex;
+  min-height: 3.25rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0.5rem;
+  padding-inline: 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 60ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-raised-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+/** The standard container. Was repeated on five pages; now it is one thing. */
+@utility card {
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  padding: 1rem;
+
+  @media (width >= 40rem) {
+    padding: 1.25rem;
+  }
+}
+
+/**
+ * The same box, one step up: the note the reader is not allowed to skim.
+ *
+ * A separate utility rather than `card` plus colour overrides — `card` sets the
+ * `border` and `background` shorthands, and whether a `border-line-strong`
+ * utility lands before or after them is a question about Tailwind's sort order
+ * rather than about this design.
+ */
+@utility card-strong {
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0.75rem;
+  background: var(--color-raised);
+  padding: 1rem;
+
+  @media (width >= 40rem) {
+    padding: 1.25rem;
+  }
+}
+
+/** A card that is also a control. Only these get a hover state. */
+@utility card-interactive {
+  transition: background-color 120ms ease, border-color 120ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-line-strong);
+    background: var(--color-surface-hover);
+  }
+}
+
+/** Small caps label above a section. The section rhythm on longer pages. */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-faint);
 }

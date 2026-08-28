@@ -141,7 +141,7 @@ export default function ConfirmPage() {
       {/* The one thing worth asking for outright: without a time there is no
           meter, and the meter is the honest measure of what is at stake. */}
       {whenUnknown && (
-        <fieldset className="rounded-lg border border-line bg-surface p-4">
+        <fieldset className="card">
           <legend className="px-1 text-base font-medium">{copy.confirm.when}</legend>
           <p className="text-sm text-muted">{copy.confirm.whenSub}</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -150,7 +150,7 @@ export default function ConfirmPage() {
                 key={option.key}
                 type="button"
                 onClick={() => setWhen(option.minutesAgo)}
-                className="min-h-11 rounded-lg border border-line bg-raised px-4 text-sm"
+                className="min-h-11 rounded-lg border border-line bg-raised px-4 text-sm transition-colors hover:border-line-strong hover:bg-raised-hover"
               >
                 {copy.confirm[option.key]}
               </button>
@@ -172,7 +172,7 @@ export default function ConfirmPage() {
         </fieldset>
       )}
 
-      <div className="rounded-lg border border-line bg-surface px-4">
+      <div className="rounded-xl border border-line bg-surface px-4">
         {EDITABLE.map(({ key, inputMode }, index) => (
           <FieldRow
             key={key}
@@ -192,7 +192,7 @@ export default function ConfirmPage() {
         ))}
       </div>
 
-      <p className="text-sm text-muted">
+      <p className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-muted">
         {holes > 0 ? copy.confirm.holes(holes) : copy.confirm.complete}
       </p>
 

@@ -181,6 +181,46 @@ function validateEnumField(
 const emptySignal = { present: false, evidence: "" };
 
 /**
+ * Validate the "is the attack still happening" subtree on its own.
+ *
+ * Split out of `validateExtraction` so the standalone triage call and the
+ * eval in `scripts/eval.mjs` run the identical rule the shipped extraction
+ * path runs. The interrupt gate is the one place where a second, subtly
+ * different implementation would be worst: it decides whether a frightened
+ * person gets a stop screen.
+ *
+ * The rule that does the work: a signal claimed without a verbatim quote is
+ * an inference, and inferences do not get to fire the interrupt. They are
+ * dropped here, before `decideInterrupt` ever sees them.
+ */
+export function validateActiveScam(raw: unknown): Extraction["active_scam"] {
+  const activeRaw = (raw ?? {}) as Record<string, unknown>;
+
+  const signal = (key: string) => {
+    const s = activeRaw[key] as { present?: unknown; evidence?: unknown } | undefined;
+    const present = s?.present === true;
+    const evidence = typeof s?.evidence === "string" ? s.evidence.trim() : "";
+    if (present && evidence === "") return emptySignal;
+    return { present, evidence: present ? evidence : "" };
+  };
+
+  const verdictRaw = String((activeRaw as { verdict?: unknown }).verdict ?? "").toUpperCase();
+  const verdict =
+    verdictRaw === "ACTIVE" || verdictRaw === "ENDED" || verdictRaw === "UNCLEAR"
+      ? (verdictRaw as "ACTIVE" | "UNCLEAR" | "ENDED")
+      : "UNCLEAR";
+
+  return {
+    remote_access_app: signal("remote_access_app"),
+    screen_sharing: signal("screen_sharing"),
+    caller_on_line: signal("caller_on_line"),
+    verification_transfer_requested: signal("verification_transfer_requested"),
+    told_to_tell_nobody: signal("told_to_tell_nobody"),
+    verdict,
+  };
+}
+
+/**
  * Run the model's raw extraction through every shape and confidence check.
  * Returns the cleaned extraction plus a record of everything that was thrown
  * away and why — the receipt shows this, because a packet with stated holes is
@@ -191,23 +231,6 @@ export function validateExtraction(raw: unknown): ValidationResult {
   const downgrades: Downgrade[] = [];
 
   const field = (key: string) => validateField(key, input[key], downgrades);
-
-  const activeRaw = (raw as { active_scam?: Record<string, unknown> })?.active_scam ?? {};
-  const signal = (key: string) => {
-    const s = activeRaw[key] as { present?: unknown; evidence?: unknown } | undefined;
-    const present = s?.present === true;
-    const evidence = typeof s?.evidence === "string" ? s.evidence.trim() : "";
-    // A signal without a quote is an inference, and inferences do not get to
-    // fire the interrupt. Drop it.
-    if (present && evidence === "") return emptySignal;
-    return { present, evidence: present ? evidence : "" };
-  };
-
-  const verdictRaw = String((activeRaw as { verdict?: unknown }).verdict ?? "").toUpperCase();
-  const verdict =
-    verdictRaw === "ACTIVE" || verdictRaw === "ENDED" || verdictRaw === "UNCLEAR"
-      ? (verdictRaw as "ACTIVE" | "UNCLEAR" | "ENDED")
-      : "UNCLEAR";
 
   const summaryRaw = (raw as { summary?: unknown })?.summary;
 
@@ -235,14 +258,9 @@ export function validateExtraction(raw: unknown): ValidationResult {
       "OTHER",
       downgrades,
     ),
-    active_scam: {
-      remote_access_app: signal("remote_access_app"),
-      screen_sharing: signal("screen_sharing"),
-      caller_on_line: signal("caller_on_line"),
-      verification_transfer_requested: signal("verification_transfer_requested"),
-      told_to_tell_nobody: signal("told_to_tell_nobody"),
-      verdict,
-    },
+    active_scam: validateActiveScam(
+      (raw as { active_scam?: unknown })?.active_scam,
+    ),
     summary: typeof summaryRaw === "string" ? summaryRaw.trim() : "",
   };
 

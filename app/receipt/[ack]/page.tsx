@@ -23,6 +23,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
 
   const [packet, setPacket] = useState<FreezePacket | null>(null);
   const [missing, setMissing] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,12 +76,32 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
         </h1>
       </div>
 
-      <section className="rounded-xl border border-line bg-surface p-4 sm:p-5">
-        <h2 className="text-sm font-medium text-muted">{copy.receipt.ack}</h2>
-        <p className="mt-1 font-mono text-3xl font-semibold tracking-wider sm:text-4xl">
-          {packet.ack}
-        </p>
-        <p className="mt-1 text-sm text-muted">{copy.receipt.ackHint}</p>
+      <section className="card">
+        <h2 className="eyebrow">{copy.receipt.ack}</h2>
+
+        {/* "Write this down" is the instruction, and a copy button is the
+            fastest way to obey it on the device it is already on. It is beside
+            the number rather than under it so the number stays the largest
+            thing on the screen. */}
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <p className="font-mono text-3xl font-semibold tracking-wider sm:text-4xl">
+            {packet.ack}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard
+                ?.writeText(packet.ack)
+                .then(() => setCopied(true))
+                .catch(() => setCopied(false));
+            }}
+            className="min-h-11 rounded-lg border border-line bg-raised px-3 text-sm text-muted transition-colors hover:border-line-strong hover:bg-raised-hover hover:text-text"
+          >
+            {copied ? copy.receipt.ackCopied : copy.receipt.ackCopy}
+          </button>
+        </div>
+
+        <p className="mt-1.5 text-sm text-muted">{copy.receipt.ackHint}</p>
 
         <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 border-t border-line pt-4 text-sm">
           {seconds && (
@@ -104,7 +125,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
       {/* Sent with holes in it, and says so. This is the product's argument in
           one block: a stated gap is safer than a confident guess. */}
       {blanks.length > 0 && (
-        <section className="rounded-xl border border-line bg-surface p-4 sm:p-5">
+        <section className="card">
           <h2 className="text-base font-medium">{copy.receipt.missing}</h2>
           <ul className="mt-2 flex flex-wrap gap-2">
             {blanks.map((entry) => (
@@ -120,13 +141,13 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
         </section>
       )}
 
-      <section className="rounded-xl border border-line-strong bg-raised p-4 sm:p-5">
+      <section className="card-strong">
         <h2 className="text-base font-semibold">{copy.receipt.realHeading}</h2>
         <p className="mt-1 text-sm leading-relaxed">{copy.receipt.realBody}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <a
             href="tel:1930"
-            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm no-underline"
+            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm no-underline transition-colors hover:bg-raised-hover"
           >
             {copy.receipt.call}
           </a>
@@ -134,7 +155,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
             href="https://cybercrime.gov.in"
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm no-underline"
+            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm no-underline transition-colors hover:bg-raised-hover"
           >
             {copy.receipt.portal}
           </a>

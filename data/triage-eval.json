@@ -1,0 +1,138 @@
+{
+  "note": "Labelled cases for the interrupt gate. Every case is synthetic and written for this file: no real transaction IDs, UPI handles, phone numbers, or personal data appears anywhere. COMPLETED means the incident is over and the interrupt must NOT fire; ACTIVE means the attack is happening now and it should. The COMPLETED set is deliberately weighted toward the adversarial shape — past-tense narratives that name remote access, a live-sounding call, or an instruction to stay quiet — because that is where a keyword-matching classifier false-positives and where the cost of firing is highest. Run it with `npm run eval`.",
+  "metric": "False-positive rate = COMPLETED cases where the interrupt fires, over all COMPLETED cases. A missed interrupt costs one person an extra nudge; a false one, repeated, trains everyone to dismiss the real ones.",
+  "cases": [
+    {
+      "id": "completed-plain-upi",
+      "label": "COMPLETED",
+      "why": "The ordinary case. Nothing to trip on.",
+      "text": "I paid for a sofa on a marketplace listing yesterday evening and the seller stopped replying after the money went through. The listing is gone now."
+    },
+    {
+      "id": "completed-anydesk-uninstalled",
+      "label": "COMPLETED",
+      "why": "Names a remote-access app, but past tense and explicitly removed. The single most important non-firing case.",
+      "text": "Two days ago someone claiming to be from my bank's fraud team got me to install AnyDesk so he could check my account. I uninstalled it the same night and changed my UPI PIN. I am only reporting it now because I saw the debit on my statement."
+    },
+    {
+      "id": "completed-call-ended",
+      "label": "COMPLETED",
+      "why": "A call is described at length, but it ended. 'He called' is not 'he is calling'.",
+      "text": "He called me three times last week saying my electricity would be disconnected and I panicked and paid. I have blocked the number since and he has not called again."
+    },
+    {
+      "id": "completed-told-nobody-then-told",
+      "label": "COMPLETED",
+      "why": "The isolation instruction is present but was broken. told_to_tell_nobody is a soft signal and must never fire alone.",
+      "text": "The caller told me it was a confidential investigation and that discussing it with anyone would be an offence. I told my daughter anyway an hour later and she said it was a scam. That was on Saturday."
+    },
+    {
+      "id": "completed-screen-share-over",
+      "label": "COMPLETED",
+      "why": "Screen sharing happened, in the past, on a device now powered off.",
+      "text": "I shared my screen with a man who said he was from the income tax department. The transfer went out during that call. I switched the phone off afterwards and my son has factory reset it for me."
+    },
+    {
+      "id": "completed-investment-app",
+      "label": "COMPLETED",
+      "why": "Investment scam, no live contact.",
+      "text": "I put money into a trading app that a group on a messaging app recommended. The app showed profits but when I tried to withdraw it asked for a tax deposit. I stopped there and have not paid anything more."
+    },
+    {
+      "id": "completed-job-task-scam",
+      "label": "COMPLETED",
+      "why": "Task scam with an escalating-payment pattern, but the user has already disengaged.",
+      "text": "A work-from-home task group asked me to prepay for higher-commission tasks. I paid twice and then realised and left the group last Thursday."
+    },
+    {
+      "id": "completed-otp-shared",
+      "label": "COMPLETED",
+      "why": "OTP vishing, concluded. No present-tense contact.",
+      "text": "Someone rang saying my card was blocked and read out my card number to prove it, then asked for the OTP. I gave it. The money left immediately. That was on Monday morning."
+    },
+    {
+      "id": "completed-loan-app-harassment",
+      "label": "COMPLETED",
+      "why": "Ongoing harassment is not an ongoing scam. This is the hardest COMPLETED case: something is genuinely still happening, but not the thing the interrupt is for.",
+      "text": "I took a small loan from an app and now they are messaging my contacts and threatening me every day. I have not paid them anything since the first repayment."
+    },
+    {
+      "id": "completed-will-call-back",
+      "label": "COMPLETED",
+      "why": "A future call is not a live call. Tests present-tense discipline directly.",
+      "text": "He said he would call me back tomorrow morning to complete the verification. I have decided not to pick up. The transfer I already made was on Tuesday night."
+    },
+    {
+      "id": "completed-romance",
+      "label": "COMPLETED",
+      "why": "Long relationship, no live coercion at the time of reporting.",
+      "text": "I was sending money to someone I met online over about four months, for a customs fee on a parcel that never arrived. I stopped contact when my brother looked at the messages."
+    },
+    {
+      "id": "completed-delivery-fraud",
+      "label": "COMPLETED",
+      "why": "Simple e-commerce fraud, no social attack at all.",
+      "text": "I paid a delivery charge on a link sent by SMS for a parcel I was not expecting. The site looked like a courier company. The money went out about six hours ago."
+    },
+    {
+      "id": "completed-quotes-the-scammer",
+      "label": "COMPLETED",
+      "why": "Quotes the scammer's present-tense words inside a past-tense report. A model that quotes without reading tense will fire here.",
+      "text": "He kept saying 'stay on the line, do not disconnect, the verification is in progress' and I believed him. That was yesterday afternoon. I hung up eventually and have not heard from him since."
+    },
+    {
+      "id": "completed-bank-already-called",
+      "label": "COMPLETED",
+      "why": "A live call exists, but with the real bank. Tests whether 'on a call' is scoped to the attacker.",
+      "text": "I am on hold with my bank's helpline right now about a debit I did not authorise last night. They told me to file a report online as well, so I am doing that while I wait."
+    },
+    {
+      "id": "active-digital-arrest",
+      "label": "ACTIVE",
+      "why": "The canonical hostage case: live call, remote access, isolation instruction, further transfer demanded.",
+      "text": "A man saying he is from the CBI is on the call with me right now. He says there is a case against me and that I must not tell anyone because it is confidential. He made me install a support app on my phone to verify my account and he is telling me to transfer more to clear my name."
+    },
+    {
+      "id": "active-screen-shared-now",
+      "label": "ACTIVE",
+      "why": "Present-tense screen sharing, explicit.",
+      "text": "My screen is being shared with him at this moment through an app he told me to download. He is walking me through my banking app and I do not know how to stop it."
+    },
+    {
+      "id": "active-still-on-line",
+      "label": "ACTIVE",
+      "why": "Live call plus a verification transfer request. No remote access.",
+      "text": "He is still on the phone with me and is asking me to send one more payment to verify the account before the refund can be released. I have already sent money twice."
+    },
+    {
+      "id": "active-remote-app-running",
+      "label": "ACTIVE",
+      "why": "Remote access live, call ended. Tests that a single hard signal is enough.",
+      "text": "The support app he told me to install is still running on my laptop and I can see the cursor moving on its own. He hung up but the screen is still doing things."
+    },
+    {
+      "id": "active-verification-transfer",
+      "label": "ACTIVE",
+      "why": "Verification-transfer demand in progress, isolation reinforced.",
+      "text": "They are messaging me now saying the account is frozen and I have to deposit a clearance fee within thirty minutes to release my own money. They keep telling me not to discuss it with my family."
+    },
+    {
+      "id": "active-police-impersonation-video",
+      "label": "ACTIVE",
+      "why": "Live video call, present tense, explicit instruction to stay connected.",
+      "text": "There is a video call open on my phone right now with a man in a police uniform in front of a station backdrop. He says I cannot end the call or leave the room until the verification is finished."
+    },
+    {
+      "id": "active-mid-transfer",
+      "label": "ACTIVE",
+      "why": "The interrupt's whole reason for existing: it can stop the next transfer.",
+      "text": "I am filling in the transfer screen right now because he is telling me to. He says this last one will unblock everything. Something feels wrong."
+    },
+    {
+      "id": "active-teamviewer-and-otp",
+      "label": "ACTIVE",
+      "why": "Remote access live plus an OTP being requested. Two hard signals.",
+      "text": "He is connected to my phone through TeamViewer as I type this and he is asking me to read out the code that just arrived by SMS."
+    }
+  ]
+}

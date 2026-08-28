@@ -1,258 +1,219 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useRef, useState } from "react";
-import { DecayMeter } from "@/components/DecayMeter";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useJourney } from "@/components/JourneyProvider";
-import { useDictation } from "@/components/useDictation";
-import { FIXTURES } from "@/lib/fixtures";
-import { prepareImage, type PreparedImage } from "@/lib/image";
 
 /**
- * The intake. There is no landing page — this is the first screen.
+ * The landing page.
  *
- * Three ways in, whichever is fastest for the person: a screenshot, a pasted
- * SMS, or one sentence typed or spoken. The clock starts on their first
- * interaction, not on page load, and the meter is already visible so what is
- * at stake is legible before they have done anything.
+ * This screen did not exist for most of the project's life, and the reason it
+ * did not is written into the intake: someone whose money has just left their
+ * account does not need a pitch, they need a text box. That is still true, and
+ * it is why the first tappable thing here is the report itself and why the real
+ * emergency routes — 1930, cybercrime.gov.in — sit above every word of
+ * explanation rather than under it.
+ *
+ * What the argument needs is the other audience: anyone who opens this cold and
+ * cannot tell from an input field why a form was rebuilt. The sequence is the
+ * whole idea, so the sequence is what gets drawn.
+ *
+ * The palette rule from globals.css holds here. This page is monochrome except
+ * for one amber node — the first step, the one with the clock on it. Nothing
+ * else is allowed colour, because nothing else here matters in the way the
+ * meter and the interrupt do.
  */
 
-type Status = "idle" | "reading" | "failed";
+type Timings = { count: number; median_ms: number | null };
 
-function Intake() {
-  const router = useRouter();
-  const params = useSearchParams();
-  const { copy, lang, markStart, setState, reset } = useJourney();
+export default function LandingPage() {
+  const { copy } = useJourney();
+  const landing = copy.landing;
 
-  const [text, setText] = useState("");
-  const [image, setImage] = useState<PreparedImage | null>(null);
-  const [status, setStatus] = useState<Status>("idle");
-  const [error, setError] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
+  /**
+   * The headline number, read from the same endpoint /evidence uses.
+   *
+   * It is here because a landing page claiming sixty seconds while the evidence
+   * page reads "not yet measured" would be the product contradicting itself on
+   * its own front door. Whatever the real distribution says is what this says,
+   * including when it says nothing.
+   */
+  const [timings, setTimings] = useState<Timings | null>(null);
 
-  const demo = params.get("demo") === "1";
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/timings")
+      .then((response) => response.json())
+      .then((result) => !cancelled && result.ok && setTimings(result))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const dictation = useDictation(lang, (transcript) => {
-    markStart();
-    setText((current) => (current ? `${current} ${transcript}` : transcript));
-  });
-
-  const pickFile = useCallback(
-    async (file: File | undefined) => {
-      if (!file) return;
-      markStart();
-      setError(null);
-
-      if (!file.type.startsWith("image/")) {
-        setError(copy.errors.badType);
-        return;
-      }
-
-      const prepared = await prepareImage(file);
-      if (prepared.bytes > 3_500_000) {
-        setError(copy.errors.tooLarge);
-        return;
-      }
-      setImage(prepared);
-    },
-    [copy.errors.badType, copy.errors.tooLarge, markStart],
-  );
-
-  const submit = useCallback(
-    async (fixtureId?: string) => {
-      markStart();
-      setStatus("reading");
-      setError(null);
-
-      try {
-        const response = await fetch("/api/extract", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(
-            fixtureId ? { fixture: fixtureId } : { text, image: image ?? undefined },
-          ),
-        });
-
-        const result = await response.json();
-
-        if (!result.ok) {
-          // Designed-for path: hand them the form rather than an error page,
-          // with everything blank and the clock still running.
-          setStatus("failed");
-          setError(
-            result.reason === "timeout"
-              ? copy.errors.timeout
-              : result.reason === "image_too_large"
-                ? copy.errors.tooLarge
-                : result.reason === "unsupported_image_type"
-                  ? copy.errors.badType
-                  : copy.errors.unreadable,
-          );
-          return;
-        }
-
-        setState({
-          extraction: result.extraction,
-          downgrades: result.downgrades ?? [],
-          interrupt: result.interrupt ?? null,
-          source: result.source,
-          corrected: [],
-          interruptShown: false,
-        });
-
-        router.push(result.interrupt?.fires ? "/interrupt" : "/confirm");
-      } catch {
-        setStatus("failed");
-        setError(copy.errors.network);
-      }
-    },
-    [copy.errors, image, markStart, router, setState, text],
-  );
-
-  const manual = useCallback(() => {
-    markStart();
-    reset();
-    setState({ extraction: null, source: "manual" });
-    router.push("/confirm");
-  }, [markStart, reset, router, setState]);
-
-  const busy = status === "reading";
-  const canSubmit = Boolean(text.trim() || image);
+  const median =
+    timings && timings.count > 0 && timings.median_ms !== null
+      ? `${(timings.median_ms / 1000).toFixed(1)}${copy.common.seconds}`
+      : null;
 
   return (
-    <div className="flex flex-col gap-5">
-      <DecayMeter occurredAt={null} lang={lang} />
+    <div className="flex flex-col gap-10 pb-6">
+      {/* ---------------------------------------------------------------- */}
 
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          {copy.intake.heading}
+      <section>
+        <p className="eyebrow">{landing.eyebrow}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-5xl">
+          {landing.heading}
         </h1>
-        <p className="mt-1 text-muted">{copy.intake.sub}</p>
-      </div>
+        <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">{landing.sub}</p>
 
-      {/* 1 — the screenshot */}
-      <div>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={(event) => void pickFile(event.target.files?.[0])}
-        />
-
-        {image ? (
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3">
-            <span className="text-sm">{copy.intake.imageReady}</span>
-            <button
-              type="button"
-              onClick={() => setImage(null)}
-              className="min-h-11 px-2 text-sm text-muted underline underline-offset-2"
-            >
-              {copy.intake.remove}
-            </button>
+        <div className="mt-6 flex flex-col gap-2">
+          <Link href="/start" className="btn-primary">
+            {landing.start}
+          </Link>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link href="/start?demo=1" className="btn-secondary">
+              {landing.demo}
+            </Link>
+            <Link href="/evidence" className="btn-secondary">
+              {landing.evidence}
+            </Link>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => fileInput.current?.click()}
-            className="flex min-h-16 w-full flex-col items-start justify-center rounded-lg border border-dashed border-line-strong bg-surface px-4 py-3 text-left"
-          >
-            <span className="text-base font-medium">{copy.intake.upload}</span>
-            <span className="text-sm text-muted">{copy.intake.uploadHint}</span>
-          </button>
-        )}
-        <p className="mt-1.5 text-xs text-faint">{copy.intake.uploadNote}</p>
-      </div>
-
-      {/* 2 and 3 — the paste, and the sentence */}
-      <div>
-        <label htmlFor="account" className="text-base font-medium">
-          {copy.intake.paste}
-        </label>
-        <textarea
-          id="account"
-          value={text}
-          onChange={(event) => {
-            markStart();
-            setText(event.target.value);
-          }}
-          onPaste={markStart}
-          rows={4}
-          placeholder={copy.intake.placeholder}
-          className="field-input mt-1.5 resize-y"
-        />
-
-        {dictation.supported && (
-          <button
-            type="button"
-            onClick={dictation.toggle}
-            aria-pressed={dictation.listening}
-            className={`mt-2 min-h-11 rounded-lg border px-4 text-sm ${
-              dictation.listening
-                ? "border-mark bg-raised text-text"
-                : "border-line bg-surface text-muted"
-            }`}
-          >
-            {dictation.listening ? copy.intake.dictating : copy.intake.dictate}
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <p role="alert" className="rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm">
-          {error}
-        </p>
-      )}
-
-      <div className="flex flex-col gap-2">
-        <button
-          type="button"
-          disabled={!canSubmit || busy}
-          onClick={() => void submit()}
-          className="btn-primary"
-        >
-          {busy ? copy.intake.reading : copy.intake.submit}
-        </button>
-
-        <button
-          type="button"
-          onClick={manual}
-          className="min-h-11 text-sm text-muted underline underline-offset-2"
-        >
-          {copy.intake.skip}
-        </button>
-      </div>
-
-      {/* Demo mode. Cached cases so a dead venue connection cannot take the
-          pitch down with it. Never shown unless explicitly asked for. */}
-      {demo && (
-        <div className="rounded-lg border border-line bg-surface p-4">
-          <h2 className="text-sm font-medium text-muted">{copy.intake.demo}</h2>
-          <ul className="mt-2 flex flex-col gap-2">
-            {FIXTURES.map((fixture) => (
-              <li key={fixture.id}>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void submit(fixture.id)}
-                  className="min-h-11 w-full rounded-md border border-line bg-raised px-3 py-2 text-left disabled:opacity-40"
-                >
-                  <span className="block text-sm font-medium">{fixture.label}</span>
-                  <span className="block text-xs text-muted">{fixture.purpose}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
-      )}
-    </div>
-  );
-}
+      </section>
 
-export default function Page() {
-  return (
-    <Suspense fallback={null}>
-      <Intake />
-    </Suspense>
+      {/* The real routes, above the explanation rather than under it. Someone in
+          the middle of a fraud is the one person this page cannot help. */}
+      <section className="card-strong">
+        <h2 className="text-base font-semibold">{landing.urgentHeading}</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{landing.urgentBody}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a
+            href="tel:1930"
+            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm font-medium no-underline transition-colors hover:bg-raised-hover"
+          >
+            {copy.receipt.call}
+          </a>
+          <a
+            href="https://cybercrime.gov.in"
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-12 items-center rounded-lg border border-line bg-surface px-4 text-sm font-medium no-underline transition-colors hover:bg-raised-hover"
+          >
+            {copy.receipt.portal}
+          </a>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+
+      <section>
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          {landing.howHeading}
+        </h2>
+
+        {/* A rail rather than three cards: the point is that these happen in an
+            order, and three cards side by side say "three features" instead. */}
+        <ol className="mt-5 flex flex-col">
+          {landing.steps.map((step, index) => {
+            const first = index === 0;
+            const last = index === landing.steps.length - 1;
+
+            return (
+              <li key={step.title} className="relative flex gap-4 pb-7 last:pb-0">
+                {!last && (
+                  <span
+                    aria-hidden
+                    className="absolute bottom-0 left-4 top-9 w-px -translate-x-1/2 bg-line"
+                  />
+                )}
+
+                <span
+                  aria-hidden
+                  className={`z-10 flex size-8 shrink-0 items-center justify-center rounded-full border font-mono text-sm ${
+                    // The clock lives on step one, so the mark colour does too.
+                    first
+                      ? "border-mark bg-mark-track text-text"
+                      : "border-line bg-surface text-muted"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <h3 className="text-lg font-medium">{step.title}</h3>
+                    <span
+                      className={`rounded border px-1.5 py-0.5 text-xs ${
+                        first ? "border-mark text-mark" : "border-line text-faint"
+                      }`}
+                    >
+                      {step.aside}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{step.body}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+
+      <section>
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          {landing.whyHeading}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{landing.whyBody}</p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="card">
+            <p className="eyebrow">{landing.whyBank}</p>
+            <p className="mt-2 text-sm leading-relaxed">{landing.whyBankBody}</p>
+          </div>
+          <div className="card">
+            <p className="eyebrow">{landing.whyCase}</p>
+            <p className="mt-2 text-sm leading-relaxed">{landing.whyCaseBody}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+
+      <section>
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          {landing.measuredHeading}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{landing.measuredBody}</p>
+
+        <Link
+          href="/evidence"
+          className="card card-interactive mt-4 flex items-center justify-between gap-4 no-underline"
+        >
+          <div className="min-w-0">
+            <p className="text-xs text-muted">{landing.measuredMedian}</p>
+            <p className="mt-0.5 text-2xl font-semibold tabular-nums">
+              {median ?? (
+                <span className="text-lg font-medium text-faint">{landing.measuredNone}</span>
+              )}
+            </p>
+            {timings && timings.count > 0 && (
+              <p className="mt-0.5 text-xs text-faint">{landing.measuredRuns(timings.count)}</p>
+            )}
+          </div>
+          <span aria-hidden className="shrink-0 text-muted">
+            →
+          </span>
+        </Link>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+
+      <section className="card-strong">
+        <h2 className="text-base font-semibold">{landing.honestHeading}</h2>
+        <p className="mt-2 text-sm leading-relaxed">{landing.honestBody}</p>
+      </section>
+    </div>
   );
 }

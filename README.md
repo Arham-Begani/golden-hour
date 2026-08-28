@@ -21,8 +21,8 @@ Golden Hour splits the report in two and sends the urgent half first.
 CFCFRMS connection. Nothing sent here reaches a bank, a police force, or any government
 system. This is a prototype of a *sequence*.
 
-That distinction is stated on the product itself — in the header of every screen and
-again on the receipt — not buried here.
+That distinction is stated on the product itself — in the header of every screen, on the
+landing page, and again on the receipt — not buried here.
 
 **It is not a government service and must never be able to be mistaken for one.** No
 emblem, no national colours, no `.gov.in` styling. Every screen carries the prototype
@@ -38,8 +38,9 @@ cp .env.example .env.local     # add GEMINI_API_KEY
 npm run dev
 ```
 
-Open `http://localhost:3000`. Add `?demo=1` for the four cached demo cases, which work
-with no API key and no network.
+Open `http://localhost:3000` for the landing page, which explains the sequence and links
+into the report. The report itself is `/start`; `/start?demo=1` adds the four cached demo
+cases, which work with no API key and no network.
 
 Check `http://localhost:3000/api/health` — it reports `deploy_ready` and names anything
 missing. `?live=1` runs a real extraction end to end.
@@ -60,6 +61,8 @@ Vercel project environment.
 
 | Piece | File | What it does |
 |---|---|---|
+| Landing | `app/page.tsx` | What this is and why it is sequenced this way. Links into the report |
+| Intake | `app/start/page.tsx` | The first screen of the report. The clock starts on first interaction here |
 | Extraction schema | `lib/schema.ts` | Zod, single source of truth for model output, validation and types |
 | Gemini schema | `lib/gemini-schema.ts` | Converts JSON Schema to Gemini's OpenAPI subset |
 | Extraction | `lib/extract.ts` | One call returns the freeze fields *and* the interrupt signals |
@@ -147,6 +150,11 @@ None of these may be filled in by a model.
    every Hindi screen rather than only here. Do not have a model "improve" it: an
    unreviewed translation labelled as such is honest; one polished into greater confidence
    is not.
+
+   The landing-page block (`landing`, `nav`, `footer`) was written later and by a model,
+   so it is unreviewed in exactly the same way and is covered by the same on-screen
+   notice. It is the least urgent copy on the site to get checked — nobody acts on a
+   landing page — but it is the first thing a Hindi-speaking visitor reads.
 
 [`CITATIONS.md`](./CITATIONS.md) records the recovery-curve research and how it was
 resolved.

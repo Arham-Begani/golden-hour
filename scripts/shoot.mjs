@@ -37,8 +37,9 @@ const VIEWPORT = { width: 360, height: 780, deviceScaleFactor: 2, isMobile: true
 const PAGES = process.env.GH_PAGES
   ? JSON.parse(process.env.GH_PAGES)
   : [
-      ["intake", "/"],
-      ["intake-demo", "/?demo=1"],
+      ["landing", "/"],
+      ["intake", "/start"],
+      ["intake-demo", "/start?demo=1"],
       ["confirm", "/confirm"],
       ["evidence", "/evidence"],
     ];

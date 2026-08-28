@@ -49,6 +49,74 @@ const en = {
     full: "Prototype. Not affiliated with I4C, NCRP or cybercrime.gov.in. Nothing here freezes anyone's money.",
   },
 
+  /**
+   * The landing page.
+   *
+   * The intake used to be the first screen, on the reasoning that anyone who
+   * arrives already knows why they are here. That is true of the person the
+   * product is for and false of everyone else who opens it — and the argument
+   * this thing is making is not self-evident from a text box. So the sequence
+   * gets explained once, here, and the report is one tap away at the top of
+   * the page rather than behind the explanation.
+   */
+  landing: {
+    eyebrow: "Cyber fraud reporting, re-sequenced",
+    heading: "Send the bank the five facts first.",
+    sub: "The national portal asks for about fifty facts before it takes one. A bank needs a handful of them to place a hold, and it needs them while the money is still in the first account. Golden Hour sends that half first and collects the rest afterwards.",
+    start: "Start a report",
+    demo: "Walk through a demo case",
+    evidence: "Read the claim and its limits",
+
+    urgentHeading: "If money has just left your account",
+    urgentBody: "This prototype cannot help you. Call 1930 — the national cyber fraud helpline — or file at cybercrime.gov.in.",
+
+    howHeading: "How it goes",
+    steps: [
+      {
+        title: "Give whatever is fastest",
+        body: "A screenshot of the debit alert, a pasted SMS, or one spoken sentence. It is read into nine fields for the bank. Not one of them is required.",
+        aside: "Target: under a minute",
+      },
+      {
+        title: "Send, and get a number",
+        body: "The packet goes with its holes in it, and the holes are named. A wrong reference number sends a bank after the wrong account; a blank one does not.",
+        aside: "Acknowledgement",
+      },
+      {
+        title: "Then the unhurried half",
+        body: "The statement, your details, the suspect — everything the investigation needs, attached to that number. No clock on this half.",
+        aside: "No deadline",
+      },
+    ],
+
+    whyHeading: "Why it is split",
+    whyBody: "The bank and the investigation want different things at different speeds. A hold has to be placed before the money moves onward. A case file can be built over weeks. One form asking for both at once runs the whole thing at the speed of the slower half.",
+    whyBank: "The freeze needs",
+    whyBankBody: "Amount, where it went, the reference, your bank, when. Minutes matter.",
+    whyCase: "The case needs",
+    whyCaseBody: "Statement, identity, address, suspect details, prior reports. Weeks are fine.",
+
+    honestHeading: "What this is not",
+    honestBody: "It is not a government service and it freezes nothing. There is no bank integration and no CFCFRMS connection — nothing sent here reaches a bank, a police force or any government system. It is a prototype of a sequence, and the sequence is the argument.",
+
+    measuredHeading: "Measured, not asserted",
+    measuredBody: "Every dispatch is timed and the whole distribution is published, slow runs included. Demo replays are counted separately and never mixed in. Where a figure could not be traced to a source, it is left empty and the page says why.",
+    measuredMedian: "Median time to dispatch",
+    measuredNone: "Not yet measured",
+    measuredRuns: (n: number) => `${n} recorded ${n === 1 ? "run" : "runs"}`,
+  },
+
+  nav: {
+    start: "Report",
+    about: "What this is",
+  },
+
+  footer: {
+    what: "What this is",
+    real: "The real routes",
+    source: "How it works",
+  },
+
   intake: {
     heading: "What happened?",
     sub: "Give whatever is fastest. One of these is enough.",
@@ -57,7 +125,8 @@ const en = {
     uploadNote: "The image is read and discarded. It is never stored.",
     imageReady: "Screenshot attached",
     remove: "Remove",
-    paste: "Or paste the SMS, or type one sentence",
+    or: "or",
+    paste: "Paste the SMS, or type one sentence",
     placeholder: "Rs 12,500 debited to a UPI ID I don't recognise…",
     dictate: "Dictate",
     dictating: "Listening — tap to stop",
@@ -165,6 +234,8 @@ const en = {
     heading: "Freeze request sent",
     ack: "Acknowledgement number",
     ackHint: "Write this down. Everything else attaches to it.",
+    ackCopy: "Copy",
+    ackCopied: "Copied",
     elapsed: "Time taken",
     sentWith: "Sent with",
     ofFields: (sent: number, total: number) => `${sent} of ${total} fields`,
@@ -241,6 +312,64 @@ const hi: Dict = {
     full: "यह एक प्रोटोटाइप है। I4C, NCRP या cybercrime.gov.in से इसका कोई संबंध नहीं है। यह किसी का पैसा फ़्रीज़ नहीं करता।",
   },
 
+  landing: {
+    eyebrow: "साइबर धोखाधड़ी की रिपोर्ट, नए क्रम में",
+    heading: "बैंक को ज़रूरी बातें पहले भेजिए।",
+    sub: "राष्ट्रीय पोर्टल एक भी बात लेने से पहले लगभग पचास बातें पूछता है। बैंक को रोक लगाने के लिए इनमें से गिनी-चुनी चाहिए, और वह भी तब तक जब तक पैसा पहले खाते में है। गोल्डन आवर पहले वही आधा हिस्सा भेजता है, बाक़ी बाद में लेता है।",
+    start: "रिपोर्ट शुरू करें",
+    demo: "डेमो केस देखें",
+    evidence: "दावा और उसकी सीमाएँ पढ़ें",
+
+    urgentHeading: "अगर अभी-अभी आपके खाते से पैसा गया है",
+    urgentBody: "यह प्रोटोटाइप आपकी मदद नहीं कर सकता। 1930 पर कॉल कीजिए — राष्ट्रीय साइबर धोखाधड़ी हेल्पलाइन — या cybercrime.gov.in पर शिकायत दर्ज कीजिए।",
+
+    howHeading: "यह इस तरह चलता है",
+    steps: [
+      {
+        title: "जो सबसे तेज़ हो वही दीजिए",
+        body: "डेबिट अलर्ट का स्क्रीनशॉट, पेस्ट किया हुआ SMS, या बोला हुआ एक वाक्य। इसे पढ़कर बैंक के लिए नौ जानकारियाँ निकाली जाती हैं। इनमें से कोई भी अनिवार्य नहीं है।",
+        aside: "लक्ष्य: एक मिनट से कम",
+      },
+      {
+        title: "भेजिए, और नंबर लीजिए",
+        body: "पैकेट अपनी ख़ाली जगहों के साथ जाता है, और वे ख़ाली जगहें बताई जाती हैं। ग़लत रेफ़रेंस नंबर बैंक को ग़लत खाते के पीछे भेज देता है; ख़ाली जगह नहीं भेजती।",
+        aside: "पावती संख्या",
+      },
+      {
+        title: "फिर बिना जल्दबाज़ी वाला हिस्सा",
+        body: "बयान, आपकी जानकारी, आरोपी का विवरण — जाँच के लिए जो चाहिए, वह सब उसी नंबर से जुड़ जाता है। इस हिस्से पर कोई घड़ी नहीं।",
+        aside: "कोई समय-सीमा नहीं",
+      },
+    ],
+
+    whyHeading: "इसे दो हिस्सों में क्यों बाँटा गया",
+    whyBody: "बैंक और जाँच, दोनों को अलग चीज़ें और अलग रफ़्तार चाहिए। रोक तब लगनी है जब तक पैसा आगे न बढ़े। केस फ़ाइल हफ़्तों में बन सकती है। एक ही फ़ॉर्म में दोनों माँगने से पूरा काम धीमे आधे हिस्से की रफ़्तार से चलता है।",
+    whyBank: "रोक लगाने के लिए",
+    whyBankBody: "रकम, पैसा कहाँ गया, रेफ़रेंस, आपका बैंक, कब हुआ। यहाँ मिनट मायने रखते हैं।",
+    whyCase: "जाँच के लिए",
+    whyCaseBody: "बयान, पहचान, पता, आरोपी का विवरण, पहले की शिकायतें। यहाँ हफ़्ते चल जाते हैं।",
+
+    honestHeading: "यह क्या नहीं है",
+    honestBody: "यह कोई सरकारी सेवा नहीं है और यह कुछ भी फ़्रीज़ नहीं करता। किसी बैंक से जुड़ाव नहीं है, CFCFRMS से जुड़ाव नहीं है — यहाँ से भेजी कोई चीज़ किसी बैंक, पुलिस या सरकारी सिस्टम तक नहीं जाती। यह एक क्रम का प्रोटोटाइप है, और वही क्रम इसका तर्क है।",
+
+    measuredHeading: "दावा नहीं, माप",
+    measuredBody: "हर भेजे गए पैकेट का समय मापा जाता है और पूरा आँकड़ा दिखाया जाता है, धीमे रन भी। डेमो रन अलग गिने जाते हैं और कभी इनमें नहीं मिलाए जाते। जिस आँकड़े का कोई स्रोत नहीं मिला, उसे ख़ाली छोड़ा गया है और वजह लिखी गई है।",
+    measuredMedian: "भेजने में लगा औसत समय",
+    measuredNone: "अभी मापा नहीं गया",
+    measuredRuns: (n: number) => `${n} दर्ज रन`,
+  },
+
+  nav: {
+    start: "रिपोर्ट",
+    about: "यह क्या है",
+  },
+
+  footer: {
+    what: "यह क्या है",
+    real: "असली रास्ते",
+    source: "यह कैसे काम करता है",
+  },
+
   intake: {
     heading: "क्या हुआ?",
     sub: "जो सबसे तेज़ हो वही दीजिए। इनमें से एक ही काफ़ी है।",
@@ -249,7 +378,8 @@ const hi: Dict = {
     uploadNote: "तस्वीर पढ़कर हटा दी जाती है। कहीं सेव नहीं होती।",
     imageReady: "स्क्रीनशॉट जुड़ गया",
     remove: "हटाएँ",
-    paste: "या SMS पेस्ट करें, या एक वाक्य लिखें",
+    or: "या",
+    paste: "SMS पेस्ट करें, या एक वाक्य लिखें",
     placeholder: "एक अनजान UPI आईडी पर 12,500 रुपये कट गए…",
     dictate: "बोलकर लिखें",
     dictating: "सुन रहे हैं — रोकने के लिए दबाएँ",
@@ -351,6 +481,8 @@ const hi: Dict = {
     heading: "फ़्रीज़ अनुरोध भेजा गया",
     ack: "पावती संख्या",
     ackHint: "इसे लिख लीजिए। बाक़ी सब इसी से जुड़ता है।",
+    ackCopy: "कॉपी करें",
+    ackCopied: "कॉपी हो गया",
     elapsed: "लगा समय",
     sentWith: "भेजा गया",
     ofFields: (sent: number, total: number) => `${total} में से ${sent} जानकारियाँ`,

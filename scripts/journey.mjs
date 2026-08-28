@@ -98,7 +98,7 @@ for (const testCase of CASES) {
   };
 
   try {
-    await page.goto(`${BASE}/?demo=1`, { waitUntil: "networkidle0" });
+    await page.goto(`${BASE}/start?demo=1`, { waitUntil: "networkidle0" });
     await wait(600);
     await clickByText(page, testCase.label);
     await wait(1600);

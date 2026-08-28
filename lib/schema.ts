@@ -79,6 +79,40 @@ const signal = (description: string) =>
   });
 
 /**
+ * Signals that this is a hostage situation in progress rather than a
+ * post-mortem.
+ *
+ * Exported on its own because the standalone triage call and the eval need
+ * exactly this subtree and nothing else — a triage call that also had to fill
+ * in nine freeze fields would be measuring something other than triage.
+ */
+export const ActiveScamSchema = z
+  .object({
+    remote_access_app: signal(
+      "The user mentions installing or being asked to install a screen-sharing or remote-access app (AnyDesk, TeamViewer, QuickSupport, RustDesk, 'support app').",
+    ),
+    screen_sharing: signal("The user's screen is currently being shared or was shared during the incident."),
+    caller_on_line: signal("The user indicates a call is still connected, or that they are being kept on a call."),
+    verification_transfer_requested: signal(
+      "Someone is asking for a further payment to 'verify', 'unblock', 'release' or 'clear' funds.",
+    ),
+    told_to_tell_nobody: signal(
+      "The user was instructed to keep this secret, not tell family, or told that discussing it is itself an offence.",
+    ),
+    verdict: z
+      .enum(SCAM_VERDICTS)
+      .describe(
+        'ACTIVE only if the source gives explicit evidence the attack is happening RIGHT NOW. UNCLEAR if it might be but you are inferring. ENDED if the incident is plainly over. Default to UNCLEAR. A false ACTIVE, repeated, trains people to dismiss the real ones.',
+      ),
+  })
+  .describe("Signals that this is a hostage situation in progress rather than a post-mortem.");
+
+/** One plain sentence of what happened. Both the extraction and triage calls return it. */
+const summaryField = z
+  .string()
+  .describe("One plain sentence describing what happened, in the user's own framing. No advice, no reassurance.");
+
+/**
  * The five-or-so facts a beneficiary bank needs to place a hold, plus the
  * signals that decide whether we interrupt the report entirely.
  *
@@ -98,31 +132,27 @@ export const ExtractionSchema = z.object({
   payment_rail: enumField(PAYMENT_RAILS, "Which payment rail moved the money."),
   fraud_category: enumField(FRAUD_CATEGORIES, "The kind of fraud this appears to be, inferred from what the user described."),
 
-  active_scam: z
-    .object({
-      remote_access_app: signal(
-        "The user mentions installing or being asked to install a screen-sharing or remote-access app (AnyDesk, TeamViewer, QuickSupport, RustDesk, 'support app').",
-      ),
-      screen_sharing: signal("The user's screen is currently being shared or was shared during the incident."),
-      caller_on_line: signal("The user indicates a call is still connected, or that they are being kept on a call."),
-      verification_transfer_requested: signal(
-        "Someone is asking for a further payment to 'verify', 'unblock', 'release' or 'clear' funds.",
-      ),
-      told_to_tell_nobody: signal(
-        "The user was instructed to keep this secret, not tell family, or told that discussing it is itself an offence.",
-      ),
-      verdict: z
-        .enum(SCAM_VERDICTS)
-        .describe(
-          'ACTIVE only if the source gives explicit evidence the attack is happening RIGHT NOW. UNCLEAR if it might be but you are inferring. ENDED if the incident is plainly over. Default to UNCLEAR. A false ACTIVE, repeated, trains people to dismiss the real ones.',
-        ),
-    })
-    .describe("Signals that this is a hostage situation in progress rather than a post-mortem."),
+  active_scam: ActiveScamSchema,
 
-  summary: z
-    .string()
-    .describe("One plain sentence describing what happened, in the user's own framing. No advice, no reassurance."),
+  summary: summaryField,
 });
+
+/**
+ * Just the triage half.
+ *
+ * The shipped hot path never uses this — extraction returns both halves in one
+ * round trip, because a second call costs seconds the user does not have. This
+ * is for triaging a description that arrives *after* the freeze fields are
+ * already read, and for the eval, which needs to score the triage rule without
+ * nine irrelevant fields in the way.
+ */
+export const TriageSchema = z.object({
+  active_scam: ActiveScamSchema,
+  summary: summaryField,
+});
+
+export type Triage = z.infer<typeof TriageSchema>;
+export type ActiveScam = z.infer<typeof ActiveScamSchema>;
 
 export type Extraction = z.infer<typeof ExtractionSchema>;
 export type ReadField = z.infer<ReturnType<typeof readField>>;

@@ -1,0 +1,214 @@
+{
+  "measured_at": "2026-08-28T14:38:44.010Z",
+  "base_url": "http://localhost:3123",
+  "total_cases": 22,
+  "scored": 22,
+  "errored": 0,
+  "completed_cases": 14,
+  "active_cases": 8,
+  "false_positives": 0,
+  "false_negatives": 0,
+  "false_positive_rate_pct": 0,
+  "false_negative_rate_pct": 0,
+  "median_latency_ms": 1332,
+  "cases": [
+    {
+      "id": "completed-plain-upi",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-anydesk-uninstalled",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-call-ended",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-told-nobody-then-told",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-screen-share-over",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-investment-app",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-job-task-scam",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-otp-shared",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-loan-app-harassment",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-will-call-back",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-romance",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-delivery-fraud",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-quotes-the-scammer",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "completed-bank-already-called",
+      "label": "COMPLETED",
+      "fires": false,
+      "verdict": "ENDED",
+      "primary": null,
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-digital-arrest",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "remote_access_app",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-screen-shared-now",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "remote_access_app",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-still-on-line",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "caller_on_line",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-remote-app-running",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "remote_access_app",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-verification-transfer",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "caller_on_line",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-police-impersonation-video",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "caller_on_line",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-mid-transfer",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "caller_on_line",
+      "correct": true,
+      "errored": false
+    },
+    {
+      "id": "active-teamviewer-and-otp",
+      "label": "ACTIVE",
+      "fires": true,
+      "verdict": "ACTIVE",
+      "primary": "remote_access_app",
+      "correct": true,
+      "errored": false
+    }
+  ]
+}

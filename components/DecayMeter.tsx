@@ -74,16 +74,20 @@ export function DecayMeter({
   const bandKey = state?.known ? state.band.key : null;
 
   return (
-    <section
-      aria-label={copy.label}
-      className="rounded-xl border border-line bg-surface p-4 sm:p-5"
-    >
-      <h2 className="text-sm font-medium tracking-wide text-muted">{copy.label}</h2>
+    <section aria-label={copy.label} className="card">
+      <h2 className="eyebrow">{copy.label}</h2>
 
       {/* Hero figure: the elapsed clock. Text token, not the mark colour — a
           light amber is illegible as text, and the track below carries identity. */}
       <p className="mt-1 flex items-baseline gap-2">
-        <span className="text-5xl font-semibold leading-none text-text sm:text-6xl">
+        {/* The placeholder is dimmed rather than white: at this size a full
+            contrast em dash reads as a value, and this state is the absence of
+            one. */}
+        <span
+          className={`text-5xl font-semibold leading-none sm:text-6xl ${
+            parts === null ? "text-line-strong" : "text-text"
+          }`}
+        >
           {parts === null ? "—" : parts.value}
         </span>
         <span className="text-lg text-muted">
@@ -168,7 +172,10 @@ export function DecayMeter({
 
       <p className="mt-1 text-xs leading-relaxed text-faint">
         {bandKey ? `${copy.bandWhy[bandKey]} ${copy.explainer}` : copy.unknownWhy}{" "}
-        <a href={sourceHref} className="text-muted underline underline-offset-2">
+        <a
+          href={sourceHref}
+          className="text-muted underline underline-offset-2 transition-colors hover:text-text"
+        >
           {copy.source}
         </a>
       </p>

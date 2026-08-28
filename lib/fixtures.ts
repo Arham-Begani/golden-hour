@@ -146,7 +146,7 @@ export const FIXTURES: Fixture[] = [
   {
     id: "six-days-old",
     label: "Six days old",
-    purpose: "The meter reads 2% and does not pretend otherwise. It never invents urgency.",
+    purpose: "The meter reads 6 days and does not pretend otherwise. It never invents urgency.",
     input:
       "I was scammed on a fake investment app on 18 August. I sent 85,000 to their account. The UTR is 402318765432.",
     occurredMinutesAgo: 60 * 24 * 6,
