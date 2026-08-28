@@ -159,3 +159,44 @@ export async function getTimings(kind: RunKind): Promise<number[]> {
   }
   return [...memoryTimings[kind]];
 }
+
+/* -------------------------------------------------------------------------- */
+/* Reachability                                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Round-trip a throwaway key to prove the store actually works.
+ *
+ * storeBackend only reports whether the two env vars are PRESENT. A wrong or
+ * expired token still reads as "upstash", and then every receipt 404s in
+ * production while /api/health insists it is ready. That failure is invisible
+ * until someone opens a receipt, which is the worst possible moment to find it.
+ *
+ * The probe writes with a short TTL, so a crash between set and delete cleans
+ * up after itself rather than leaking keys.
+ */
+export async function probeStore(): Promise<{
+  ok: boolean;
+  backend: typeof storeBackend;
+  error: string | null;
+}> {
+  if (!redis) return { ok: false, backend: storeBackend, error: null };
+
+  const key = `gh:probe:${Math.random().toString(36).slice(2)}`;
+  try {
+    await redis.set(key, "1", { ex: 30 });
+    const value = await redis.get<string | number>(key);
+    await redis.del(key);
+    return {
+      ok: String(value) === "1",
+      backend: storeBackend,
+      error: String(value) === "1" ? null : `probe read back ${JSON.stringify(value)}`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      backend: storeBackend,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}

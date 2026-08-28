@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { extract, extractionResponseSchema } from "@/lib/extract";
 import { EXTRACT_MODEL, hasGeminiKey } from "@/lib/gemini";
 import { getFixture } from "@/lib/fixtures";
-import { storeBackend } from "@/lib/store";
+import { probeStore } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,11 +21,19 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const live = new URL(request.url).searchParams.get("live") === "1";
 
+  /**
+   * An actual round-trip, not a check that two env vars are non-empty. A wrong
+   * or expired Upstash token still looks configured, and the failure only
+   * surfaces when a receipt 404s in front of whoever is watching.
+   */
+  const probe = await probeStore();
+
   const base = {
     ok: true,
     gemini_key: hasGeminiKey(),
     model: EXTRACT_MODEL,
-    store: storeBackend,
+    store: probe.backend,
+    store_reachable: probe.ok,
     schema_fields: Object.keys(
       (extractionResponseSchema() as { properties: Record<string, unknown> }).properties,
     ).length,
@@ -35,12 +43,14 @@ export async function GET(request: Request) {
      * usually lands somewhere that has never seen the packet and 404s. Check
      * this on the deployed URL before demoing.
      */
-    deploy_ready: hasGeminiKey() && storeBackend === "upstash",
+    deploy_ready: hasGeminiKey() && probe.ok,
     warnings: [
       hasGeminiKey() ? null : "GEMINI_API_KEY is not set — live extraction will fail.",
-      storeBackend === "upstash"
+      probe.ok
         ? null
-        : "Store is in-memory. On serverless this loses packets between requests; set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.",
+        : probe.backend === "memory"
+          ? "Store is in-memory. On serverless this loses packets between requests; set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN."
+          : `Upstash credentials are set but the round-trip failed${probe.error ? `: ${probe.error}` : ""}. Receipts will 404.`,
     ].filter(Boolean),
   };
 
