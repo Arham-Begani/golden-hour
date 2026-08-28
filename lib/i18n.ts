@@ -38,6 +38,13 @@ const en = {
   brand: "Golden Hour",
 
   prototype: {
+    /**
+     * Shown only in Hindi. The translation has not been read by a native
+     * speaker, and emergency instructions are the last place to leave that
+     * unsaid. Delete this string the day someone reviews lib/i18n.ts.
+     */
+    hindiUnreviewed:
+      "The Hindi on this site has not been checked by a native speaker yet. If anything reads wrong, switch to English.",
     short: "Prototype — no bank integration",
     full: "Prototype. Not affiliated with I4C, NCRP or cybercrime.gov.in. Nothing here freezes anyone's money.",
   },
@@ -61,15 +68,29 @@ const en = {
   },
 
   meter: {
-    label: "Recovery probability",
+    label: "Time since the fraud",
     unknown: "Unknown",
     unknownWhy: "We don't know when this happened yet.",
     since: "Fraud reported as",
-    cited: "Published figure",
-    interpolated: "Interpolated between published figures",
-    source: "Where this number comes from",
+    source: "Where this comes from",
     explainer:
-      "This is computed from when the fraud happened, not from when you opened this page.",
+      "Counted from when the fraud happened, not from when you opened this page.",
+    /**
+     * Bands, not percentages. No published figure gives a recovery rate by
+     * elapsed time, so none is shown. See CITATIONS.md.
+     */
+    bands: {
+      "first-hour": "Inside the first hour",
+      "same-day": "Past the first hour",
+      "first-week": "Past the first day",
+      older: "More than a week ago",
+    },
+    bandWhy: {
+      "first-hour": "A hold can still land before the money is moved onward. Send now.",
+      "same-day": "The money has probably moved at least once. Still worth sending now.",
+      "first-week": "Send it anyway. The account trail is still the investigation's starting point.",
+      older: "Send it anyway. This is a police report now, and it still counts.",
+    },
   },
 
   confirm: {
@@ -214,6 +235,8 @@ const hi: Dict = {
   brand: "गोल्डन आवर",
 
   prototype: {
+    hindiUnreviewed:
+      "इस साइट का हिन्दी अनुवाद अभी किसी हिन्दीभाषी ने जाँचा नहीं है। कुछ ग़लत लगे तो अंग्रेज़ी पर जाएँ।",
     short: "प्रोटोटाइप — किसी बैंक से जुड़ा नहीं",
     full: "यह एक प्रोटोटाइप है। I4C, NCRP या cybercrime.gov.in से इसका कोई संबंध नहीं है। यह किसी का पैसा फ़्रीज़ नहीं करता।",
   },
@@ -237,14 +260,24 @@ const hi: Dict = {
   },
 
   meter: {
-    label: "पैसा वापस मिलने की संभावना",
+    label: "धोखाधड़ी को कितना समय हुआ",
     unknown: "पता नहीं",
     unknownWhy: "यह कब हुआ, अभी हमें नहीं पता।",
     since: "धोखाधड़ी का समय",
-    cited: "प्रकाशित आँकड़ा",
-    interpolated: "प्रकाशित आँकड़ों के बीच का अनुमान",
-    source: "यह संख्या कहाँ से आई",
+    source: "यह जानकारी कहाँ से आई",
     explainer: "यह आपके बताए समय से गिना गया है, इस पेज को खोलने के समय से नहीं।",
+    bands: {
+      "first-hour": "पहले एक घंटे के भीतर",
+      "same-day": "एक घंटे से ज़्यादा",
+      "first-week": "एक दिन से ज़्यादा",
+      older: "एक हफ़्ते से ज़्यादा",
+    },
+    bandWhy: {
+      "first-hour": "पैसा आगे भेजे जाने से पहले रोक लग सकती है। अभी भेजें।",
+      "same-day": "पैसा शायद एक बार आगे जा चुका है। फिर भी अभी भेजें।",
+      "first-week": "फिर भी भेजें। खाते का रिकॉर्ड जाँच की शुरुआत है।",
+      older: "फिर भी भेजें। यह अब पुलिस शिकायत है, और इसकी अहमियत है।",
+    },
   },
 
   confirm: {

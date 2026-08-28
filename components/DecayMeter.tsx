@@ -1,65 +1,47 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ANCHORS, elapsedLabel, meterState, recoveryProbability } from "@/lib/decay";
+import { useEffect, useState } from "react";
+import {
+  BANDS,
+  MAX_MINUTES,
+  MIN_MINUTES,
+  elapsedParts,
+  meterState,
+  timelinePosition,
+} from "@/lib/decay";
 import { t, type Lang } from "@/lib/i18n";
 
 /**
  * The one element on the page that moves.
  *
- * Form: a stat tile — hero figure plus a sparkline of the published curve with
- * the user's own position marked. Not a chart of many series, so no legend;
- * the label says what is plotted.
+ * It used to show a recovery percentage. It does not any more, because no
+ * published source gives a recovery rate by elapsed time — see CITATIONS.md and
+ * the header of lib/decay.ts. What is shown instead is the thing that is
+ * actually known: how long ago the fraud happened, which band that falls in,
+ * and what to do about it.
  *
- * Two honesty mechanics are built into the drawing itself:
- *   - The sub-one-hour segment is dashed, because the published curve does not
- *     anchor inside the first hour and that stretch is interpolation.
- *   - The three cited points are ticked on the axis, so the evidence and the
- *     fit are visible at the same time.
+ * That is a smaller claim, and it is the whole point. A decaying percentage
+ * nobody can source is urgency theatre. An elapsed clock is a fact, and it is
+ * still computed from the user's OWN timestamp rather than from page load — a
+ * fraud from six days ago reads "6 days" and does not pretend to be urgent.
  *
- * The number is computed from the user's fraud timestamp. Six days ago reads
- * 2% and stays there. It never manufactures urgency that isn't there.
+ * Form: a stat tile — hero figure plus a log-scaled timeline with the report
+ * marked on it. The marker's position is a position, not a probability; there
+ * is no magnitude claim buried in the drawing.
  */
 
 const W = 320;
-const H = 76;
+const H = 52;
 const PAD_X = 10;
-const PAD_TOP = 8;
-const PAD_BOTTOM = 18;
+const TRACK_Y = 18;
 
-const MIN_T = ANCHORS[0].minutes;
-const MAX_T = ANCHORS[ANCHORS.length - 1].minutes;
-const Y_MAX = 0.62;
+const px = (position: number) => PAD_X + position * (W - PAD_X * 2);
 
-const LOG_MIN = Math.log10(MIN_T);
-const LOG_SPAN = Math.log10(MAX_T) - LOG_MIN;
-
-const x = (minutes: number) => {
-  const clamped = Math.min(Math.max(minutes, MIN_T), MAX_T);
-  return PAD_X + ((Math.log10(clamped) - LOG_MIN) / LOG_SPAN) * (W - PAD_X * 2);
-};
-
-const y = (probability: number) =>
-  H - PAD_BOTTOM - (probability / Y_MAX) * (H - PAD_TOP - PAD_BOTTOM);
-
-/** Sample the curve in log-time so the drawn line matches the maths exactly. */
-function pathBetween(fromMinutes: number, toMinutes: number, steps = 48): string {
-  const fromLog = Math.log10(fromMinutes);
-  const toLog = Math.log10(toMinutes);
-  const points: string[] = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const minutes = 10 ** (fromLog + ((toLog - fromLog) * i) / steps);
-    points.push(`${x(minutes).toFixed(2)},${y(recoveryProbability(minutes)).toFixed(2)}`);
-  }
-
-  return `M${points.join("L")}`;
-}
-
+/** The band boundaries, drawn as ticks so the scale is legible. */
 const TICKS = [
   { minutes: 60, label: "1h" },
   { minutes: 60 * 24, label: "24h" },
-  { minutes: 60 * 24 * 7, label: "7d" },
+  { minutes: MAX_MINUTES, label: "7d" },
 ];
 
 export function DecayMeter({
@@ -86,15 +68,10 @@ export function DecayMeter({
     return () => clearInterval(id);
   }, []);
 
-  const curve = useMemo(
-    () => ({
-      interpolated: pathBetween(MIN_T, ANCHORS[1].minutes),
-      cited: pathBetween(ANCHORS[1].minutes, MAX_T),
-    }),
-    [],
-  );
-
   const state = now ? meterState(occurredAt, now) : null;
+  const parts = state?.known ? elapsedParts(state.minutes) : null;
+  const position = state?.known ? timelinePosition(state.minutes) : 0;
+  const bandKey = state?.known ? state.band.key : null;
 
   return (
     <section
@@ -103,114 +80,85 @@ export function DecayMeter({
     >
       <h2 className="text-sm font-medium tracking-wide text-muted">{copy.label}</h2>
 
-      {/* Hero figure. Text token, not the mark colour — a light amber is
-          illegible as text, and the bar beside it already carries identity. */}
-      <p className="mt-1 flex items-baseline gap-3">
-        <span
-          className="text-5xl font-semibold leading-none text-text sm:text-6xl"
-          aria-live="off"
-        >
-          {state === null ? "—" : state.known ? `${(state.probability * 100).toFixed(1)}%` : copy.unknown}
+      {/* Hero figure: the elapsed clock. Text token, not the mark colour — a
+          light amber is illegible as text, and the track below carries identity. */}
+      <p className="mt-1 flex items-baseline gap-2">
+        <span className="text-5xl font-semibold leading-none text-text sm:text-6xl">
+          {parts === null ? "—" : parts.value}
         </span>
-        {state?.known && (
-          <span className="text-sm text-muted">{elapsedLabel(state.minutes)}</span>
-        )}
+        <span className="text-lg text-muted">
+          {parts === null ? (state === null ? "" : copy.unknown) : parts.unit}
+        </span>
       </p>
 
-      {/* The meter track: one fill, the unfilled part a dimmer step of the
-          same ramp so the state reads across the whole bar. */}
-      <div
-        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-mark-track"
-        role="img"
-        aria-label={
-          state?.known
-            ? `${(state.probability * 100).toFixed(1)} percent`
-            : copy.unknown
-        }
-      >
-        <div
-          className="h-full rounded-full bg-mark transition-[width] duration-700 ease-linear"
-          style={{ width: state?.known ? `${(state.probability / Y_MAX) * 100}%` : "0%" }}
-        />
-      </div>
+      {bandKey && (
+        <p className="mt-2 text-sm font-medium">{copy.bands[bandKey]}</p>
+      )}
 
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="mt-3 w-full"
+        className="mt-2 w-full"
         role="img"
-        aria-label="The published recovery curve, with the current report marked on it."
+        aria-label={
+          state?.known
+            ? `${copy.bands[state.band.key]}. ${copy.bandWhy[state.band.key]}`
+            : copy.unknown
+        }
       >
-        {/* Axis: hairline, solid, recessive. */}
+        {/* The track. One rail, log-scaled from a minute to a week. */}
         <line
           x1={PAD_X}
-          y1={H - PAD_BOTTOM}
+          y1={TRACK_Y}
           x2={W - PAD_X}
-          y2={H - PAD_BOTTOM}
-          stroke="var(--color-line)"
-          strokeWidth="1"
+          y2={TRACK_Y}
+          stroke="var(--color-mark-track)"
+          strokeWidth="6"
+          strokeLinecap="round"
         />
 
-        {TICKS.map((tick) => (
-          <g key={tick.label}>
+        {/* Elapsed so far. A position along the clock, not a quantity. */}
+        {state?.known && (
+          <line
+            x1={PAD_X}
+            y1={TRACK_Y}
+            x2={px(position)}
+            y2={TRACK_Y}
+            stroke="var(--color-mark)"
+            strokeWidth="6"
+            strokeLinecap="round"
+            className="transition-[x2] duration-700 ease-linear"
+          />
+        )}
+
+        {BANDS.slice(0, -1).map((band, i) => (
+          <g key={band.key}>
             <line
-              x1={x(tick.minutes)}
-              y1={H - PAD_BOTTOM}
-              x2={x(tick.minutes)}
-              y2={H - PAD_BOTTOM + 4}
+              x1={px(timelinePosition(band.untilMinutes))}
+              y1={TRACK_Y + 6}
+              x2={px(timelinePosition(band.untilMinutes))}
+              y2={TRACK_Y + 11}
               stroke="var(--color-line-strong)"
               strokeWidth="1"
             />
             <text
-              x={x(tick.minutes)}
-              y={H - 4}
-              textAnchor={tick.minutes === MAX_T ? "end" : "middle"}
+              x={px(timelinePosition(band.untilMinutes))}
+              y={H - 6}
+              textAnchor={i === BANDS.length - 2 ? "end" : "middle"}
               className="fill-faint"
               fontSize="10"
             >
-              {tick.label}
+              {TICKS[i]?.label}
             </text>
           </g>
         ))}
 
-        {/* Dashed = interpolated. The published figures do not anchor here, and
-            the drawing should say so without a footnote. */}
-        <path
-          d={curve.interpolated}
-          fill="none"
-          stroke="var(--color-mark)"
-          strokeWidth="2"
-          strokeDasharray="3 3"
-          strokeLinecap="round"
-        />
-        <path
-          d={curve.cited}
-          fill="none"
-          stroke="var(--color-mark)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* The cited points, marked on the curve they were fitted to. */}
-        {ANCHORS.filter((anchor) => anchor.cited).map((anchor) => (
-          <circle
-            key={anchor.minutes}
-            cx={x(anchor.minutes)}
-            cy={y(anchor.probability)}
-            r="2.5"
-            fill="var(--color-mark)"
-            stroke="var(--color-surface)"
-            strokeWidth="1.5"
-          />
-        ))}
-
         {/* Where this report sits. 2px surface ring so it stays legible
-            wherever it lands on the line. */}
+            wherever it lands on the rail. */}
         {state?.known && (
           <circle
-            cx={x(Math.max(state.minutes, MIN_T))}
-            cy={y(state.probability)}
-            r="4.5"
+            cx={px(Math.max(position, timelinePosition(MIN_MINUTES)))}
+            cy={TRACK_Y}
+            r="5"
             fill="var(--color-mark)"
             stroke="var(--color-surface)"
             strokeWidth="2"
@@ -218,8 +166,8 @@ export function DecayMeter({
         )}
       </svg>
 
-      <p className="mt-2 text-xs leading-relaxed text-faint">
-        {state?.known ? copy.explainer : copy.unknownWhy}{" "}
+      <p className="mt-1 text-xs leading-relaxed text-faint">
+        {bandKey ? `${copy.bandWhy[bandKey]} ${copy.explainer}` : copy.unknownWhy}{" "}
         <a href={sourceHref} className="text-muted underline underline-offset-2">
           {copy.source}
         </a>
