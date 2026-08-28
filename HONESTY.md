@@ -33,7 +33,7 @@ This is not a government service and must never be mistakable for one. No emblem
 | The decay meter's elapsed time | **Real** | Computed from the fraud timestamp the user entered, never from page load. A six-day-old fraud reads six days. |
 | The recovery percentage the meter used to show | **Not real** | Removed rather than mocked. See below — it is the entry that matters most here. |
 | The interrupt gate | **Real** | A tested pure function over quoted signals. It fires only on an explicit ACTIVE verdict plus a hard signal the model could quote. |
-| The interrupt's false-positive rate | **Real, with limits** | Really measured, with real limits. 0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1332ms. Measured 2026-08-28. |
+| The interrupt's false-positive rate | **Real, with limits** | Really measured, with real limits. 0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1330ms. Measured 2026-08-28. |
 | The portal comparison benchmark | **Not real** | Not measured. The portal column of data/portal-benchmark.json is empty, and /evidence says so rather than hiding it. Someone has to open cybercrime.gov.in and count the fields; a fabricated benchmark would discredit every honest thing next to it. |
 | The measured median completion time | **Not real** | Not yet measured. No unaided human run-throughs have been recorded. Demo replays and the automated journey are bucketed separately and excluded on purpose, because they serve a cached extraction and start the clock at the fixture click. |
 | The Hindi copy | **Real, with limits** | Present and unreviewed. No native speaker has read it. Every Hindi screen says so, and this page is deliberately English only. |
@@ -57,7 +57,7 @@ Source: [Rajya Sabha Unstarred Question 1349, 11 February 2026](https://www.mha.
 
 ## What the interrupt's 0% does not mean
 
-0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1332ms. Measured 2026-08-28.
+0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1330ms. Measured 2026-08-28.
 
 Reproduce it with npm run eval. Every case runs through the real triage route, the real model call and the real gate; nothing is stubbed. The cases are in data/triage-eval.json and the raw result in data/triage-eval-result.json.
 
