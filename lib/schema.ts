@@ -152,6 +152,12 @@ export const FreezePacketSchema = z.object({
   corrected: z.array(z.string()).default([]),
   /** Milliseconds from first interaction to dispatch. The claim, measured. */
   elapsed_ms: z.number().nullable().default(null),
+  /**
+   * Whether this was a real report or a demo replay. Only "real" runs count
+   * toward the sixty-second claim. Defaults so packets stored before the split
+   * still parse — they are not read back into the distribution either way.
+   */
+  run_kind: z.enum(["real", "demo"]).default("real"),
   lang: z.enum(["en", "hi"]).default("en"),
   interrupt_shown: z.boolean().default(false),
 });

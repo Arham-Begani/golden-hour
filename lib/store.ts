@@ -19,6 +19,23 @@ const TTL_SECONDS = 60 * 60 * 24;
 /** How many dispatch timings the evidence page reads from. */
 const TIMINGS_CAP = 200;
 
+/**
+ * Demo replays are capped lower than real runs. They are not evidence, and a
+ * few scripted journey loops should not be able to crowd anything out.
+ */
+const DEMO_CAP = 50;
+
+/**
+ * Real human runs and demo replays are counted separately and never mixed.
+ *
+ * A demo replay serves a cached extraction and starts its clock at the fixture
+ * click, so it measures confirm-page review time and nothing else. Averaging
+ * those into the sixty-second claim would be the same fabrication that
+ * data/portal-benchmark.json refuses for the portal column. The evidence page
+ * reports "real" only.
+ */
+export type RunKind = "real" | "demo";
+
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -28,7 +45,7 @@ export const storeBackend = redis ? "upstash" : "memory";
 
 type Entry = { value: unknown; expiresAt: number };
 const memory = new Map<string, Entry>();
-const memoryTimings: number[] = [];
+const memoryTimings: Record<RunKind, number[]> = { real: [], demo: [] };
 
 function memoryGet<T>(key: string): T | null {
   const entry = memory.get(key);
@@ -84,7 +101,20 @@ export function newAck(): string {
 
 const packetKey = (ack: string) => `gh:packet:${ack}`;
 const statementKey = (ack: string) => `gh:statement:${ack}`;
-const TIMINGS_KEY = "gh:timings";
+const timingsKey = (kind: RunKind) => `gh:timings:${kind}`;
+const capFor = (kind: RunKind) => (kind === "real" ? TIMINGS_CAP : DEMO_CAP);
+
+/**
+ * The pre-split key. Deliberately never read.
+ *
+ * Whatever it holds was recorded before real and demo runs were told apart, so
+ * its entries cannot be attributed to either. Migrating them into "real" would
+ * assert something nobody observed; migrating them into "demo" would assert the
+ * opposite. Both are guesses, and this project does not ship guesses. It is at
+ * most 200 integers, so it costs nothing to leave alone.
+ */
+const LEGACY_TIMINGS_KEY = "gh:timings";
+void LEGACY_TIMINGS_KEY;
 
 export async function saveFreezePacket(packet: FreezePacket): Promise<void> {
   await put(packetKey(packet.ack), packet);
@@ -107,22 +137,25 @@ export async function getStatement(ack: string): Promise<Statement | null> {
 /* -------------------------------------------------------------------------- */
 
 /** Record how long one run took from first interaction to dispatch. */
-export async function recordTiming(elapsedMs: number): Promise<void> {
+export async function recordTiming(elapsedMs: number, kind: RunKind): Promise<void> {
   if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
+  const key = timingsKey(kind);
+  const cap = capFor(kind);
   if (redis) {
-    await redis.lpush(TIMINGS_KEY, elapsedMs);
-    await redis.ltrim(TIMINGS_KEY, 0, TIMINGS_CAP - 1);
+    await redis.lpush(key, elapsedMs);
+    await redis.ltrim(key, 0, cap - 1);
     return;
   }
-  memoryTimings.unshift(elapsedMs);
-  memoryTimings.length = Math.min(memoryTimings.length, TIMINGS_CAP);
+  memoryTimings[kind].unshift(elapsedMs);
+  memoryTimings[kind].length = Math.min(memoryTimings[kind].length, cap);
 }
 
-/** Every recorded run. The evidence page shows the distribution, not a boast. */
-export async function getTimings(): Promise<number[]> {
+/** Every recorded run of one kind. The evidence page shows the distribution, not a boast. */
+export async function getTimings(kind: RunKind): Promise<number[]> {
+  const cap = capFor(kind);
   if (redis) {
-    const raw = await redis.lrange<number | string>(TIMINGS_KEY, 0, TIMINGS_CAP - 1);
+    const raw = await redis.lrange<number | string>(timingsKey(kind), 0, cap - 1);
     return raw.map(Number).filter((n) => Number.isFinite(n) && n > 0);
   }
-  return [...memoryTimings];
+  return [...memoryTimings[kind]];
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isFixtureSummary } from "@/lib/fixtures";
 import { decideInterrupt } from "@/lib/interrupt";
 import { ExtractionSchema, type FreezePacket } from "@/lib/schema";
 import { newAck, recordTiming, saveFreezePacket } from "@/lib/store";
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
     elapsed_ms?: unknown;
     lang?: unknown;
     interrupt_shown?: unknown;
+    source?: unknown;
   };
 
   try {
@@ -44,6 +46,19 @@ export async function POST(request: Request) {
   const occurred = parsed.data.occurred_at.value;
   const elapsed = typeof body.elapsed_ms === "number" ? body.elapsed_ms : null;
 
+  /**
+   * Real run or demo replay.
+   *
+   * The client's own `source` is a hint; the summary fingerprint is the part
+   * that holds. A demo replay serves a cached extraction and starts its clock
+   * at the fixture click, so counting one toward the sixty-second claim would
+   * inflate the number with a run that never did the work.
+   */
+  const kind = body.source === "fixture" || isFixtureSummary(parsed.data.summary) ? "demo" : "real";
+
+  /** A lost clock is not a fast run. Record nothing, and say nothing was recorded. */
+  const timingRecorded = elapsed !== null && elapsed > 0;
+
   const packet: FreezePacket = {
     ack: newAck(),
     created_at: new Date().toISOString(),
@@ -51,17 +66,21 @@ export async function POST(request: Request) {
     extraction: parsed.data,
     corrected: Array.isArray(body.corrected) ? body.corrected.filter((c) => typeof c === "string") : [],
     elapsed_ms: elapsed,
+    run_kind: kind,
     lang: body.lang === "hi" ? "hi" : "en",
     interrupt_shown: body.interrupt_shown === true,
   };
 
   await saveFreezePacket(packet);
-  if (elapsed) await recordTiming(elapsed);
+  if (timingRecorded) await recordTiming(elapsed, kind);
 
   return NextResponse.json({
     ok: true,
     ack: packet.ack,
     created_at: packet.created_at,
+    run_kind: kind,
+    /** False when the clock was lost. Better surfaced than silently dropped. */
+    timing_recorded: timingRecorded,
     // Sent with holes in it, and says so.
     downgrades,
     interrupt: decideInterrupt(parsed.data),

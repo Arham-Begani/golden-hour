@@ -95,6 +95,8 @@ export default function ConfirmPage() {
           elapsed_ms: elapsedMs(),
           lang,
           interrupt_shown: state.interruptShown,
+          // A hint only. The server fingerprints demo replays itself.
+          source: state.source,
         }),
       });
 
@@ -111,7 +113,17 @@ export default function ConfirmPage() {
       setSending(false);
       setError(copy.errors.network);
     }
-  }, [copy.errors, corrected, elapsedMs, extraction, lang, router, setState, state.interruptShown]);
+  }, [
+    copy.errors,
+    corrected,
+    elapsedMs,
+    extraction,
+    lang,
+    router,
+    setState,
+    state.interruptShown,
+    state.source,
+  ]);
 
   const whenUnknown = isMissing(extraction.occurred_at);
 
