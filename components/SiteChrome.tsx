@@ -63,6 +63,14 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         {copy.prototype.full}
       </p>
 
+      {/* A product about not being misled should say which of its own copy is
+          unverified. Shown in Hindi only, because that is the copy it is about. */}
+      {lang === "hi" && (
+        <p className="mb-4 rounded-md border border-line bg-surface px-3 py-2 text-xs leading-relaxed text-muted">
+          {copy.prototype.hindiUnreviewed}
+        </p>
+      )}
+
       <main className="flex-1">{children}</main>
     </div>
   );
