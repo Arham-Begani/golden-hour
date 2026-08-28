@@ -64,7 +64,7 @@ Vercel project environment.
 | Gemini schema | `lib/gemini-schema.ts` | Converts JSON Schema to Gemini's OpenAPI subset |
 | Extraction | `lib/extract.ts` | One call returns the freeze fields *and* the interrupt signals |
 | Anti-hallucination | `lib/validate.ts` | Shape + confidence checks that force `UNREADABLE` |
-| Recovery curve | `lib/decay.ts` | Log-time interpolation from the user's own timestamp |
+| The clock | `lib/decay.ts` | Elapsed time and band, from the user's own timestamp. No percentage — see below |
 | Interrupt gate | `lib/interrupt.ts` | Conservative: `ACTIVE` **and** a quoted hard signal |
 | Store | `lib/store.ts` | Upstash, or in-memory for local dev. 24h TTL |
 | Demo cases | `lib/fixtures.ts` | Cached extractions, run through the real validation path |
@@ -81,11 +81,19 @@ check. The receipt then names what was dropped and why.
 The reason: a missing transaction ID means the bank works with what it has. A wrong one
 means the bank freezes the wrong account while the real one empties.
 
-**The meter is computed from the fraud's timestamp, not the page load.** A six-day-old
-fraud reads 2% on arrival and stays there. The sub-one-hour stretch of the curve is
-drawn dashed because the published figures do not anchor inside the first hour, and the
-three cited points are ticked on the axis so the fit and its evidence are visible at
-once.
+**The meter shows a clock, not a percentage — and that is the interesting part.** It
+used to show a falling recovery probability fitted to three figures from the concept doc:
+50% within an hour, 10% within a day, 2% after a week. None of them could be traced to a
+primary source. In [Rajya Sabha Unstarred Question
+1349](https://www.mha.gov.in/MHA1/Par2017/pdfs/par2026-pdfs/RS11022026/1349.pdf) of 11
+February 2026 the MHA was asked for "total amount recovered vis-à-vis losses incurred,
+year-wise" and the answer does not contain the word *recovered*. There is no published
+recovery curve.
+
+So the percentage is gone and the clock stayed: elapsed time since the user's own
+timestamp, the band it falls in, and what to do about it. A six-day-old fraud reads
+"6 days" and does not pretend to be urgent. The direction is real and sourced; the
+magnitude is not claimed. `/evidence` says all of this on the product itself.
 
 **The interrupt is hard to trip on purpose.** It fires only on an explicit `ACTIVE`
 verdict *and* at least one hard signal backed by a verbatim quote. `UNCLEAR` never
@@ -98,35 +106,47 @@ everyone to dismiss the real ones.
 
 ```bash
 npm run verify     # typecheck + unit tests + production build
-npm run test       # 42 unit tests: decay curve, validation, interrupt gate, schema
+npm run test       # 50 unit tests: clock and bands, validation, interrupt gate, schema, run provenance
 npm run shots      # screenshots at 360px; fails if any page scrolls sideways
 npm run journey    # drives all four demo cases end to end in a real browser
 ```
 
 `npm run journey` is the one that matters. It walks intake → interrupt → confirm →
-receipt → statement for each case and asserts the interrupt fires only where it should
-and that the send button is **never** disabled by a missing field.
+receipt → statement for each case and asserts the interrupt fires only where it should,
+that the send button is **never** disabled by a missing field, and that its own four
+runs land in the demo timing bucket and leave the real distribution untouched.
 
-Both browser scripts need Chrome installed and the dev server running.
+Both browser scripts need Chrome installed and a server running. Prefer a production
+server (`npm run build && npx next start`) over `npm run dev` — the scripts use fixed
+waits, and dev-mode on-demand compilation makes them flaky for reasons that have nothing
+to do with the app.
 
 ---
 
-## Two things a human still has to do
+## What is still open
 
-Neither of these may be filled in by a model. Both are load-bearing for the pitch.
+None of these may be filled in by a model.
 
-1. **[`CITATIONS.md`](./CITATIONS.md) — the recovery curve is currently UNSOURCED.**
-   The 50% / 10% / 2% figures come from the concept doc and a first search pass could
-   not trace them to a primary source. Worse, it found a published claim that appears to
-   *contradict* the 24-hour anchor. `/evidence` renders a loud unverified banner until
-   every anchor has a `source`. Read `CITATIONS.md` — it records what was found and the
-   three ways out.
+1. **[`data/portal-benchmark.json`](./data/portal-benchmark.json) — the portal column is
+   empty.** Someone has to open cybercrime.gov.in and count the fields. The documentary
+   route was tried and failed: the portal's own citizen manuals do not enumerate this
+   form — the financial-fraud one covers the 1930 helpline route and is marked "For Delhi
+   Only", and the general manual is image-only. `/evidence` says so in those words rather
+   than hiding the empty column. A fabricated benchmark would discredit every other
+   honest thing on the site.
 
-2. **[`data/portal-benchmark.json`](./data/portal-benchmark.json) — the portal column is
-   empty.** Someone has to open cybercrime.gov.in and count the fields. `/evidence`
-   shows unfilled rows as "not yet counted" rather than hiding them. A fabricated
-   benchmark would discredit every other honest thing on the site.
+2. **The measured median has no real runs yet.** `/evidence` reads "not yet measured"
+   until humans have done unaided run-throughs. Demo replays and `npm run journey` are
+   recorded separately and excluded on purpose — they serve a cached extraction and start
+   the clock at the fixture click, so they measure review time, not the task. Whatever
+   the real median turns out to be is what the site claims; if it lands above 60s, the
+   claim changes, not the data.
 
-Also: the Hindi copy in `lib/i18n.ts` is a first pass and needs a native speaker before
-the pitch. Machine-shaped phrasing in emergency instructions is a bad look in a product
-about not being misled.
+3. **The Hindi in `lib/i18n.ts` has not been read by a native speaker.** It reads well —
+   idiomatic register, correct nuqta — but it is unverified, and the product says so on
+   every Hindi screen rather than only here. Do not have a model "improve" it: an
+   unreviewed translation labelled as such is honest; one polished into greater confidence
+   is not.
+
+[`CITATIONS.md`](./CITATIONS.md) records the recovery-curve research and how it was
+resolved.
