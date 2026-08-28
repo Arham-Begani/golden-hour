@@ -195,3 +195,33 @@ export function materialiseFixture(fixture: Fixture, now: Date = new Date()): Re
 
   return raw;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Telling a demo replay apart from a real run                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Every fixture's summary line, as it arrives back at the server.
+ *
+ * `summary` is the one field that makes a usable fingerprint: it is not in the
+ * confirm page's EDITABLE list, so the user never touches it, and
+ * validateExtraction only trims it. materialiseFixture rewrites occurred_at but
+ * leaves summary alone, so what comes back is byte-identical to what is here.
+ */
+const FIXTURE_SUMMARIES: ReadonlySet<string> = new Set(
+  FIXTURES.map((fixture) =>
+    String((fixture.raw as { summary?: unknown }).summary ?? "").trim(),
+  ).filter(Boolean),
+);
+
+/**
+ * True if this summary came from a demo fixture rather than a real report.
+ *
+ * The client also sends its own `source`, but a client flag is only a hint —
+ * this is the check that cannot be talked out of. It matters in exactly one
+ * direction: a demo replay must never be counted as a real run in the
+ * sixty-second claim. The reverse (someone marking a genuine run as demo) costs
+ * them their own datapoint and nobody else anything.
+ */
+export const isFixtureSummary = (summary: string): boolean =>
+  summary.trim().length > 0 && FIXTURE_SUMMARIES.has(summary.trim());
