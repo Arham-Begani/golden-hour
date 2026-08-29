@@ -1,273 +1,231 @@
-# Demo video script
+# Demo video — 2 minutes
 
-Target runtime **2:50**. One continuous narration. A 60-second cut is at the bottom.
+**Brief:** max 2:00. Minute one demos the project as a citizen. Minute two explains how
+you built it and why you made those choices.
 
-Every on-screen line quoted here is the real copy from `lib/i18n.ts`. If you change the
-copy, change the narration with it.
+**Your plan, which this script is written for:**
 
----
-
-## How this is built
-
-**Record the voiceover in one take, start to finish.** It is written to be read straight
-through — the connective sentences are load-bearing, and reading it in pieces is what
-makes a demo sound stitched together.
-
-**Then lay the picture under it.** Every split below is a *picture* cut. The voice keeps
-running across it, which is exactly why the viewer never feels the seam. You are never
-cutting the narration; you are changing what is on screen beneath a sentence that is
-already moving.
-
-Two hard rules:
-
-1. **Never cut the picture mid-sentence at a split.** Land the cut on the sentence break
-   marked, so the new image arrives with a new thought.
-2. **Never cut inside the run** (SPLIT B → SPLIT C). That stretch is one continuous
-   screen recording. The claim is temporal; an edit inside it destroys the only thing
-   being demonstrated. If a take goes badly, discard the whole take and start again.
+- **Minute 1** — voice recorded first, screen recording edited in on top. No facecam.
+- **Minute 2** — facecam only, you explaining the build.
 
 ---
 
-# The narration
+# What "the run" means
 
-Read it all. `(beat)` is a pause, not a stop. `⟢ SPLIT` marks a picture change only.
+Wherever this page says **the run**, it means one continuous screen recording of you
+using the app, start to finish, without stopping:
+
+> Start a report → Add a screenshot → Read this → correct one field → Send freeze
+> request → hold on the receipt
+
+About 40 seconds, filmed on your phone. **This is the demo** — everything else in the
+video is context around it.
+
+The app times it and prints the result on the receipt as **Time taken**. That is why it
+cannot be scripted, sped up, or edited in the middle: the number on screen has to be a
+real person doing a real task, or it is not evidence of anything.
 
 ---
 
-⟢ **SPLIT A — open on the real portal.** Screen recording of cybercrime.gov.in. No title
-card, no logo, no music sting.
+# First: time your run
 
-**0:00**
+Everything in minute one is budgeted around one number, and only you know it.
 
-> Someone in India loses money to a UPI scam at 9:14 at night. By 9:16, they know.
+Do one real run on your phone, start to finish, and read the **Time taken** figure off
+the receipt. That is `R`.
+
+| If `R` is… | Minute one is |
+|---|---|
+| ~30s | 10s problem · 30s run · 15s interrupt · 5s spare |
+| ~40s | 8s problem · 40s run · 10s interrupt · 2s spare |
+| ~50s | 5s problem · 50s run · **cut the interrupt** |
+| over 60s | Cut the interrupt, trim the problem to one line, and see Part 6 |
+
+**Do not speed up, trim, or cut inside the run to make it fit.** The run's real duration
+is the claim. If it doesn't fit, something else goes — never the run.
+
+---
+
+# MINUTE ONE — the citizen demo
+
+Voice first, then lay the screen recording under it. No face.
+
+## What to say
+
+> Someone loses money to a UPI scam at 9:14 at night. By 9:16 they know.
 >
-> This is where they're told to go.
-
-*(Let the portal breathe here — the category dropdown, the register prompt, the OTP
-screen. Don't rush to the next line.)*
-
-> It asks them to pick a category for a crime they don't understand yet. Then to
-> register. Then to wait for a one-time password — on the phone the scammer may still be
-> calling.
+> This is where they're told to go. Pick a category. Register. Wait for an OTP — on the
+> phone the scammer may still be calling.
 >
-> Meanwhile the money is moving. It's already been split across two accounts.
-
-*(Scroll the reporting form so its full length passes. Hold a beat longer than feels
-comfortable. The length of that form is the argument.)*
-
-> The thing is, two clocks are running, and they're nothing alike.
-
-⟢ **SPLIT B — cut to the landing page at `/`.** Lands on "two clocks are running", so the
-new screen arrives with the new idea.
-
-**0:30**
-
-> A bank needs about five facts to place a hold, and it needs them in minutes. An
-> investigation needs about fifty, and it has weeks.
-
-*(Scroll to "Why it is split" and stop on the two columns — The freeze needs / The case
-needs. Do not read the heading aloud. Let it be read.)*
-
-> The portal collects both at once — and runs the whole thing at the speed of the slower
-> half.
+> A bank needs five facts to freeze the account. The portal asks for fifty before it
+> takes one.
 >
 > So: send the five first.
 
-⟢ **SPLIT C — cut to the phone. THE RUN BEGINS. One unbroken take from here to SPLIT D.**
-
-**0:45**
+*(Stop talking. Let the run play.)*
 
 > A screenshot of the debit alert. That's the whole first step.
 
-*(Silence. Tap **Start a report** → **Add a screenshot** → pick the real debit SMS →
-**Read this**. Say nothing while it reads. The quiet reads as confidence.)*
+*(silence — about 8 seconds)*
 
-> Nine fields for the bank. Not one of them is required.
+> Nine fields. None of them required.
 
-*(Silence through the correction and the send. Correct exactly one field, then tap
-**Send freeze request**.)*
+*(silence until the receipt appears)*
 
-**On the receipt:**
+> Acknowledgement number. Time taken, on screen. Six of nine fields — and it names the
+> three that are missing.
 
-> Acknowledgement number. Time taken — on screen. Sent with six of nine fields, and it
-> names the three that are missing.
+*(Only if your budget allows — see the table above:)*
 
-*(Hold on **Time taken** for two full seconds. That figure is the claim. No zoom, no
-stopwatch overlay — the product measures itself and prints the result; an overlay implies
-you don't trust your own instrument.)*
+> And if you're still inside the scam, the report stops and tells you to hang up, and to
+> tell one person right now.
 
-> That's the sequence. Everything after this point has no clock on it.
->
-> But some people who reach a reporting form are still inside the scam. The caller is
-> still on the line. The remote-access app is still installed.
+**99 words** without the interrupt line, **122** with it — roughly 38s and 47s of speech. The rest of the minute is the run playing under the silences.
 
-⟢ **SPLIT D — cut to the interrupt.** Lands on "still inside the scam". Use the digital
-arrest demo case, or type a real in-progress sentence.
+## What to film
 
-**1:35**
+**Clip A — the portal · ~8 seconds**
+cybercrime.gov.in on your phone. The category dropdown, the register prompt, then scroll
+the form so its length passes. **Do not submit anything** — filing a fake report to a
+live government system is a false police complaint.
 
-> So the report stops.
+**Clip B — the run · ONE UNBROKEN TAKE**
+1. **Start a report**
+2. **Add a screenshot** → your real debit-SMS screenshot
+3. **Read this**, wait while it reads
+4. correct exactly one field
+5. **Send freeze request**
+6. hold on the receipt 3 seconds
 
-*(On screen: **Stop.** then **Hang up.**)*
+Fumble it? Delete and start over. Never fix this one with an edit.
 
-> One instruction for what's actually happening. And then this.
+**Clip C — the interrupt · ~10 seconds** *(only if the budget above allows)*
+The digital-arrest demo case. Show **Stop.** → **Hang up.** → **Tell one person. Right
+now.** Do not send the message.
 
-*(Scroll to **Tell one person. Right now.** Tap **Send a message** so the pre-written SMS
-composer opens. Show the message text. Do not send it.)*
+## Where each clip goes
 
-*(beat)*
-
-> Being told to keep it secret is how these scams hold. One call to someone you trust
-> ends it faster than anything on this page.
->
-> Now — back to those blank fields.
-
-⟢ **SPLIT E — cut to the blurred screenshot run.** Lands on "back to those blank fields".
-
-**2:05**
-
-> This screenshot is blurred. A model asked to read it will happily invent a reference
-> number that looks about right.
-
-*(Upload it, let it read, land on `/confirm` with several fields showing **Could not
-read**. Send anyway.)*
-
-> A missing transaction ID means the bank works with what it has. A wrong one means the
-> bank freezes the wrong account while the real one empties.
-
-*(On the receipt, land on the missing-fields block.)*
-
-> So the fields come back blank, the packet goes anyway, and the receipt names what was
-> dropped and why.
->
-> That refusal runs through the whole thing.
-
-⟢ **SPLIT F — cut to `/evidence`.** Lands on "runs through the whole thing".
-
-**2:25**
-
-> Every dispatch is timed, and the whole distribution is published — slow runs included.
-> Demo runs are counted separately and never mixed in.
-
-*(Scroll to the portal comparison.)*
-
-> The comparison against the live portal is empty, because nobody has counted it.
-
-*(Scroll to the clock section.)*
-
-> The meter shows a clock, not a recovery percentage — because we went looking for the
-> published curve, and there isn't one. The government was asked for it in Parliament in
-> February, and didn't give it.
->
-> Where we couldn't source something, it's blank, and the page says why.
-
-⟢ **SPLIT G — cut to the prototype notice, then the receipt's real-routes block.**
-
-**2:40**
-
-> This freezes nothing. No bank integration, no government connection.
->
-> It's a prototype of a sequence — and the sequence is the argument.
-
-*(Last frame: **Call 1930** and **cybercrime.gov.in**. Hold. Cut to black. No outro
-card.)*
-
-**2:50 — end**
+| Switch to | When you hear |
+|---|---|
+| Clip A | *(the start)* |
+| Clip B | "So: send the five first." |
+| Clip C | "And if you're still inside the scam…" |
 
 ---
 
-## The splits, for the edit
+# MINUTE TWO — how you built it, and why
 
-| | At the words | Picture becomes | Safe because |
-|---|---|---|---|
-| **A** | *(cold open)* | cybercrime.gov.in | — |
-| **B** | "two clocks are running" | landing page `/` | new idea, new screen |
-| **C** | "send the five first" | phone, `/start` | imperative hands off to action |
-| **D** | "still inside the scam" | `/interrupt` | the sentence names what you're cutting to |
-| **E** | "back to those blank fields" | blurred run | explicit callback, signals the move |
-| **F** | "runs through the whole thing" | `/evidence` | widens scope, so the wider shot follows |
-| **G** | "prototype of a sequence" | prototype notice → 1930 | closing thought, closing frame |
+**Straight to camera. No script-reading — know the three beats and talk.**
 
-Every one lands on a sentence boundary where the narration is already turning. **C → D is
-the one that must stay whole.**
+Three decisions, twenty seconds each. Don't add a fourth.
 
----
+## What to say
 
-## Before you record
-
-- [ ] **Deploy the current work.** The live URL is behind — the landing page, `/start`
-      and `/api/triage` are not on it yet. Shoot what you will submit.
-- [ ] `curl .../api/health` → `deploy_ready: true`, `warnings: []`
-- [ ] A **real** payment screenshot — genuine debit SMS or UPI confirmation. Redact digits
-      if you like; do not fabricate one. A staged screenshot is the one thing a sharp
-      viewer can smell.
-- [ ] A **blurred or cropped** transaction screenshot for SPLIT E.
-- [ ] Phone on Do Not Disturb. A notification banner mid-run costs you the take.
-- [ ] Rehearse on `?demo=1` — bucketed as demo, excluded from the measured median.
-      Rehearse as much as you like.
-- [ ] Decide now that **every real take counts**.
-
----
-
-## The honesty trap
-
-Read this before your first real take.
-
-**Every non-demo dispatch counts in the measured median.** Your takes are real runs.
-
-- **Do not cherry-pick.** Using your fastest take while `/evidence` shows a slower median
-  is exactly the dishonesty this product is built against — and it is discoverable,
-  because the site is deployed and anyone can open it.
-- **Keep every take.** Then SPLIT F shows the real median across all of them. If the
-  video take is 41s and the median is 52s, showing both is *stronger* than either alone,
-  because it proves you are not curating.
-- **If the median lands above sixty seconds**, change the claim, not the data — and say
-  the real number out loud in the narration. A product whose evidence page contradicts
-  its own headline is finished the moment a judge clicks through.
-
----
-
-## The 60-second cut
-
-Keep **SPLIT C alone**, unbroken, with one line of setup in front of it:
-
-> The national portal asks for about fifty facts before it accepts one. A bank needs five
-> of them, in minutes.
-
-Then the run. Then the receipt.
-
-The run *is* the thesis, demonstrated in real time. The interrupt is the most memorable
-thirty seconds you have, but it is not the claim — add it back only if there is room.
-
----
-
-## Production notes
-
-- **Record on an actual phone, portrait.** The design targets 360px on a throttled
-  connection. A wide desktop capture quietly throws that away.
-- **Plain, imperative voiceover.** Match the product's copy: no apology, no reassurance
-  theatre, no exclamation marks. No "imagine a world where."
-- **No music under the run.** If you want a bed, bring it in at SPLIT F and keep it under
-  the voice.
-- **Do not narrate what is legible.** If a line is on screen, let it be read.
-- **Do not explain the stack.** Nobody is deciding based on Zod.
-- **Subtitle it.** Burned-in captions — much of this gets watched muted.
-
----
-
-## Optional: the measured interrupt
-
-For a technical audience with thirty seconds spare. Insert at SPLIT D, after "ends it
-faster than anything on this page":
-
-*(Picture: `npm run eval` running, then `data/triage-eval-result.json`.)*
-
-> The interrupt fires on an explicit verdict plus a quoted signal, and nothing else. On
-> twenty-two labelled cases it produced no false positives and no false negatives.
+> Three decisions.
 >
-> Twenty-two cases written by the same person who wrote the gate. So: no false positive
-> was observed. Not that they don't occur.
+> **First, the split.** A bank needs five facts in minutes. An investigation needs fifty
+> over weeks. One form asking for both runs at the speed of the slower half. So the
+> urgent half goes first, and the rest attaches to the acknowledgement number. The
+> government already does this on the 1930 helpline — just not on the web.
+>
+> **Second, the model isn't allowed to guess.** A wrong transaction ID freezes the wrong
+> account while the real one empties. So "unreadable" is enforced on the server, not
+> asked for in the prompt — and the receipt names every field it dropped.
+>
+> **Third, I deleted my own headline number.** The meter showed a recovery percentage. I
+> couldn't source it. Parliament was asked for that data in February, and the answer
+> doesn't contain it. So it shows a clock now, and the evidence page says why.
 
-That last sentence is the only reason to include this. Anyone can show a green test run;
-volunteering the limit of your own measurement is what makes the rest of the video
-credible.
+**145 words** — about 56s at a normal pace. That is the whole minute. Do not add a fourth decision, and do not sign off at the end.
+
+**Then stop.** Don't summarise, don't thank anyone, don't say "and that's Golden Hour."
+Cut on the last word.
+
+## Delivery notes
+
+- **Don't read this off the screen.** Learn the three headers — *the split*, *no
+  guessing*, *deleted my own number* — and say the rest in your own words. Reading to
+  camera is obvious and it costs you more than a perfect sentence gains.
+- **One take per beat is fine.** Record each of the three separately if it's easier and
+  join them; nobody can see a cut on a talking head that holds still.
+- **Look at the lens, not at yourself.**
+- **The third beat is your strongest.** Slow down for it. Most people claim their thing
+  works; almost nobody says "I removed my own number because I couldn't back it up."
+
+---
+
+# Optional — cutaways in minute two
+
+Facecam-only works. But if editing allows, a **2-second cutaway** on beats two and three
+makes them land much harder, and still counts as explaining rather than demoing:
+
+- On *"the receipt names every field it dropped"* → the receipt's missing-fields block
+- On *"the evidence page explains why"* → `/evidence`, the line reading *"There is no
+  published recovery curve, so we do not draw one"*
+
+Keep your voice running underneath; cut back to your face right after. If it costs you
+time, drop them — the words carry it alone.
+
+---
+
+# Before you record
+
+- [ ] **Deploy your latest work.** The live site is out of date — the landing page and
+      `/start` aren't on it. Film what you'll submit.
+- [ ] `/api/health` shows `deploy_ready: true`, no warnings.
+- [ ] A **real** payment screenshot. Blur the digits if you want; don't fabricate one.
+- [ ] Do one timed run and write down `R`. Budget minute one off it.
+- [ ] Phone on Do Not Disturb — one banner ruins Clip B.
+- [ ] Practise on `?demo=1`. Those runs don't count toward your measured time.
+
+---
+
+# The one thing that could sink you
+
+**Every real run you record counts in the median on `/evidence`.** Film Clip B six times
+and all six are in that number.
+
+- **Don't use your fastest take while the site shows a slower average.** Anyone can open
+  `/evidence` and see the gap. That's the exact dishonesty this project is built against.
+- **Keep every take.** If your video run is 41 seconds and the average is 52, that's
+  fine — and if anyone asks, saying so is a better answer than a curated number.
+- **If the average lands above 60 seconds**, change the claim, not the data.
+- **Practice runs on `?demo=1` don't count.** Use them freely.
+
+---
+
+# If you're over 2:00
+
+Cut in this order. Stop as soon as you fit.
+
+1. **The interrupt (Clip C)** — the biggest saving, ~10s, and minute two still stands
+   without it
+2. **The portal (Clip A)** — drop to one sentence over a single still of the form
+3. **The third beat in minute two** — painful, it's the strongest, but it's the longest
+4. **The cutaways**
+
+**Never cut:** the run itself, or any of it.
+
+Time the final edit. If it lands at 2:01, it's over. Leave yourself 3–5 seconds of
+headroom.
+
+---
+
+# Both presenting
+
+If your teammate presents too, the natural split is **one voice per minute** — one does
+the citizen demo, the other does the build. Same script, and it saves you a costume
+change between voice-only and facecam.
+
+If you do that, the handover line at 1:00 should be plain: *"That's the citizen side.
+Here's how it's built."* Don't do introductions — you have no seconds for them.
+
+---
+
+# Rules for the look
+
+- **Film the demo on a real phone, upright.** The design is built for a small screen.
+- **Plain speaking voice.** No hype, no "imagine a world where."
+- **No music during the run.** The silence is the point.
+- **Don't read out text that's on screen.** Let people read it.
+- **Subtitles.** Most people watch without sound.
