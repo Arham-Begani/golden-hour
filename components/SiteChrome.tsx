@@ -36,7 +36,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <header className="mb-4 flex min-w-0 items-center justify-between gap-2 border-b border-line py-3">
         <Link
           href="/"
-          className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight text-text no-underline"
+          className="flex min-h-11 min-w-0 items-center gap-2 text-base font-semibold tracking-tight text-text no-underline"
         >
           {/* The one mark on the site, and it is the clock. Amber is rationed
               to the meter and this — the thing the product is named after. */}
@@ -47,7 +47,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/evidence"
-            className="text-xs text-muted underline underline-offset-2 transition-colors hover:text-text"
+            className="flex min-h-11 items-center text-xs text-muted underline underline-offset-2 transition-colors hover:text-text"
           >
             {copy.evidence.nav}
           </Link>
@@ -94,26 +94,26 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
       {!interrupted && (
         <footer className="mt-12 border-t border-line pt-5 text-xs text-faint">
-          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link href="/" className="underline underline-offset-2 hover:text-text">
+          <nav className="flex flex-wrap items-center gap-x-4">
+            <Link href="/" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
               {copy.footer.what}
             </Link>
-            <Link href="/start" className="underline underline-offset-2 hover:text-text">
+            <Link href="/start" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
               {copy.nav.start}
             </Link>
-            <Link href="/evidence" className="underline underline-offset-2 hover:text-text">
+            <Link href="/evidence" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
               {copy.evidence.nav}
             </Link>
             {/* The real routes, reachable from any screen and not only the
                 receipt. This is the half of the footer that is not decoration. */}
-            <a href="tel:1930" className="underline underline-offset-2 hover:text-text">
+            <a href="tel:1930" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
               {copy.receipt.call}
             </a>
             <a
               href="https://cybercrime.gov.in"
               target="_blank"
               rel="noreferrer"
-              className="underline underline-offset-2 hover:text-text"
+              className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text"
             >
               {copy.receipt.portal}
             </a>
