@@ -28,6 +28,19 @@ type Timings = {
 
 const seconds = (ms: number | null) => (ms === null ? "—" : `${(ms / 1000).toFixed(1)}s`);
 
+/**
+ * Below this many runs, the numbers are shown with a caveat rather than as a
+ * distribution.
+ *
+ * The first real run landed on 3 September and this page immediately reported
+ * "Median 49.5s / Fastest 49.5s / Slowest 49.5s / Under 60s 1/1" with no
+ * qualification, because every branch here keyed off `count > 0`. A median of
+ * one run is not a median, and "1/1" reads like a success rate. That is the
+ * overstatement this whole page exists to argue against, committed by the page
+ * itself, so the small-sample state is now explicit.
+ */
+const ENOUGH_RUNS = 5;
+
 export default function EvidencePage() {
   const [timings, setTimings] = useState<Timings | null>(null);
 
@@ -72,8 +85,27 @@ export default function EvidencePage() {
           time, not the task.
         </p>
 
+        {timings && timings.count > 0 && timings.count < ENOUGH_RUNS && (
+          <p className="mt-4 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+            <strong>
+              {timings.count === 1
+                ? "One run recorded. That is not a distribution."
+                : `${timings.count} runs recorded. That is not yet a distribution.`}
+            </strong>{" "}
+            The figures below are shown because hiding them would be worse, not because they
+            establish anything. A median over {timings.count === 1 ? "one run" : `${timings.count} runs`} is
+            close to a single observation, and the sixty-second claim should not be read as
+            proven until there are more. Whatever the number turns out to be at that point is
+            what this page will say.
+          </p>
+        )}
+
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Median" value={seconds(timings?.median_ms ?? null)} />
+          {/* "Median" is a lie at n=1, so it is not used at n=1. */}
+          <Stat
+            label={timings && timings.count === 1 ? "The one run" : "Median"}
+            value={seconds(timings?.median_ms ?? null)}
+          />
           <Stat label="Fastest" value={seconds(timings?.fastest_ms ?? null)} />
           <Stat label="Slowest" value={seconds(timings?.slowest_ms ?? null)} />
           <Stat

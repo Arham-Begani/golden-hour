@@ -54,6 +54,18 @@ const OPEN: Entry[] = [
 const FIXED: Entry[] = [
   {
     found:
+      "The most important path in the product had never been measured. The interrupt — a supporting feature — had a rigorous evaluation, 22 labelled cases and five disclosed limits. Extraction, which is the thing a person actually comes here to do, had none, and the screenshot path that the front page leads with had never been run once. The project measured its second-most important feature and not its most important one.",
+    did: "There is now an extraction evaluation over generated screenshots and text in English, Hinglish, Hindi and an unpunctuated dictation transcript. Across three passes: 74 of 75 fields correct, and the screenshot path 40 of 40 with nothing invented — including three images where a field was cut out entirely, so any value returned for it could not have been read.",
+    check: { label: "The numbers and their limits", href: "/honesty" },
+  },
+  {
+    found:
+      "One value got through wrong, and it is the one that matters. Given a dictation transcript saying “fastcart dot pay at samplebank”, the model returned fastcart@samplebank — a different account, and a perfectly well-formed handle. The server checks shape, so it had nothing to object to, and the value went into the packet.",
+    did: "Nothing automatic, deliberately. Shape validation catches malformed values and cannot catch plausible ones; that is now a measured limit stated on the honesty page rather than a suspicion. The mitigation that exists is the confirm screen, where the handle is shown back and can be corrected before sending. A guard built in three days against a single observed case would either fire constantly or never.",
+    check: { label: "Read the limit", href: "/honesty" },
+  },
+  {
+    found:
       "The judging harness did not work. Pressing “Start the run” at /judge began a stopwatch over a frame that never loaded — a clock counting up against an empty box. It had been shipping that way since the page was written, and it is the page the submission offers reviewers as the guided run.",
     did: "The iframe was rendered only once a run started, so the ref was still null in the click handler that set its source and the frame kept the blank placeholder from its markup. It is now always mounted and driven by an effect. This is also why no run had ever been recorded: none could finish.",
     check: { label: "Time a run yourself", href: "/judge" },

@@ -138,6 +138,8 @@ const en = {
     measuredHeading: "Measured, not asserted",
     measuredBody: "Every dispatch is timed and the whole distribution is published, slow runs included. Demo replays are counted separately and never mixed in. Where a figure could not be traced to a source, it is left empty and the page says why.",
     measuredMedian: "Median time to dispatch",
+    /** Used until there are enough runs for "median" to mean anything. */
+    measuredSingle: "Time to dispatch, one run",
     measuredNone: "Not yet measured",
     measuredRuns: (n: number) => `${n} recorded ${n === 1 ? "run" : "runs"}`,
 
@@ -463,6 +465,7 @@ const hi: Dict = {
     measuredHeading: "दावा नहीं, माप",
     measuredBody: "हर भेजे गए पैकेट का समय मापा जाता है और पूरा आँकड़ा दिखाया जाता है, धीमे रन भी। डेमो रन अलग गिने जाते हैं और कभी इनमें नहीं मिलाए जाते। जिस आँकड़े का कोई स्रोत नहीं मिला, उसे ख़ाली छोड़ा गया है और वजह लिखी गई है।",
     measuredMedian: "भेजने में लगा औसत समय",
+    measuredSingle: "भेजने में लगा समय, एक रन",
     measuredNone: "अभी मापा नहीं गया",
     measuredRuns: (n: number) => `${n} दर्ज रन`,
 

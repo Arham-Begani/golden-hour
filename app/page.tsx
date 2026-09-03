@@ -230,7 +230,11 @@ export default function LandingPage() {
           className="card card-interactive mt-4 flex items-center justify-between gap-4 no-underline"
         >
           <div className="min-w-0">
-            <p className="text-xs text-muted">{landing.measuredMedian}</p>
+            {/* A median over one run is not a median. The label says so until
+                there is a distribution behind it. */}
+            <p className="text-xs text-muted">
+              {timings && timings.count === 1 ? landing.measuredSingle : landing.measuredMedian}
+            </p>
             <p className="mt-0.5 text-2xl font-semibold tabular-nums">
               {median ?? (
                 <span className="text-lg font-medium text-faint">{landing.measuredNone}</span>
