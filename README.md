@@ -121,7 +121,7 @@ everyone to dismiss the real ones.
 
 ```bash
 npm run verify     # typecheck + unit tests + production build
-npm run test       # 97 unit tests: clock and bands, validation, interrupt gate, schema, run provenance,
+npm run test       # 100 unit tests: clock and bands, validation, interrupt gate, schema, run provenance,
                    #   triage gate, bank payload, honesty/HONESTY.md sync, judge scenario safety
 npm run eval       # scores the interrupt against 22 labelled cases; needs a running server
 npm run shots      # screenshots at 360px; fails if any page scrolls sideways

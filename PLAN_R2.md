@@ -1,5 +1,14 @@
 # Round 2 plan
 
+> **Status, 3 September.** This was the audit that set the week's order. Items 1 and 3–10
+> are done; the reasoning for each is in `BUILD_LOG.md` steps 7–9 and the reader-facing
+> version is on `/changes`. **Still open: item 2 (real timed runs) and the counting half of
+> item 3 (the portal benchmark)** — both are measurements a human has to take, and both are
+> blocked by the project's own rule that a model may not fill them in.
+>
+> Kept unedited below, because a plan rewritten after the fact to match what happened is
+> not evidence of anything.
+
 Audit written 2026-09-02, against commit `0ea75a3` and the live deployment at
 `golden-hour-kappa.vercel.app`. Findings first, then ranked work, then what not to build.
 

@@ -82,3 +82,66 @@ describe("the demo set exercises the validator", () => {
     expect(extraction.utr_or_upi_ref.value).toBe(UNREADABLE);
   });
 });
+
+/**
+ * The synthetic-data rule, applied to the fixtures.
+ *
+ * HONESTY.md claims no real UPI handle, phone number or personal identifier
+ * appears anywhere in this repository "including in seeds and tests". That was
+ * asserted for the eval cases and the judge scenarios and never for the demo
+ * fixtures — which is where it was false: the clean-SMS case shipped a
+ * `@okaxis` handle (a suffix Axis Bank actually issues, and one this project's
+ * own judge-scenario test forbids by name) and a real bank helpline number.
+ *
+ * The demo cases are the strings most likely to end up in a screenshot, a video
+ * frame or a slide, so they are the last place the rule should have gone
+ * unchecked.
+ */
+describe("the demo fixtures carry no real identifiers", () => {
+  /** Kept identical to the list in lib/judge-scenarios.test.ts on purpose. */
+  const REAL_PSP_SUFFIXES =
+    /@(?:ok(?:axis|hdfcbank|icici|sbi|bizaxis)|ybl|ibl|axl|apl|paytm|upi|sbi|hdfcbank|icici|axisbank|kotak|yesbank|barodampay|fbl|idfcbank|jupiteraxis|superyes|abfspay)\b/i;
+
+  /** Everything a fixture puts on screen: its prompt text and every read value. */
+  const surfaceOf = (fixture: (typeof FIXTURES)[number]) =>
+    [fixture.input, JSON.stringify(fixture.raw)].join(" ");
+
+  it("uses no real-world UPI handle suffix", () => {
+    for (const fixture of FIXTURES) {
+      expect(
+        REAL_PSP_SUFFIXES.test(surfaceOf(fixture)),
+        `fixture "${fixture.id}" contains a real PSP handle suffix`,
+      ).toBe(false);
+    }
+  });
+
+  it("contains nothing shaped like a phone number, Aadhaar or PAN", () => {
+    const INDIAN_MOBILE = /(?:^|\D)(?:\+?91[-\s]?)?[6-9]\d{9}(?:\D|$)/;
+    const AADHAAR = /(?:^|\D)\d{4}\s\d{4}\s\d{4}(?:\D|$)/;
+    const PAN = /(?:^|\W)[A-Z]{5}\d{4}[A-Z](?:\W|$)/;
+
+    for (const fixture of FIXTURES) {
+      for (const [name, pattern] of [
+        ["mobile", INDIAN_MOBILE],
+        ["aadhaar", AADHAAR],
+        ["pan", PAN],
+      ] as const) {
+        expect(
+          pattern.test(surfaceOf(fixture)),
+          `fixture "${fixture.id}" contains something shaped like a ${name}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it("contains no toll-free helpline number other than 1930", () => {
+    // 1930 is the real national helpline and is meant to be reachable. Any
+    // other 1800-block number in demo copy is some real institution's line.
+    for (const fixture of FIXTURES) {
+      expect(
+        /\b1800[\s-]?\d{6,7}\b/.test(surfaceOf(fixture)),
+        `fixture "${fixture.id}" contains a real toll-free number`,
+      ).toBe(false);
+    }
+  });
+});

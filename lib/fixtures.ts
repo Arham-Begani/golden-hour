@@ -8,6 +8,12 @@ import { UNREADABLE } from "./schema";
  * exact same `validateExtraction` path as a live response, so what a judge
  * sees is the real pipeline with a cached first step, not a mock of it.
  *
+ * Every identifier here is synthetic, and the VPA suffixes are deliberately not
+ * real ones. A handle ending in a suffix an Indian PSP actually issues could
+ * route to a real person's account, which is why lib/fixtures.test.ts asserts
+ * against the same list the judge scenarios are held to. This file used to
+ * carry @okaxis and a real bank helpline number, and nothing was checking it.
+ *
  * The cases are chosen deliberately. Three of them are the product's best
  * arguments: the blurred screenshot proves the model will decline to read a
  * field, the misread reference proves the SERVER refuses one the model was
@@ -44,7 +50,7 @@ export const FIXTURES: Fixture[] = [
     label: "Clean bank SMS",
     purpose: "The happy path. Screenshot to dispatchable packet in one step.",
     input:
-      "Dear Customer, Rs.12,500.00 debited from A/c XX4471 on 24-08-26 at 21:14:07 to VPA rahulk.9821@okaxis (UPI Ref 523612345678). Not you? Call 18002586161. -HDFC Bank",
+      "Dear Customer, Rs.12,500.00 debited from A/c XX4471 on 24-08-26 at 21:14:07 to VPA rahul.k9821@examplebank (UPI Ref 523612345678). Not you? Call your bank. -HDFC Bank",
     occurredMinutesAgo: 9,
     raw: {
       amount: field("12500.00", 0.98),
@@ -54,7 +60,7 @@ export const FIXTURES: Fixture[] = [
       transaction_ref: field(UNREADABLE, 0.2),
       utr_or_upi_ref: field("523612345678", 0.97),
       occurred_at: field("__OCCURRED_AT__", 0.94),
-      beneficiary_handle: field("rahulk.9821@okaxis", 0.96),
+      beneficiary_handle: field("rahul.k9821@examplebank", 0.96),
       beneficiary_name: field(UNREADABLE, 0.1),
       victim_bank: field("HDFC Bank", 0.95),
       source_account_last4: field("4471", 0.93),

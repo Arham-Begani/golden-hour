@@ -96,6 +96,8 @@ Three of the original build constraints were dropped deliberately rather than me
 
 ## Demo data
 
-Every fixture, eval case and test input in this repository is synthetic and was written for it. No real transaction ID, UTR, UPI handle, phone number, Aadhaar number, PAN, account number or personal detail appears anywhere, including in seeds and tests. The test suite asserts this against the eval cases rather than trusting it.
+Every fixture, eval case and test input in this repository is synthetic and was written for it. No real transaction ID, UTR, UPI handle, phone number, Aadhaar number, PAN, account number or personal detail appears anywhere, including in seeds and tests. The test suite asserts this rather than trusting it — across the demo fixtures, the judge scenarios and the eval cases, each checked against the list of handle suffixes Indian PSPs actually issue.
 
 Uploaded images are sent to the model and never persisted. Freeze packets are stored for 24 hours and then expire.
+
+That assertion was not always true of the fixtures. Until 3 September the clean-SMS demo case carried a @okaxis handle — a suffix Axis Bank actually issues, and one this project’s own judge-scenario test already forbade by name — along with a real bank helpline number. The rule was enforced everywhere except the strings most likely to end up in a screenshot. It is enforced there now, and the gap is recorded here rather than quietly closed.

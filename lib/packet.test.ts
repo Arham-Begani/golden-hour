@@ -42,7 +42,7 @@ describe("toBankPayload", () => {
     const payload = toBankPayload(packetFor("clean-sms"));
     expect(payload.amount).toBe("12500.00");
     expect(payload.utr_or_upi_ref).toBe("523612345678");
-    expect(payload.beneficiary.handle).toBe("rahulk.9821@okaxis");
+    expect(payload.beneficiary.handle).toBe("rahul.k9821@examplebank");
     expect(payload.unreadable).not.toContain("amount");
   });
 

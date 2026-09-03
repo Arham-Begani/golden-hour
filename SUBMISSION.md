@@ -53,7 +53,7 @@ is reachable without an account. This is deliberate: the existing portal makes v
 register and wait for an OTP before it accepts anything, often while the scammer is still
 on the phone, and removing that step is central to the project. Reviewers wanting a guided
 run can open `/judge` — a scenario, a stopwatch, and the live product on one screen, no
-setup.
+setup. `/changes` lists what was fixed since Round 1, and what is still open.
 
 Short version, if the field is cramped:
 

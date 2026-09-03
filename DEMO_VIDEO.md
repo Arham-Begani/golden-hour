@@ -176,9 +176,16 @@ Cut on the last word.
 Facecam-only works. But if editing allows, a **2-second cutaway** on beats two and three
 makes them land much harder, and still counts as explaining rather than demoing:
 
-- On *"the receipt shows you what got dropped"* → the receipt's missing-fields block
+- On *"the receipt shows you what got dropped"* → the **`Dropped` chip on the confirm
+  screen**, using the `A confident misread` demo case. This is the strongest two seconds
+  available to you: the model returned an eleven-digit reference at 0.93 confidence and the
+  server refused it, with the rejected value printed underneath. No earlier cut could show
+  this — every demo case's blanks used to come from the model declining to read a field,
+  which shows the prompt behaving, not the guarantee holding.
 - On *"the evidence page explains why"* → `/evidence`, the line reading *"There is no
   published recovery curve, so we do not draw one"*
+- If you have a third second spare, the receipt's **"What would be transmitted"** block
+  open, showing `"unreadable": [...]` and `"dispatched": false` in the payload
 
 Keep your voice running underneath; cut back to your face right after. If it costs you
 time, drop them — the words carry it alone.
@@ -195,6 +202,8 @@ time, drop them — the words carry it alone.
 - [ ] Do one timed run and write down `R`. Budget minute one off it.
 - [ ] Phone on Do Not Disturb — one banner ruins Clip B.
 - [ ] Practise on `?demo=1`. Those runs don't count toward your measured time.
+- [ ] Know where `/changes` is. If anyone asks what is new since Round 1, that is the answer
+      and it is one link.
 
 ---
 
