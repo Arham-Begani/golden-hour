@@ -1,0 +1,113 @@
+{
+  "_README": [
+    "Text cases for the extraction eval. Hand-written, unlike the image cases, which are",
+    "generated with their answer key by scripts/make-eval-images.mjs.",
+    "",
+    "HONESTY.md has said since 28 August that the interrupt was only ever measured on",
+    "English prose, and that Hinglish, Hindi and unpunctuated dictation are what a real",
+    "user is most likeliest to give it. These are that gap, for extraction rather than",
+    "triage: the same fields, asked for in the language the person actually speaks.",
+    "",
+    "'expect' is the answer key. A field set to UNREADABLE is NOT in the text at all --",
+    "the person did not say it. Any value returned for one of those was invented, and is",
+    "scored as a hallucination with no defence available.",
+    "",
+    "Every identifier is synthetic. No VPA suffix here is one an Indian PSP issues, and",
+    "there are no real phone numbers, Aadhaar numbers or PANs."
+  ],
+
+  "cases": [
+    {
+      "id": "text-english-sms",
+      "why": "Baseline. A clean pasted bank SMS, the easiest input there is.",
+      "language": "english",
+      "text": "Dear Customer, Rs.12,500.00 debited from A/c XX4471 on 24-08-26 at 21:14:07 to VPA rahul.k9821@examplebank (UPI Ref 523612345678). Not you? Call your bank. -Example Bank",
+      "expect": {
+        "amount": "12500.00",
+        "utr_or_upi_ref": "523612345678",
+        "beneficiary_handle": "rahul.k9821@examplebank",
+        "source_account_last4": "4471",
+        "victim_bank": "Example Bank"
+      }
+    },
+    {
+      "id": "text-hinglish-full",
+      "why": "Hinglish narrative carrying every field. The commonest way an Indian user actually types.",
+      "language": "hinglish",
+      "text": "Bhai mere account se 6,500 rupaye cut gaye abhi. Maine galti se ek fake delivery wale ko bhej diye. UPI reference 418290337145 hai aur paisa store.refund@demobank pe gaya hai. Mera account XX6614 hai, Demo Bank ka.",
+      "expect": {
+        "amount": "6500",
+        "utr_or_upi_ref": "418290337145",
+        "beneficiary_handle": "store.refund@demobank",
+        "source_account_last4": "6614",
+        "victim_bank": "Demo Bank"
+      }
+    },
+    {
+      "id": "text-hinglish-no-ref",
+      "why": "Hinglish with the reference genuinely unknown. The field must come back empty, not filled.",
+      "language": "hinglish",
+      "text": "Kisi ne mujhe call karke bola ki mera parcel customs mein atka hai aur maine 9,400 rupaye transfer kar diye. Mujhe reference number nahi pata, app se logout ho gaya hoon. Paisa bright.deals@demobank pe gaya tha.",
+      "expect": {
+        "amount": "9400",
+        "utr_or_upi_ref": "UNREADABLE",
+        "beneficiary_handle": "bright.deals@demobank",
+        "source_account_last4": "UNREADABLE",
+        "victim_bank": "UNREADABLE"
+      }
+    },
+    {
+      "id": "text-dictation-no-punctuation",
+      "why": "A speech-to-text transcript: no punctuation, spelled-out digits, filler words.",
+      "language": "english-dictation",
+      "text": "um so basically i paid fifteen thousand six hundred rupees to someone who said they were from the electricity board it was around nine in the evening the reference was seven seven four three one zero nine two eight two six five and it went to fastcart dot pay at samplebank i think my account ends five one two seven",
+      "expect": {
+        "amount": "15600",
+        "utr_or_upi_ref": "774310928265",
+        "beneficiary_handle": "fastcart.pay@samplebank",
+        "source_account_last4": "5127",
+        "victim_bank": "UNREADABLE"
+      }
+    },
+    {
+      "id": "text-hindi-devanagari",
+      "why": "Hindi in Devanagari. The product ships a Hindi interface; nothing had tested a Hindi input.",
+      "language": "hindi",
+      "text": "मेरे खाते से 31,200 रुपये कट गए हैं। यह भुगतान payments.desk77@examplebank को गया है और यूपीआई संदर्भ संख्या 902184773051 है। मेरा खाता XX8830 है, एग्ज़ाम्पल बैंक में।",
+      "expect": {
+        "amount": "31200",
+        "utr_or_upi_ref": "902184773051",
+        "beneficiary_handle": "payments.desk77@examplebank",
+        "source_account_last4": "8830",
+        "victim_bank": ["Example Bank", "एग्ज़ाम्पल बैंक"]
+      },
+      "_note": "Two corrections to this key, both mine rather than the model's. It first said UNREADABLE for victim_bank, which was simply wrong — the sentence names the bank in Devanagari. It then demanded the Latin form, and the model returns the name in the script the person wrote it in, which is the same value and cannot route a bank anywhere different. Both forms are accepted. Recorded here because a benchmark whose author quietly fixes the key after seeing the output is not a benchmark."
+    },
+    {
+      "id": "text-vague-almost-nothing",
+      "why": "The hardest case for invention: an upset person who remembers almost nothing. Four of five fields must come back empty.",
+      "language": "english",
+      "text": "I think about two thousand rupees went out of my account late last night, maybe around midnight. I don't have the message any more and I can't remember who it went to. I just want to report it before it's too late.",
+      "expect": {
+        "amount": "2000",
+        "utr_or_upi_ref": "UNREADABLE",
+        "beneficiary_handle": "UNREADABLE",
+        "source_account_last4": "UNREADABLE",
+        "victim_bank": "UNREADABLE"
+      }
+    },
+    {
+      "id": "text-hinglish-partial-ref",
+      "why": "The person half-remembers the reference. A completed twelve digits would be the exact failure lib/validate.ts exists to stop.",
+      "language": "hinglish",
+      "text": "Mere account se 47,000 nikal gaye. Reference kuch 5236 se shuru hota tha, poora yaad nahi hai. Paisa mehta.traders@testbank pe gaya. Test Bank ka account hai mera.",
+      "expect": {
+        "amount": "47000",
+        "utr_or_upi_ref": "UNREADABLE",
+        "beneficiary_handle": "mehta.traders@testbank",
+        "source_account_last4": "UNREADABLE",
+        "victim_bank": "Test Bank"
+      }
+    }
+  ]
+}

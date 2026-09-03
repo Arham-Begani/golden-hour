@@ -1,0 +1,629 @@
+{
+  "measured_at": "2026-09-03T16:25:53.866Z",
+  "base_url": "https://golden-hour-kappa.vercel.app",
+  "scored_fields": [
+    "amount",
+    "utr_or_upi_ref",
+    "beneficiary_handle",
+    "source_account_last4",
+    "victim_bank"
+  ],
+  "image_cases": 8,
+  "text_cases": 7,
+  "errored": 0,
+  "median_latency_ms": 3139,
+  "passes": 3,
+  "stability": {
+    "passes": 3,
+    "fields_tracked": 75,
+    "fields_that_varied": 1,
+    "varied": [
+      {
+        "field": "text-dictation-no-punctuation.beneficiary_handle",
+        "outcomes": [
+          "misread",
+          "correct"
+        ]
+      }
+    ],
+    "escaped_per_pass": [
+      1,
+      0,
+      1
+    ],
+    "worst_pass_escapes": 1,
+    "correct_per_pass": [
+      74,
+      75,
+      74
+    ]
+  },
+  "overall": {
+    "fields_scored": 75,
+    "correct": 74,
+    "missed": 0,
+    "misread": 1,
+    "invented": 0,
+    "bad_values": 1,
+    "caught_by_validator": 0,
+    "escaped_to_packet": 1
+  },
+  "catch_rate_pct": 0,
+  "images": {
+    "fields_scored": 40,
+    "correct": 40,
+    "missed": 0,
+    "misread": 0,
+    "invented": 0,
+    "bad_values": 0,
+    "caught_by_validator": 0,
+    "escaped_to_packet": 0
+  },
+  "text": {
+    "fields_scored": 35,
+    "correct": 34,
+    "missed": 0,
+    "misread": 1,
+    "invented": 0,
+    "bad_values": 1,
+    "caught_by_validator": 0,
+    "escaped_to_packet": 1
+  },
+  "cases": [
+    {
+      "id": "sms-clean",
+      "kind": "image",
+      "latency_ms": 3518,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "sms-blurred",
+      "kind": "image",
+      "latency_ms": 3761,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "sms-ref-cut",
+      "kind": "image",
+      "latency_ms": 3394,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "upi-clean",
+      "kind": "image",
+      "latency_ms": 3603,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "upi-glare",
+      "kind": "image",
+      "latency_ms": 4100,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "upi-handle-cut",
+      "kind": "image",
+      "latency_ms": 4266,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "sms-dark-lowcontrast",
+      "kind": "image",
+      "latency_ms": 3653,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "sms-everything-cut",
+      "kind": "image",
+      "latency_ms": 3139,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-english-sms",
+      "kind": "text",
+      "latency_ms": 2503,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-hinglish-full",
+      "kind": "text",
+      "latency_ms": 2573,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-hinglish-no-ref",
+      "kind": "text",
+      "latency_ms": 2040,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-dictation-no-punctuation",
+      "kind": "text",
+      "latency_ms": 2208,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "misread",
+          "caught": false,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-hindi-devanagari",
+      "kind": "text",
+      "latency_ms": 2164,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-vague-almost-nothing",
+      "kind": "text",
+      "latency_ms": 2076,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": "low_confidence"
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    },
+    {
+      "id": "text-hinglish-partial-ref",
+      "kind": "text",
+      "latency_ms": 1994,
+      "fields": [
+        {
+          "field": "amount",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "utr_or_upi_ref",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "beneficiary_handle",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "source_account_last4",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        },
+        {
+          "field": "victim_bank",
+          "outcome": "correct",
+          "caught": null,
+          "downgrade_reason": null
+        }
+      ]
+    }
+  ]
+}

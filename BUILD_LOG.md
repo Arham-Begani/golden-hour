@@ -665,3 +665,93 @@ below the acknowledgement number, so it should not compete — but the receipt i
 drop screen for a victim and this is a block written for a judge. If the two audiences pull
 harder apart than expected, the honest move is to leave a link on the receipt and put the
 payload on `/evidence`, where the other judge-facing material already lives.
+
+
+---
+
+## Step 10 - measuring the path the product is actually for - 2026-09-03
+
+Asked whether the project was as good as it gets, went looking, and found the asymmetry
+that had been sitting there the whole time.
+
+**The interrupt had a dual-path eval, 22 labelled cases, a confidence-interval caveat and
+five disclosed limits. Extraction had nothing.** No accuracy measurement, no hallucination
+measurement, and the image path - the marquee interaction the landing page leads with -
+had never been run once. Not a unit test, not a fixture, not one live vision call. The
+`blurred` demo case is a hand-written cache, not a model response.
+
+So the project rigorously measured its second-most important feature and had never measured
+its most important one. That is the first thing a sharp reviewer finds.
+
+### What the eval measures, and why it is not accuracy
+
+Accuracy is the obvious metric and the less important one. The claim is not "the model
+reads well"; it is that a missing transaction ID means the bank works with what it has,
+while a wrong one means the bank freezes the wrong account while the real one empties.
+
+Three outcomes per field - correct, missed, bad - and a bad value is then either caught by
+`lib/validate.ts` or **escapes into the packet**. Escapes are the only outcome that could
+misdirect a hold, so they are what the run fails on. A `missed` passes: refusing to read is
+the designed behaviour, and failing on misses would create pressure to loosen the validator.
+
+Recovering the model's raw answer needed no new endpoint. `/api/extract` already returns the
+validated extraction *and* the downgrade list, and each downgrade carries `original` - what
+the model said before the server refused it. Both sides from one call, so the catch rate is
+measurable rather than assumed.
+
+### The images are generated, and the cut fields are cut
+
+A real screenshot of a real debit alert is real financial data about a real person, and
+there is none in this repository. Generating them keeps the synthetic-data rule intact and -
+the part that matters - means the answer key is written by the same object that draws the
+image, so a case cannot quietly disagree with its own ground truth.
+
+Fields whose expected answer is unreadable are **removed from the DOM before rendering**,
+not blurred. To count an invention you must be certain the information was unavailable, and
+a blurred number is ambiguous: a model that reads it may simply have survived the blur. A
+number never drawn cannot have been read.
+
+That distinction caught a bug in my own generator immediately: the SMS template rendered the
+literal word "Bank" as a fallback when the bank name was cut, so a model returning "Bank"
+would have been scored as inventing a value that was, in fact, printed in the image. Fixed
+before the first real run.
+
+### The result
+
+Three passes against production, 75 fields each:
+
+- **Vision path: 40 of 40 correct on every pass.** Nothing invented, nothing misread -
+  including three images with a field cut out entirely.
+- **Text: 34 of 35.** English, Hinglish, Hindi in Devanagari, and an unpunctuated dictation
+  transcript.
+- **One escape**, and it is the interesting one.
+
+Given "fastcart dot pay at samplebank", the model returned `fastcart@samplebank` - dropping
+a segment and producing a **different account** whose VPA is perfectly well-formed.
+`lib/validate.ts` did not catch it and cannot: there is nothing wrong with the shape.
+
+**Shape validation catches malformed values, not plausible ones.** That is a real limit on
+the product's central safety claim, it is now measured rather than suspected, and it is on
+`/honesty` as a `not-real` row. It is also the most credible thing on that page, because it
+is the project reporting where its own best idea stops working.
+
+### Two things I got wrong, both recorded rather than smoothed
+
+**The Hindi answer key was wrong twice.** First it said the bank name was absent when the
+sentence names it in Devanagari - that would have published a hallucination the model did
+not commit. Then it demanded the Latin form, when the model returns the name in the script
+the person wrote it in, which is the same value and cannot route anywhere different. Both
+corrections are in `data/extraction-text-eval.json` with the reasoning. A benchmark whose
+author quietly edits the key after seeing the output is not a benchmark.
+
+**One pass is not a measurement of a non-deterministic system.** The first run showed the
+escape; re-running that exact case immediately produced the correct value. Temperature 0 is
+not determinism. `--repeat N` now makes the instability the measurement: escapes across
+three passes were 1, 0, 1, and the exit code uses the worst pass rather than the kindest.
+
+### Uncertain
+
+**Whether the vision result survives real photographs.** Generated screenshots are cleaner
+than what people actually take of a cracked screen at midnight, and 40/40 on synthetic
+images is not 40/40 on those. This is the first thing I would attack next, and it needs
+either real donated screenshots or a much nastier generator.

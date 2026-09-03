@@ -360,3 +360,60 @@ as `description` and seeds the statement on `/report/[ack]`. Someone who describ
 situation under time pressure should not be asked to type it again on the unhurried screen.
 It seeds only when no statement has been saved yet — once they have edited it, that is
 theirs.
+
+
+---
+
+## 13. The extraction eval fails on escapes, not on misses
+
+**Chosen:** `scripts/eval-extract.mjs` scores three outcomes per field - correct, missed,
+bad - and exits non-zero only when a bad value **escapes into the packet**. Screenshots are
+generated with their answer key; fields expected to be unreadable are cut out of the image
+rather than blurred; the suite can run N passes and reports the worst.
+
+**Rejected:** scoring accuracy and calling that the number. **Rejected:** failing the run on
+low accuracy. **Rejected:** collecting real screenshots. **Rejected:** blurring a field and
+calling a value returned for it a hallucination.
+
+**Why this existed at all.** The interrupt had a measured false-positive rate from the
+start. Extraction - the thing a user comes here to do - had none, and the image path had
+never been exercised once. The project rigorously measured its second-most important
+feature and never measured its most important one. A judge finds that asymmetry in five
+minutes.
+
+**Why accuracy is the wrong headline.** The product's claim is not "the model reads well".
+It is that a missing transaction ID means the bank works with what it has, while a wrong one
+means the bank freezes the wrong account while the real one empties. So the metric is how
+often a wrong value reaches the packet, and a `missed` is a *success* - it is the behaviour
+`UNREADABLE` exists to produce. Failing the run on misses would create pressure to loosen
+the validator, which is precisely backwards, and it is the same asymmetry decision 6 applies
+to the interrupt's false negatives.
+
+**Why the removed fields are removed rather than blurred.** To count an invention you have
+to be certain the information was unavailable. A blurred reference is ambiguous: a model
+that reads it correctly may simply have survived the blur. A field never drawn cannot have
+been read, so a value returned for one is an invention with no defence - which is what makes
+the number a measurement rather than a judgement.
+
+**Why the answer key is generated alongside the image.** Two hand-maintained artefacts drift,
+and here the drift is invisible: a case would quietly disagree with its own ground truth and
+report a defect that is not there. It nearly happened anyway - the Hindi case's key was wrong
+twice, both times mine, and both corrections are recorded in the case file rather than
+quietly applied. A benchmark whose author edits the key after seeing the output is not a
+benchmark.
+
+**Why passes, not a pass.** Temperature is 0, which is not determinism. The first run showed
+one escape; the immediate re-run of that case was correct. `--repeat N` makes the instability
+itself the measurement, and the exit code uses the worst pass.
+
+**What it found, and what was not done about it.** 74 of 75 fields correct; the vision path
+40 of 40 with nothing invented; one escape. Given "fastcart dot pay at samplebank" the model
+returned `fastcart@samplebank` - a different account and a perfectly well-formed VPA, so
+`lib/validate.ts` has nothing to object to. **Shape validation catches malformed values, not
+plausible ones.** That limit is now on `/honesty` as a `not-real` row.
+
+No automatic mitigation was added, deliberately. The existing one is real - the confirm
+screen shows the handle back and it can be corrected before sending - and the fixes
+available in three days (flagging dictated input, lowering the confidence floor) would either
+fire constantly or not at all. Stating a measured limit is worth more than a guard built in a
+hurry against a single observed case.

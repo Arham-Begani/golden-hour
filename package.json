@@ -14,7 +14,9 @@
     "journey": "node scripts/journey.mjs",
     "verify": "npm run typecheck && npm run test && npm run build",
     "eval": "node scripts/eval.mjs",
-    "docs:honesty": "vitest run -u lib/honesty.test.ts"
+    "docs:honesty": "vitest run -u lib/honesty.test.ts",
+    "eval:images": "node scripts/make-eval-images.mjs",
+    "eval:extract": "node scripts/eval-extract.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.18.0",
