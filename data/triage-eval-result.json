@@ -1,6 +1,8 @@
 {
-  "measured_at": "2026-08-28T15:04:08.136Z",
+  "measured_at": "2026-09-03T01:38:18.629Z",
   "base_url": "https://golden-hour-kappa.vercel.app",
+  "path": "extract",
+  "route": "/api/extract",
   "total_cases": 22,
   "scored": 22,
   "errored": 0,
@@ -10,7 +12,7 @@
   "false_negatives": 0,
   "false_positive_rate_pct": 0,
   "false_negative_rate_pct": 0,
-  "median_latency_ms": 1330,
+  "median_latency_ms": 2014,
   "cases": [
     {
       "id": "completed-plain-upi",
@@ -197,7 +199,7 @@
       "label": "ACTIVE",
       "fires": true,
       "verdict": "ACTIVE",
-      "primary": "verification_transfer_requested",
+      "primary": "caller_on_line",
       "correct": true,
       "errored": false
     },
@@ -210,5 +212,40 @@
       "correct": true,
       "errored": false
     }
-  ]
+  ],
+  "comparison": {
+    "extract": {
+      "path": "extract",
+      "route": "/api/extract",
+      "total_cases": 22,
+      "scored": 22,
+      "errored": 0,
+      "completed_cases": 14,
+      "active_cases": 8,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "false_positive_rate_pct": 0,
+      "false_negative_rate_pct": 0,
+      "median_latency_ms": 2014
+    },
+    "triage": {
+      "path": "triage",
+      "route": "/api/triage",
+      "total_cases": 22,
+      "scored": 22,
+      "errored": 0,
+      "completed_cases": 14,
+      "active_cases": 8,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "false_positive_rate_pct": 0,
+      "false_negative_rate_pct": 0,
+      "median_latency_ms": 1214
+    },
+    "agreed": 22,
+    "compared": 22,
+    "disagreements": [],
+    "verdict_agreed": 22,
+    "verdict_disagreements": []
+  }
 }

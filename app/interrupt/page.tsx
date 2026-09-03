@@ -37,7 +37,11 @@ export default function InterruptPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
+      {/* role="alert" so the stop instruction is announced. This screen arrives
+          via a client-side route change, which a screen reader does not report
+          on its own — the one screen on the site where not being told what
+          happened is a safety problem rather than an inconvenience. */}
+      <div role="alert">
         <p className="text-sm font-semibold uppercase tracking-widest text-danger">
           {copy.interrupt.heading}
         </p>

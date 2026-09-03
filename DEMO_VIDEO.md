@@ -57,10 +57,10 @@ Voice first, then lay the screen recording under it. No face.
 > This is where they're told to go. Pick a category. Register. Wait for an OTP — on the
 > phone the scammer may still be calling.
 >
-> A bank needs five facts to freeze the account. The portal asks for fifty before it
-> takes one.
+> A bank needs a handful of facts to freeze the account. The portal wants the whole police
+> complaint before it takes one.
 >
-> So: send the five first.
+> So: send the bank's half first.
 
 *(Stop talking. Let the run play.)*
 
@@ -108,7 +108,7 @@ now.** Do not send the message.
 | Switch to | When you hear |
 |---|---|
 | Clip A | *(the start)* |
-| Clip B | "So: send the five first." |
+| Clip B | "So: send the bank's half first." |
 | Clip C | "And if you're still inside the scam…" |
 
 ---
@@ -121,22 +121,37 @@ Three decisions, twenty seconds each. Don't add a fourth.
 
 ## What to say
 
-> Three decisions.
->
-> **First, the split.** A bank needs five facts in minutes. An investigation needs fifty
-> over weeks. One form asking for both runs at the speed of the slower half. So the
-> urgent half goes first, and the rest attaches to the acknowledgement number. The
-> government already does this on the 1930 helpline — just not on the web.
->
-> **Second, the model isn't allowed to guess.** A wrong transaction ID freezes the wrong
-> account while the real one empties. So "unreadable" is enforced on the server, not
-> asked for in the prompt — and the receipt names every field it dropped.
->
-> **Third, I deleted my own headline number.** The meter showed a recovery percentage. I
-> couldn't source it. Parliament was asked for that data in February, and the answer
-> doesn't contain it. So it shows a clock now, and the evidence page says why.
+*(the split)*
 
-**145 words** — about 56s at a normal pace. That is the whole minute. Do not add a fourth decision, and do not sign off at the end.
+> After a scam, two things have to happen. The money has to be frozen — that's minutes.
+> The crime has to be investigated — that's weeks. Both sit on the same form, so the
+> urgent one waits for the slow one. The government already splits them on the 1930
+> helpline: a short list of facts, a number, the full complaint within 24 hours. The
+> website doesn't. So I send the bank's nine facts first, and the rest attaches to that
+> number.
+
+*(no guessing)*
+
+> The app reads that screenshot for you, and it can get things wrong. Misread the
+> transaction ID and you freeze the wrong account while the real one keeps draining. So
+> nothing the model reads is trusted — every field is checked again on the server, and
+> anything that fails is sent blank instead of guessed. The receipt shows you what got
+> dropped.
+
+*(deleted my own number)*
+
+> The countdown used to show a recovery percentage. I couldn't source it. I asked the
+> government for that data in February and the answer doesn't have it — so I deleted my
+> own number. It's a clock now, and the evidence page says why.
+
+**187 words**, about 64 seconds. Plain language costs words — that is the trade for
+being understood. The bracketed labels are for you, not to be said out loud. Don't add a
+fourth decision, and don't sign off at the end.
+
+**If you need seconds back**, drop the first sentence of beat two — *"The app reads that
+screenshot for you, and it can get things wrong."* — and then the helpline sentence in
+beat one, which minute one has already implied. Each costs about five seconds. After that,
+shorten the gaps between beats rather than talking faster.
 
 **Then stop.** Don't summarise, don't thank anyone, don't say "and that's Golden Hour."
 Cut on the last word.
@@ -146,6 +161,8 @@ Cut on the last word.
 - **Don't read this off the screen.** Learn the three headers — *the split*, *no
   guessing*, *deleted my own number* — and say the rest in your own words. Reading to
   camera is obvious and it costs you more than a perfect sentence gains.
+- **Say "transaction ID", not "UTR". Say "the model", not "Gemini" or "the LLM".** The
+  script already avoids the jargon; don't put it back in on the day.
 - **One take per beat is fine.** Record each of the three separately if it's easier and
   join them; nobody can see a cut on a talking head that holds still.
 - **Look at the lens, not at yourself.**
@@ -159,7 +176,7 @@ Cut on the last word.
 Facecam-only works. But if editing allows, a **2-second cutaway** on beats two and three
 makes them land much harder, and still counts as explaining rather than demoing:
 
-- On *"the receipt names every field it dropped"* → the receipt's missing-fields block
+- On *"the receipt shows you what got dropped"* → the receipt's missing-fields block
 - On *"the evidence page explains why"* → `/evidence`, the line reading *"There is no
   published recovery curve, so we do not draw one"*
 
@@ -170,8 +187,9 @@ time, drop them — the words carry it alone.
 
 # Before you record
 
-- [ ] **Deploy your latest work.** The live site is out of date — the landing page and
-      `/start` aren't on it. Film what you'll submit.
+- [ ] **Deploy your latest work and re-check it.** (The old note here said the live site
+      was missing the landing page and `/start`. It is not — both have been live since
+      28 August. Verify rather than trust either note.)
 - [ ] `/api/health` shows `deploy_ready: true`, no warnings.
 - [ ] A **real** payment screenshot. Blur the digits if you want; don't fabricate one.
 - [ ] Do one timed run and write down `R`. Budget minute one off it.

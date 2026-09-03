@@ -27,7 +27,18 @@
   --color-raised-hover: #26262b;
   --color-text: #fafaf9;
   --color-muted: #a8a8b3;
-  --color-faint: #838390; /* 5.3:1 on ink — the floor for small print */
+  --color-faint: #838390; /* 5.3:1 on ink, 4.9:1 on surface — the floor for small print */
+
+  /**
+   * The meter's em dash when no timestamp is known yet.
+   *
+   * It must read as the absence of a value rather than as a value, so it is
+   * dimmer than any text token — but it is still text, and at 1.9:1 the old
+   * --color-line-strong was below the floor even for display sizes. This is
+   * 3.4:1 on surface, which clears the 3:1 large-text minimum. Nothing but that
+   * placeholder uses it.
+   */
+  --color-placeholder: #6a6a75;
 
   /**
    * The meter. The only thing on the site that moves.

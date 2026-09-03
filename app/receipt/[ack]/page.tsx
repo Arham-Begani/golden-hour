@@ -4,7 +4,8 @@ import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { useJourney } from "@/components/JourneyProvider";
 import { FREEZE_FIELDS, type FreezePacket, type ReadField } from "@/lib/schema";
-import { isMissing } from "@/lib/validate";
+import { isMissingFreezeField } from "@/lib/validate";
+import { toBankPayload } from "@/lib/packet";
 import { t } from "@/lib/i18n";
 
 /**
@@ -64,7 +65,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
     field: packet.extraction[key] as ReadField,
   }));
 
-  const blanks = fields.filter((entry) => isMissing(entry.field));
+  const blanks = fields.filter((entry) => isMissingFreezeField(entry.key, entry.field));
   const sent = fields.length - blanks.length;
   const seconds = packet.elapsed_ms ? (packet.elapsed_ms / 1000).toFixed(1) : null;
 
@@ -140,6 +141,22 @@ export default function ReceiptPage({ params }: { params: Promise<{ ack: string 
           <p className="mt-3 text-sm leading-relaxed text-faint">{copy.receipt.missingWhy}</p>
         </section>
       )}
+
+      {/* The artefact behind the word "dispatchable".
+          Collapsed by default: this screen is the moment the person's stress is
+          supposed to drop, and a wall of JSON is not that. Native <details> so
+          it needs no JavaScript and is keyboard-operable for free. */}
+      <details className="card">
+        <summary className="cursor-pointer text-base font-medium marker:text-faint">
+          {copy.receipt.payload}
+        </summary>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{copy.receipt.payloadIntro}</p>
+        {/* The pre scrolls inside its own box; the page never scrolls sideways. */}
+        <pre className="mt-3 overflow-x-auto rounded-lg border border-line bg-ink p-3 font-mono text-xs leading-relaxed text-muted">
+          {JSON.stringify(toBankPayload(packet), null, 2)}
+        </pre>
+        <p className="mt-2 text-xs leading-relaxed text-faint">{copy.receipt.payloadNowhere}</p>
+      </details>
 
       <section className="card-strong">
         <h2 className="text-base font-semibold">{copy.receipt.realHeading}</h2>

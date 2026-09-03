@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { UNREADABLE } from "./schema";
-import { isMissing, validateExtraction } from "./validate";
+import { FREEZE_FIELDS, UNREADABLE, type ReadField } from "./schema";
+import { emptyExtraction, isMissing, isMissingFreezeField, validateExtraction } from "./validate";
 
 const field = (value: string, confidence = 0.95) => ({ value, confidence });
 
@@ -200,5 +200,40 @@ describe("isMissing", () => {
     expect(isMissing({ value: "  ", confidence: 1 })).toBe(true);
     expect(isMissing(undefined)).toBe(true);
     expect(isMissing({ value: "523612345678", confidence: 0.9 })).toBe(false);
+  });
+});
+
+/**
+ * The count the receipt shows, on the packet that has nothing in it.
+ *
+ * `isMissing` alone reported 1 of 9 sent for a completely empty report,
+ * because an unread payment rail is stored as "UNKNOWN" rather than
+ * UNREADABLE — the enum has no sentinel, so the placeholder looked like a
+ * value. On the screen whose argument is that it counts its holes honestly,
+ * the count was the generous one.
+ */
+describe("isMissingFreezeField", () => {
+  it("treats every field of an empty extraction as a hole", () => {
+    const blank = emptyExtraction();
+    const present = FREEZE_FIELDS.filter(
+      (key) => !isMissingFreezeField(key, blank[key] as ReadField),
+    );
+    expect(present, "an empty packet must report 0 of 9 fields sent").toEqual([]);
+  });
+
+  it("still counts a real payment rail as present", () => {
+    expect(isMissingFreezeField("payment_rail", { value: "UPI", confidence: 0.9 })).toBe(false);
+  });
+
+  it("counts the enum placeholders as holes", () => {
+    expect(isMissingFreezeField("payment_rail", { value: "UNKNOWN", confidence: 0.2 })).toBe(true);
+    expect(isMissingFreezeField("fraud_category", { value: "OTHER", confidence: 0.2 })).toBe(true);
+  });
+
+  it("does not apply an enum placeholder rule to free-text fields", () => {
+    // "OTHER" is a placeholder for fraud_category and an ordinary string here.
+    expect(isMissingFreezeField("beneficiary_name", { value: "OTHER", confidence: 0.9 })).toBe(
+      false,
+    );
   });
 });

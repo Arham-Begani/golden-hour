@@ -29,6 +29,19 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   const interrupted = pathname === "/interrupt";
 
+  /**
+   * /judge pins its own prototype notice to the bottom of the viewport, where
+   * it cannot be scrolled past. Rendering this one as well puts the same
+   * sentence on screen twice — three times once the framed product draws its
+   * own copy inside the frame — which is how a disclosure stops being read.
+   *
+   * The frame's own copy is deliberately left alone. The harness's claim is
+   * that it times the shipped product unmodified, and teaching a product
+   * screen to render differently when it is being watched would cost more
+   * than the duplication does.
+   */
+  const pinsOwnNotice = pathname === "/judge";
+
   return (
     // overflow-x-clip is a backstop, not the fix: a long word or a wide table
     // must never make the whole page scroll sideways on a 360px screen.
@@ -78,9 +91,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Stated in the chrome, on every screen. Never only in a README. */}
-      <p className="mb-5 rounded-lg border border-line bg-surface px-3 py-2 text-xs leading-relaxed text-muted">
-        {copy.prototype.full}
-      </p>
+      {!pinsOwnNotice && (
+        <p className="mb-5 rounded-lg border border-line bg-surface px-3 py-2 text-xs leading-relaxed text-muted">
+          {copy.prototype.full}
+        </p>
+      )}
 
       {/* A product about not being misled should say which of its own copy is
           unverified. Shown in Hindi only, because that is the copy it is about. */}
@@ -103,6 +118,17 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             </Link>
             <Link href="/evidence" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
               {copy.evidence.nav}
+            </Link>
+            {/* The honesty page was previously reachable only by typing the
+                URL. A disclosure nobody can navigate to is not a disclosure. */}
+            <Link href="/honesty" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
+              {copy.nav.honesty}
+            </Link>
+            <Link href="/judge" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
+              {copy.nav.judge}
+            </Link>
+            <Link href="/changes" className="inline-flex min-h-11 items-center underline underline-offset-2 transition-colors hover:text-text">
+              {copy.nav.changes}
             </Link>
             {/* The real routes, reachable from any screen and not only the
                 receipt. This is the half of the footer that is not decoration. */}

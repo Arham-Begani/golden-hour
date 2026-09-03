@@ -15,6 +15,8 @@
  * machine-shaped phrasing.
  */
 
+import { elapsedParts } from "./decay";
+
 export const LANGS = ["en", "hi"] as const;
 export type Lang = (typeof LANGS)[number];
 
@@ -61,8 +63,24 @@ const en = {
    */
   landing: {
     eyebrow: "Cyber fraud reporting, re-sequenced",
-    heading: "Send the bank the five facts first.",
-    sub: "The national portal asks for about fifty facts before it takes one. A bank needs a handful of them to place a hold, and it needs them while the money is still in the first account. Golden Hour sends that half first and collects the rest afterwards.",
+    /**
+     * Nine, because nine is what the product actually collects — FREEZE_FIELDS,
+     * and the number the receipt counts against. This read "five facts" for a
+     * while, borrowed from the concept doc's rhetoric, while every screen below
+     * it said nine.
+     */
+    heading: "Send the bank the nine facts first.",
+    /**
+     * This sentence used to open "The national portal asks for about fifty
+     * facts before it takes one."
+     *
+     * Nobody counted fifty. data/portal-benchmark.json refuses to guess that
+     * exact figure, and /evidence says in as many words that guessing it would
+     * discredit everything next to it — so the front page was asserting the one
+     * number the evidence page declines to. Restore a count here only once a
+     * human has opened the portal and made one.
+     */
+    sub: "The national portal collects the whole police complaint before it accepts anything. A bank needs a handful of those facts to place a hold, and it needs them while the money is still in the first account. Golden Hour sends that half first and collects the rest afterwards.",
     start: "Start a report",
     demo: "Walk through a demo case",
     evidence: "Read the claim and its limits",
@@ -96,6 +114,24 @@ const en = {
     whyCase: "The case needs",
     whyCaseBody: "Statement, identity, address, suspect details, prior reports. Weeks are fine.",
 
+    /**
+     * The strongest evidence in the project, and it was buried four sections
+     * down /evidence. The government already runs this sequence on the 1930
+     * helpline: minimal packet, acknowledgement number, full complaint against
+     * that number within 24 hours. That moves the argument from "a redesign
+     * someone thought of" to "the state's own procedure disagrees with the
+     * state's own web form", which is a different claim entirely.
+     *
+     * The quote is verbatim and the source sits next to it, per the rule that
+     * a statistic is never shown on a separate references page.
+     */
+    alreadyHeading: "This sequence is already official procedure",
+    alreadyBody: "Not on the website — on the phone. The portal's own instructions for reporting a financial fraud through 1930 take a short list of facts first, then say:",
+    alreadyQuote: "the complainant will get a system generated Log-in Id/acknowledgement number through SMS/Mail. Using the above Log-in Id/acknowledgement number, the complainant must complete registration of complaint on National Cybercrime Reporting Portal (www.cybercrime.gov.in) within 24 hours.",
+    alreadyAfter: "Minimal packet, acknowledgement number, full statement afterwards against that number. That is exactly the re-sequencing this prototype argues for. Golden Hour's claim is only that the web route should work the way the helpline already does.",
+    alreadySource: "Citizen Financial Cyber Frauds Reporting and Management System — MHA / I4C",
+    alreadySourceNote: "Marked “For Delhi Only”, which is a limit of the document, not of the argument.",
+
     honestHeading: "What this is not",
     honestBody: "It is not a government service and it freezes nothing. There is no bank integration and no CFCFRMS connection — nothing sent here reaches a bank, a police force or any government system. It is a prototype of a sequence, and the sequence is the argument.",
 
@@ -104,11 +140,27 @@ const en = {
     measuredMedian: "Median time to dispatch",
     measuredNone: "Not yet measured",
     measuredRuns: (n: number) => `${n} recorded ${n === 1 ? "run" : "runs"}`,
+
+    /**
+     * The two pages that answer the two questions a sceptical reader has, and
+     * that were previously reachable only by typing the URL.
+     */
+    checkHeading: "Check it yourself",
+    checkBody: "None of these asks you to take our word for anything.",
+    changesTitle: "What changed for Round 2, and what was wrong",
+    changesBody: "The defects found auditing this project against itself, worst first, with the two that are still open listed at the top.",
+    judgeTitle: "Time a run yourself",
+    judgeBody: "A scenario, a stopwatch, and the live product on one screen. Nothing is pre-filled, and your run counts toward the median above.",
+    honestyTitle: "What is real and what is not",
+    honestyBody: "Every claim this prototype makes, line by line, marked real or not real — including the number we deleted because we could not source it.",
   },
 
   nav: {
     start: "Report",
     about: "What this is",
+    judge: "Time a run",
+    honesty: "What is real",
+    changes: "What changed",
   },
 
   footer: {
@@ -139,6 +191,20 @@ const en = {
   meter: {
     label: "Time since the fraud",
     unknown: "Unknown",
+    /**
+     * The elapsed units, localised.
+     *
+     * `lib/decay.ts` stays pure and English — it is the tested module and its
+     * job is arithmetic, not copy. The keys here are exactly the unit strings
+     * `elapsedParts` returns, so the mapping is a lookup rather than a parse.
+     * Before this existed the meter counted in English on every Hindi screen.
+     */
+    units: { min: "min", hour: "hour", hours: "hours", day: "day", days: "days" } as Record<
+      string,
+      string
+    >,
+    justNow: "just now",
+    ago: (value: string, unit: string) => `${value} ${unit} ago`,
     unknownWhy: "We don't know when this happened yet.",
     since: "Fraud reported as",
     source: "Where this comes from",
@@ -167,6 +233,15 @@ const en = {
     sub: "Correct anything that's wrong. Blanks are fine — send anyway.",
     when: "When did this happen?",
     whenSub: "We could not read a time. One tap is enough.",
+    /**
+     * Shown when the model DID read a time.
+     *
+     * This control used to render only when the timestamp was missing, which
+     * meant a misread time could not be corrected at all — on the one field
+     * that drives the meter and that a bank reads first.
+     */
+    whenRead: "Read from what you gave us. Change it if it is wrong.",
+    whenEdited: "Set by you.",
     justNow: "Just now",
     withinHour: "Within the hour",
     today: "Earlier today",
@@ -182,6 +257,22 @@ const en = {
     sending: "Sending…",
     holes: (n: number) => `${n} field${n === 1 ? "" : "s"} unreadable. Send anyway.`,
     complete: "Everything readable.",
+
+    /**
+     * The place the description arrives second.
+     *
+     * DECISIONS.md §3 justified /api/triage by saying the "is this still
+     * happening" signal lives only in a sentence the user types, "which they
+     * often type second" — but there was nowhere to type it second. A
+     * screenshot-only intake could therefore never fire the interrupt, and the
+     * route had no caller outside the eval. This is that missing surface.
+     *
+     * Optional, below the fields, and it never blocks the send button.
+     */
+    describe: "Anything else about what happened?",
+    describeHint:
+      "Optional. A screenshot cannot say whether this is still going on right now. A sentence can.",
+    describePlaceholder: "He is still on the call telling me not to hang up…",
   },
 
   fields: {
@@ -250,6 +341,16 @@ const en = {
     call: "Call 1930",
     portal: "cybercrime.gov.in",
     retention: "This packet is deleted automatically after 24 hours.",
+
+    /**
+     * The payload block. "Dispatchable" was an assertion about an artefact
+     * nobody could look at; this is the artefact.
+     */
+    payload: "What would be transmitted",
+    payloadIntro:
+      "The freeze packet in the shape a beneficiary bank would receive it. Fields that could not be read are absent and named under unreadable, so a hole cannot be mistaken for a value. The triage signals, the model's confidence scores and anything written for the police statement are deliberately not in here.",
+    payloadNowhere:
+      "This is posted nowhere. There is no bank integration and no CFCFRMS connection, which is why the payload says so about itself.",
   },
 
   report: {
@@ -314,8 +415,8 @@ const hi: Dict = {
 
   landing: {
     eyebrow: "साइबर धोखाधड़ी की रिपोर्ट, नए क्रम में",
-    heading: "बैंक को ज़रूरी बातें पहले भेजिए।",
-    sub: "राष्ट्रीय पोर्टल एक भी बात लेने से पहले लगभग पचास बातें पूछता है। बैंक को रोक लगाने के लिए इनमें से गिनी-चुनी चाहिए, और वह भी तब तक जब तक पैसा पहले खाते में है। गोल्डन आवर पहले वही आधा हिस्सा भेजता है, बाक़ी बाद में लेता है।",
+    heading: "बैंक को ज़रूरी नौ बातें पहले भेजिए।",
+    sub: "राष्ट्रीय पोर्टल कुछ भी स्वीकार करने से पहले पूरी पुलिस शिकायत माँगता है। बैंक को रोक लगाने के लिए इनमें से गिनी-चुनी बातें चाहिए, और वह भी तब तक जब तक पैसा पहले खाते में है। गोल्डन आवर पहले वही आधा हिस्सा भेजता है, बाक़ी बाद में लेता है।",
     start: "रिपोर्ट शुरू करें",
     demo: "डेमो केस देखें",
     evidence: "दावा और उसकी सीमाएँ पढ़ें",
@@ -349,6 +450,13 @@ const hi: Dict = {
     whyCase: "जाँच के लिए",
     whyCaseBody: "बयान, पहचान, पता, आरोपी का विवरण, पहले की शिकायतें। यहाँ हफ़्ते चल जाते हैं।",
 
+    alreadyHeading: "यह क्रम पहले से सरकारी प्रक्रिया है",
+    alreadyBody: "वेबसाइट पर नहीं — फ़ोन पर। 1930 के ज़रिए वित्तीय धोखाधड़ी की शिकायत के लिए पोर्टल के अपने निर्देश पहले थोड़ी-सी जानकारी लेते हैं, फिर कहते हैं:",
+    alreadyQuote: "the complainant will get a system generated Log-in Id/acknowledgement number through SMS/Mail. Using the above Log-in Id/acknowledgement number, the complainant must complete registration of complaint on National Cybercrime Reporting Portal (www.cybercrime.gov.in) within 24 hours.",
+    alreadyAfter: "थोड़ी-सी जानकारी, पावती संख्या, और उसके बाद उसी नंबर से जुड़ा पूरा बयान। यह प्रोटोटाइप ठीक यही क्रम माँगता है। गोल्डन आवर का दावा सिर्फ़ इतना है कि वेब वाला रास्ता भी वैसे ही चले जैसे हेल्पलाइन पहले से चलती है।",
+    alreadySource: "Citizen Financial Cyber Frauds Reporting and Management System — MHA / I4C",
+    alreadySourceNote: "इस दस्तावेज़ पर “For Delhi Only” लिखा है — यह दस्तावेज़ की सीमा है, तर्क की नहीं।",
+
     honestHeading: "यह क्या नहीं है",
     honestBody: "यह कोई सरकारी सेवा नहीं है और यह कुछ भी फ़्रीज़ नहीं करता। किसी बैंक से जुड़ाव नहीं है, CFCFRMS से जुड़ाव नहीं है — यहाँ से भेजी कोई चीज़ किसी बैंक, पुलिस या सरकारी सिस्टम तक नहीं जाती। यह एक क्रम का प्रोटोटाइप है, और वही क्रम इसका तर्क है।",
 
@@ -357,11 +465,23 @@ const hi: Dict = {
     measuredMedian: "भेजने में लगा औसत समय",
     measuredNone: "अभी मापा नहीं गया",
     measuredRuns: (n: number) => `${n} दर्ज रन`,
+
+    checkHeading: "ख़ुद जाँचिए",
+    checkBody: "इनमें से किसी के लिए भी आपको हमारी बात मान लेने की ज़रूरत नहीं है।",
+    changesTitle: "राउंड 2 में क्या बदला, और क्या ग़लत था",
+    changesBody: "इस प्रोजेक्ट की ख़ुद की जाँच में मिली ख़ामियाँ, सबसे गंभीर पहले, और जो दो अब भी बाक़ी हैं वे सबसे ऊपर।",
+    judgeTitle: "ख़ुद एक रन का समय मापिए",
+    judgeBody: "एक परिस्थिति, एक स्टॉपवॉच, और साथ में चलता हुआ असली प्रोडक्ट। कुछ भी पहले से भरा नहीं है, और आपका रन ऊपर दिए औसत में गिना जाएगा।",
+    honestyTitle: "क्या असली है और क्या नहीं",
+    honestyBody: "इस प्रोटोटाइप का हर दावा, एक-एक करके, असली या नक़ली के रूप में चिह्नित — उस आँकड़े समेत जिसे स्रोत न मिलने पर हमने हटा दिया।",
   },
 
   nav: {
     start: "रिपोर्ट",
     about: "यह क्या है",
+    judge: "रन का समय मापें",
+    honesty: "क्या असली है",
+    changes: "क्या बदला",
   },
 
   footer: {
@@ -392,6 +512,9 @@ const hi: Dict = {
   meter: {
     label: "धोखाधड़ी को कितना समय हुआ",
     unknown: "पता नहीं",
+    units: { min: "मिनट", hour: "घंटा", hours: "घंटे", day: "दिन", days: "दिन" },
+    justNow: "अभी-अभी",
+    ago: (value: string, unit: string) => `${value} ${unit} पहले`,
     unknownWhy: "यह कब हुआ, अभी हमें नहीं पता।",
     since: "धोखाधड़ी का समय",
     source: "यह जानकारी कहाँ से आई",
@@ -415,6 +538,8 @@ const hi: Dict = {
     sub: "जो ग़लत है उसे ठीक करें। ख़ाली जगह चलेगी — फिर भी भेजें।",
     when: "यह कब हुआ?",
     whenSub: "हमें समय नहीं मिला। एक टैप काफ़ी है।",
+    whenRead: "आपने जो दिया उसी से पढ़ा गया है। ग़लत हो तो बदल दीजिए।",
+    whenEdited: "आपका बताया हुआ।",
     justNow: "अभी-अभी",
     withinHour: "एक घंटे के भीतर",
     today: "आज पहले",
@@ -430,6 +555,11 @@ const hi: Dict = {
     sending: "भेजा जा रहा है…",
     holes: (n: number) => `${n} जानकारी पढ़ी नहीं जा सकी। फिर भी भेजें।`,
     complete: "सब कुछ पढ़ लिया गया।",
+
+    describe: "और कुछ बताना चाहेंगे कि क्या हुआ?",
+    describeHint:
+      "वैकल्पिक। स्क्रीनशॉट से यह पता नहीं चलता कि यह अभी भी चल रहा है या नहीं। एक वाक्य से चल जाता है।",
+    describePlaceholder: "वह अभी भी कॉल पर है और कह रहा है कि फ़ोन मत काटो…",
   },
 
   fields: {
@@ -497,6 +627,12 @@ const hi: Dict = {
     call: "1930 पर कॉल करें",
     portal: "cybercrime.gov.in",
     retention: "यह पैकेट 24 घंटे बाद अपने आप हट जाता है।",
+
+    payload: "क्या भेजा जाता",
+    payloadIntro:
+      "फ़्रीज़ पैकेट, उसी रूप में जिसमें लाभार्थी बैंक को मिलता। जो जानकारी पढ़ी नहीं जा सकी वह इसमें है ही नहीं और unreadable के नीचे नाम से दर्ज है, ताकि ख़ाली जगह को कभी कोई मान न समझ ले। ट्रायाज संकेत, मॉडल का कॉन्फ़िडेंस और पुलिस बयान के लिए लिखी बातें जान-बूझकर इसमें नहीं हैं।",
+    payloadNowhere:
+      "यह कहीं नहीं भेजा जाता। किसी बैंक से जुड़ाव नहीं है और CFCFRMS से जुड़ाव नहीं है — इसीलिए पैकेट ख़ुद अपने बारे में यही कहता है।",
   },
 
   report: {
@@ -544,3 +680,19 @@ const hi: Dict = {
 const DICTS: Record<Lang, Dict> = { en, hi };
 
 export const t = (lang: Lang): Dict => DICTS[lang] ?? en;
+
+/**
+ * "14 minutes ago", in the reader's language.
+ *
+ * Lives here rather than in `lib/decay.ts` because it is copy, and decay.ts is
+ * the tested arithmetic module — its `elapsedLabel` and `elapsedParts` stay
+ * English and stay pinned. Both the meter and the confirm screen's timestamp
+ * row go through this, so the same instant never renders two different ways on
+ * one screen.
+ */
+export function elapsedText(lang: Lang, minutes: number): string {
+  const copy = t(lang).meter;
+  const { value, unit } = elapsedParts(minutes);
+  if (value === "<1") return copy.justNow;
+  return copy.ago(value, copy.units[unit] ?? unit);
+}

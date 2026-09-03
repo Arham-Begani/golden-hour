@@ -5,9 +5,15 @@ decides whether the money comes back.**
 
 The concept is in [`idea_2.md`](./idea_2.md). The short version: the national portal is
 a police intake form that has been asked to double as an emergency stop button, and it
-is paced like the former. The bank needs about five facts within minutes to place a
-hold; the investigation needs about fifty over weeks. The portal traps the five behind
-the fifty.
+is paced like the former. The bank needs a handful of facts within minutes to place a
+hold; the investigation needs everything else over weeks. The portal traps the urgent
+half behind the slow one.
+
+(`idea_2.md` puts numbers on those two halves — five and fifty. Nobody has counted the
+portal's, so the counted number this repository is willing to state is its own: nine
+freeze fields, `FREEZE_FIELDS` in `lib/schema.ts`. See
+[`data/portal-benchmark.json`](./data/portal-benchmark.json) for why the other column is
+still empty.)
 
 Golden Hour splits the report in two and sends the urgent half first.
 
@@ -39,7 +45,7 @@ npm run dev
 ```
 
 Open `http://localhost:3000` for the landing page, which explains the sequence and links
-into the report. The report itself is `/start`; `/start?demo=1` adds the four cached demo
+into the report. The report itself is `/start`; `/start?demo=1` adds the five cached demo
 cases, which work with no API key and no network.
 
 Check `http://localhost:3000/api/health` — it reports `deploy_ready` and names anything
@@ -71,10 +77,12 @@ Vercel project environment.
 | Interrupt gate | `lib/interrupt.ts` | Conservative: `ACTIVE` **and** a quoted hard signal |
 | Store | `lib/store.ts` | Upstash, or in-memory for local dev. 24h TTL |
 | Demo cases | `lib/fixtures.ts` | Cached extractions, run through the real validation path |
-| Triage | `lib/triage.ts`, `/api/triage` | The interrupt signals on their own, for a description that arrives after extraction |
-| Prompts | `lib/prompts.ts` | One `TRIAGE_INSTRUCTION`, composed into both model calls, so the eval scores what ships |
+| Triage | `lib/triage.ts`, `/api/triage` | The interrupt signals on their own. Called by the confirm screen when a description arrives after extraction, and by the eval |
+| Prompts | `lib/prompts.ts` | One `TRIAGE_INSTRUCTION`, composed into both model calls. The eval scores both and reports the shipped one |
 | Honesty | `lib/honesty.ts` | The single source for `/honesty` **and** `HONESTY.md`; a test fails if they drift |
+| Bank payload | `lib/packet.ts` | The wire format a beneficiary bank would receive. Holes are named, not omitted |
 | Judge harness | `app/judge/page.tsx` | Seeded scenario, stopwatch, the real product in a frame, honesty strip pinned |
+| What changed | `app/changes/page.tsx` | The Round 2 defect ledger: what was wrong, what was done, where to check |
 
 ### The three ideas worth reading the code for
 
@@ -113,11 +121,11 @@ everyone to dismiss the real ones.
 
 ```bash
 npm run verify     # typecheck + unit tests + production build
-npm run test       # 85 unit tests: clock and bands, validation, interrupt gate, schema, run provenance,
-                   #   triage gate, honesty/HONESTY.md sync, judge scenario safety
+npm run test       # 97 unit tests: clock and bands, validation, interrupt gate, schema, run provenance,
+                   #   triage gate, bank payload, honesty/HONESTY.md sync, judge scenario safety
 npm run eval       # scores the interrupt against 22 labelled cases; needs a running server
 npm run shots      # screenshots at 360px; fails if any page scrolls sideways
-npm run journey    # drives all four demo cases end to end in a real browser
+npm run journey    # drives every demo case end to end in a real browser
 npm run docs:honesty  # regenerate HONESTY.md after editing lib/honesty.ts
 ```
 
@@ -132,11 +140,21 @@ npm run build && npx next start     # the eval needs a live server and a model k
 npm run eval
 ```
 
-Currently **0% on 14 COMPLETED cases** (0/14), 0% false negatives on 8 ACTIVE cases, median
-triage latency 1332ms. Every case runs through the real `/api/triage` route, the real model
-call and the real gate — nothing is stubbed. Cases live in `data/triage-eval.json`, the run
-writes `data/triage-eval-result.json`, and `/honesty` reads its figures from that file rather
-than from anything hand-typed.
+Currently **0% on 14 COMPLETED cases** (0/14) and 0% false negatives on 8 ACTIVE cases,
+median latency 2014ms, measured on `/api/extract` — the route the intake actually calls.
+Every case runs through a real route, a real model call and the real gate; nothing is
+stubbed. Cases live in `data/triage-eval.json`, the run writes
+`data/triage-eval-result.json`, and `/honesty` reads its figures from that file rather than
+from anything hand-typed.
+
+**It scores two paths, and that is the point.** The eval used to run `/api/triage` only,
+while the intake calls `/api/extract` — a different system prompt, asked alongside nine
+freeze fields. Both compose the same `TRIAGE_INSTRUCTION` and a test asserts that
+composition, but containment is not equivalence, so the number did not quite describe the
+shipped gate. `npm run eval` now runs both by default, reports the extraction path as the
+headline, and lists every case where the two disagree. On the 3 September run they agreed
+on 22 of 22 decisions with 22 of 22 identical verdicts. Use `--path extract` or
+`--path triage` to score just one.
 
 The run exits non-zero on a false positive and zero on a false negative, on purpose:
 tightening the gate until every ACTIVE case fires is exactly the change that would make the

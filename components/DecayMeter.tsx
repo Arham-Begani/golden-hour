@@ -75,7 +75,11 @@ export function DecayMeter({
 
   return (
     <section aria-label={copy.label} className="card">
-      <h2 className="eyebrow">{copy.label}</h2>
+      {/* A <p>, not an <h2>. The meter renders above the page's own h1 on both
+          screens that use it, so a heading here put an h2 before the h1 in the
+          document. The <section> already carries aria-label={copy.label}, so
+          nothing is lost by demoting it. */}
+      <p className="eyebrow">{copy.label}</p>
 
       {/* Hero figure: the elapsed clock. Text token, not the mark colour — a
           light amber is illegible as text, and the track below carries identity. */}
@@ -85,13 +89,20 @@ export function DecayMeter({
             one. */}
         <span
           className={`text-5xl font-semibold leading-none sm:text-6xl ${
-            parts === null ? "text-line-strong" : "text-text"
+            parts === null ? "text-placeholder" : "text-text"
           }`}
         >
           {parts === null ? "—" : parts.value}
         </span>
+        {/* The unit is looked up rather than printed: elapsedParts is English
+            (it is the tested arithmetic module) and this counted "3 hours" at a
+            Hindi reader until the lookup existed. */}
         <span className="text-lg text-muted">
-          {parts === null ? (state === null ? "" : copy.unknown) : parts.unit}
+          {parts === null
+            ? state === null
+              ? ""
+              : copy.unknown
+            : (copy.units[parts.unit] ?? parts.unit)}
         </span>
       </p>
 

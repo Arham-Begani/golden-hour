@@ -327,3 +327,341 @@ Whether the iframe survives contact with a real judge on a real phone. It is sam
 tested at 360px, but a 70vh frame on a small screen means two scrollbars in the same gesture
 space, and the "open it full screen" escape hatch exists because I do not fully trust it. If
 one thing on this page needs a human to try it before demo day, it is that.
+
+---
+
+## Step 7 — the Round 2 audit's first five items — 2026-09-02
+
+Round 2 is a resubmission on 7 September, judged partly on what visibly changed. `PLAN_R2.md`
+is the audit that set the order; this entry is what came of items 1–5 of it.
+
+The framing that produced the list, and which is worth keeping: **the build was stronger
+than its evidence.** Nothing here needed new features. What it needed was for the things
+already built to actually be reachable and actually be true.
+
+### `/judge` had been dead in production the whole time
+
+The worst finding, and it had been shipping since the page was written. Loading the live
+`/judge`, pressing **Start the run**, and waiting produced a stopwatch counting up over a
+permanently blank frame:
+
+```
+{"iframeExists":true, "src":"about:blank", "innerPath":"blank"}
+```
+
+`start()` set `phase` to `"running"` and then assigned `frame.current.src = "/start"`. But
+the `<iframe>` was rendered only while `phase !== "idle"`, so inside that click handler it
+had not mounted, the ref was `null`, the assignment was skipped, and the frame then mounted
+with the `about:blank` hardcoded in its JSX. React batches state updates in event handlers,
+so there was never a version of this that worked.
+
+Fixed by mounting the frame always and hiding it with `hidden` while idle, and driving
+`src` from an effect keyed on `[phase, run]` — `run` being a counter bumped by `start()`,
+without which "Run it again" would leave the previous run's receipt on screen, since the
+URL string does not change between runs.
+
+**Two things this had been costing, and the second is the larger one.** `SUBMISSION.md`
+offers `/judge` to reviewers as the guided run. And it is the reason `/api/timings` reports
+`count: 0` — no run could ever complete through the harness, so the sixty-second claim had
+no measurements and the landing page's own headline tile read "Not yet measured".
+
+Verified end to end in a real browser this time, and verified the part that matters rather
+than the part that is easy: the frame loads `/start` and renders the real intake, driving
+it to a `/receipt/` path stops the clock and captures the acknowledgement number, and
+"Run it again" reloads the intake. Deliberately **not** verified by completing a freeze —
+the local server points at the production Upstash, so a scripted completion would have put
+a bot run into the real distribution. Driving the frame straight to a nonexistent receipt
+exercises the same poll and writes nothing.
+
+### The front page asserted the one number `/evidence` refuses to guess
+
+The landing page opened with *"The national portal asks for about fifty facts before it
+takes one."* Nobody counted fifty. `data/portal-benchmark.json` refuses that exact figure
+in writing, and `/evidence` says guessing it "would discredit every honest thing next to
+it". The same number was in `SUBMISSION.md` — under a note to myself to check it, which was
+never actioned — and in the video script.
+
+Removed from all three rather than softened, because "about" is not a hedge that survives a
+reviewer opening `/evidence` in the next tab. The sentence now describes the portal's
+behaviour without counting it. A number goes back only when a human has opened the portal
+and counted, and `SUBMISSION.md` now says so where the stale note used to be.
+
+The heading moved from "five facts" to "nine facts" in the same pass. Five was borrowed
+from the concept doc's rhetoric while every screen underneath said nine — `FREEZE_FIELDS`
+is nine, and the receipt counts against nine.
+
+### `/honesty` and `/judge` were reachable from nowhere
+
+```
+grep -rn "honesty\|/judge" app/page.tsx components/*.tsx lib/i18n.ts   →   no matches
+```
+
+Not in the header, the footer, the landing page, or any product screen. Honesty is a named
+judging criterion and the page built for it could only be reached by typing the URL. Both
+now sit in the footer on every screen and as a pair of cards on the landing page.
+
+### The strongest evidence in the project was buried four sections deep
+
+`/evidence` quotes the portal's own CFCFRMS instructions: short list of facts → system
+generated acknowledgement number → full complaint against that number within 24 hours.
+**The government already runs this sequence on the helpline.** That is the difference
+between "a student thinks the form should be reordered" and "the state's own procedure
+disagrees with the state's own web form", and it was below the fold of a page reachable by
+one small header link. It is now on the landing page with the quote verbatim and the source
+next to it, and it is in the 250 words and in minute two of the video.
+
+### What I chose not to do, and why
+
+**Suppressing the site chrome inside the judge frame.** The product currently draws its
+header and prototype notice inside the frame, under the harness's own copies of both. The
+obvious fix is to have `SiteChrome` detect `window.self !== window.top` and render less.
+
+I did not, and the reason is the harness's own claim: the frame is the shipped product,
+unmodified, and it "does not know it is being timed". That is exactly why `postMessage`
+from `/receipt` was rejected when this page was built. Teaching a product screen to render
+differently when it is being watched costs more than the duplication does. What I did
+instead is parent-side only — `/judge` pins its own prototype notice, so `SiteChrome` no
+longer also renders the inline one on that route. Two copies instead of three, and the
+product untouched.
+
+### Also fixed, because it would have cost time on shoot day
+
+`DEMO_VIDEO.md`'s pre-flight said "the live site is out of date — the landing page and
+`/start` aren't on it". It has not been true since 28 August; `/start`, `/judge` and
+`/honesty` all return 200 and `deploy_ready: true`.
+
+Worse, minute two's script was garbled: the "no guessing" beat ran into the third beat
+mid-sentence (`"So I+ asked the government for that data in February"`), the third beat had
+no opening, and the delivery notes below referenced three beats where only two existed.
+Rewritten as three, recounted at 187 words / ~64s.
+
+### Uncertain
+
+**Whether the median that comes out of the harness will be under sixty seconds.** Nothing
+has been measured yet, and the point of fixing `/judge` is that this is now findable out.
+`/evidence` and the landing tile both read from the same endpoint, so whatever the runs say
+is what the site says. If it lands above sixty, the claim changes and not the data.
+
+**The 0% false-positive rate still describes `/api/triage`, which the product never calls.**
+Item 6 in `PLAN_R2.md`, deliberately left until after mentor feedback, because it is the
+item most likely to be redirected by it.
+
+---
+
+## Step 8 — the route with no caller, and the number that measured the wrong thing — 2026-09-03
+
+`PLAN_R2.md` item 6, both halves. They looked like two jobs and were one: `/api/triage`
+existed, was documented as load-bearing, was the thing the headline number measured, and
+was called by nothing except the eval.
+
+### The gap was in the UI, not the model
+
+`DECISIONS.md` §3 justified the route like this: a screenshot of a debit SMS carries no
+evidence about whether the caller is still on the line, so that signal "only ever lives in
+the sentence the user types — which they often type second."
+
+There was no second. The intake submits its textarea *with* the image, in the same call.
+Nothing downstream ever asked for prose again. So the justification described a moment in
+the flow that did not exist, and the consequence was concrete: **a screenshot-only report
+could never fire the interrupt at all.** The most likely input to the product was the one
+input the safety feature could not see.
+
+So the confirm screen now carries an optional description box. Debounced 900ms, minimum 20
+characters, one call per distinct sentence.
+
+**It cannot block the send button, and that is not a limitation.** A missed interrupt costs
+one person an extra nudge; a send button that waits on a model call costs the sixty-second
+claim, for everyone. The call is fire-and-forget: dispatch before it returns and the packet
+goes. Same asymmetry as the gate's threshold in decision 5, applied to latency.
+
+No spinner either. The meter is the one moving element on that screen, and a "checking…"
+beside the send button reads as a reason to wait — the opposite of what the rest of the
+screen says.
+
+### Two defects I introduced, found by driving it rather than by reading it
+
+Typing an ACTIVE description on `/confirm` correctly landed on `/interrupt`. Then:
+
+1. **The description was gone on the way back.** It was local component state, and
+   continuing from the interrupt re-mounts the page. The one screen whose job is to not
+   make a frightened person repeat themselves was making them repeat themselves. Moved into
+   `JourneyState`, which is mirrored to sessionStorage, and read through the same
+   draft-overlay pattern `edits` already uses — an effect copying it into local state would
+   race the provider's post-mount read.
+
+2. **Latent trap.** `triaged.current` resets on re-mount, so one more keystroke after
+   continuing would have re-triaged the restored text and bounced the user straight back
+   into the interrupt. "The interrupt must never trap the user" is a stated rule and this
+   would have broken it. The screen is now shown at most once per report, gated on
+   `state.interruptShown`.
+
+Neither was visible from reading the diff. Both took about ninety seconds to find in a
+browser.
+
+### The number was measuring a sibling of the shipped path
+
+The eval scored `/api/triage`. The intake calls `/api/extract`. Different system
+instructions — `TRIAGE_ONLY_INSTRUCTION` against `EXTRACTION_INSTRUCTION` — and the shipped
+one asks the question with nine freeze fields, and possibly an image, competing for the
+model's attention in the same call.
+
+`lib/prompts.ts` composes both from one `TRIAGE_INSTRUCTION` constant and
+`lib/triage.test.ts` asserts that composition. But `toContain` is containment, not
+equivalence, and the write-up around it — in `prompts.ts`, in `DECISIONS.md` §3, on
+`/honesty` — said the number described the shipped gate. It described a sibling of it.
+
+`npm run eval` now takes `--path extract | triage | both` and defaults to both. The
+extraction path is the headline because it is the one a user hits; the triage path is
+reported beside it; every disagreement is listed by name.
+
+**Decisions and verdicts are counted separately**, because they are not the same claim. Two
+prompts can shut the same gate from different readings, and reporting only the decision
+agreement would overstate how alike they are. That distinction earned itself immediately:
+the local run had one case (`completed-loan-app-harassment`) come back UNCLEAR on extraction
+and ENDED on triage — same closed gate, different reading.
+
+### The result
+
+Against production, 3 September: **0/14 false positives and 0/8 false negatives on
+`/api/extract`**, median 2014ms. 22/22 identical decisions against the triage path, 22/22
+identical verdicts.
+
+So the old claim was true. It had simply never been tested, which is a different thing, and
+`/honesty` now says it in those words rather than quietly restating the old figure.
+
+### What I do not believe about that result, beyond what was already listed
+
+**Each figure is one run.** Temperature is 0, which is not determinism: the same 22 cases
+run locally and against production on the same day produced one differing verdict. Both
+readings left the gate shut, so nothing user-visible moved, but a single clean run is
+evidence and not a fixed property. Added to `/honesty` as a fifth limit alongside the
+disclosure about which path was historically measured.
+
+### Also
+
+What the person types on `/confirm` is carried into the freeze packet as `description` and
+seeds the statement on `/report/[ack]` — only when nothing has been saved against that
+acknowledgement yet, since once they have edited the statement, that is the statement.
+Verified end to end: packet stored, statement pre-filled, run bucketed `demo`, real
+distribution still at zero.
+
+`README.md` and `DECISIONS.md` §3 and §6 corrected; decision 12 added for the description
+box. The README's own intro was still repeating the unsourced "five behind the fifty" that
+step 7 removed from the product, and now names the one count this repository is willing to
+state — its own nine.
+
+### Uncertain
+
+**Whether the description box slows the median.** It sits above the send button on the
+screen where the clock is still running, and it is the first thing step 7's item 2 will
+measure. If real runs come in slower than expected, this is the first thing to look at, and
+moving it below the send button is the cheap experiment.
+
+---
+
+## Step 9 — the packet, the accessibility audit, and the delta page — 2026-09-03
+
+The rest of `PLAN_R2.md`, plus the two builds from the winning plan that close a judging
+criterion with evidence rather than surface.
+
+### "Dispatchable" was an assertion about an artefact nobody could see
+
+The central claim is *a complete, dispatchable freeze packet*. A judge could see nine rows
+on a receipt. The packet itself existed only as the app's internal state in Redis, shaped
+for the app rather than for a recipient, and the honest answer to "what would you actually
+send CFCFRMS?" was "read the repo".
+
+`lib/packet.ts` makes it a real thing: `toBankPayload()` projects a stored packet into a
+wire format, and the receipt renders exactly what that function returns. Not a mockup of a
+payload — the function's output.
+
+Two properties carry the argument, and both are tested:
+
+- **The holes are in the format.** Unread fields are *absent* from the payload and named in
+  an `unreadable` array. A null would serialise as a value-shaped blank; absence plus an
+  explicit list cannot be mistaken for one. That is the product's entire thesis expressed
+  as a schema rather than as a sentence.
+- **It is not the internal state.** The triage signals, the confidence scores, the elapsed
+  timing and the reporter's free text are all excluded. A bank placing a hold has no use
+  for any of it, and shipping the stored object wholesale would be a privacy decision made
+  by accident. `lib/packet.test.ts` asserts none of them can leak.
+
+`dispatched: false` is a literal in the payload, so the artefact discloses its own status
+without depending on the surrounding copy.
+
+Collapsed behind a native `<details>`: the receipt is the moment the person's stress is
+supposed to drop, and a wall of JSON is not that. Native, so it needs no JavaScript and is
+keyboard-operable for free.
+
+### The accessibility claims were claims
+
+The product asserts large type and high contrast. Nothing had measured either, which is the
+exact pattern the last two days were spent removing everywhere else — and a reviewer who
+checks would have found it before we did.
+
+Measured every colour pair. Most are comfortable: body text 17–19:1, muted 7.1–8.4:1, the
+amber mark 5.8:1, the interrupt red 6.5:1. The palette comments' own claims (faint at 5.3:1
+on ink, mark at 5.8:1 on surface) turned out to be accurate.
+
+**Two failures, both fixed:**
+
+- The meter's empty-state em dash used `--color-line-strong` at **1.9:1** — below the floor
+  even for display sizes. The intent was right (the placeholder must read as the absence of
+  a value, not as one) but the execution was invisible. Added `--color-placeholder` at
+  3.4:1, which clears the large-text minimum and still reads as empty. Nothing else uses it.
+- One source line on the landing page sits on `card-strong` (raised), where `faint`
+  measures **4.49:1** and misses 4.5:1 by a hair. Moved to `muted`. It is a citation, which
+  is the last thing on this site that should be the hardest to read.
+
+**Three structural fixes:**
+
+- The meter emitted an `<h2>` above the page's own `<h1>` on both screens that use it. It is
+  a `<p>` now; the `<section>` already carried `aria-label`, so nothing was lost.
+- `/interrupt` arrives by client-side navigation, which a screen reader does not report. It
+  is `role="alert"` now — the one screen where not being told what happened is a safety
+  problem rather than an inconvenience.
+- The send button's busy state was a label swap on a disabled button, which is not
+  announced. `aria-live="polite"`.
+
+Recorded on `/honesty` as a **partial** claim, not a real one, because the limit is real:
+nothing has been tested with an actual screen reader, and nobody who uses one has looked at
+it. Measuring contrast is not an accessibility audit; it is the part that can be done
+without a person.
+
+### `/changes`
+
+A defect ledger rather than a feature list. The obvious version of this page is "what we
+added" — every project in the round will have one, and it asks the reader to take the
+improvement on trust. This one names what was wrong first and hands over the link that
+proves it is not wrong now.
+
+The two still-open items are at the top rather than the bottom. A list of fixes that quietly
+omits the unfinished work is the thing this project spent the week removing.
+
+Built as a visual sibling of `/honesty` — same hairline row list, no colour, server
+component, English only for the same reason. The first draft repeated "Still open" under
+each open entry, directly beneath a heading that already said it; cut, on the same reasoning
+`FieldRow` uses when it explains only the first hole.
+
+### Also in this batch
+
+- **The receipt over-counted.** `isMissing` sees `payment_rail: "UNKNOWN"` as a value, so a
+  wholly empty packet reported *1 of 9 fields sent*. `isMissingFreezeField` treats the enum
+  placeholders as the holes they are. On the screen whose argument is that it counts holes
+  honestly, that count should not have been the generous one.
+- **A misread timestamp could not be corrected.** The time control rendered only when the
+  model failed to read one, so a wrong reading was stuck — on the field that drives the
+  meter and that a bank reads first. Always shown now, with the stored value in words above
+  it, rendered through the same formatter the meter uses so one instant never appears two
+  ways on one screen.
+- **The meter counted in English on Hindi screens.** `elapsedParts` is English by design
+  (it is the tested arithmetic module), and the unit went straight to the DOM. `elapsedText`
+  in `lib/i18n.ts` looks it up instead. `lib/decay.ts` stays pure and its tests stay pinned.
+
+### Uncertain
+
+**Whether the payload block belongs on the receipt at all.** It is collapsed and it is
+below the acknowledgement number, so it should not compete — but the receipt is a stress-
+drop screen for a victim and this is a block written for a judge. If the two audiences pull
+harder apart than expected, the honest move is to leave a link on the receipt and put the
+payload on `/evidence`, where the other judge-facing material already lives.

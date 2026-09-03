@@ -63,6 +63,8 @@ export default function JudgePage() {
   const [elapsed, setElapsed] = useState(0);
   const [ack, setAck] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  /** Bumped on every start, so a rerun reloads a frame already on /start. */
+  const [run, setRun] = useState(0);
 
   const startedAt = useRef<number | null>(null);
   const frame = useRef<HTMLIFrameElement>(null);
@@ -112,10 +114,19 @@ export default function JudgePage() {
     startedAt.current = Date.now();
     setElapsed(0);
     setAck(null);
-    setPhase("running");
     // Reload rather than trust whatever the frame was showing, so a second run
     // never starts halfway through the first one's state.
-    if (frame.current) frame.current.src = "/start";
+    //
+    // Assigning `frame.current.src` here does not work and shipped broken for
+    // several days: the iframe used to be rendered only while phase !== "idle",
+    // so at this point in a click handler it had not mounted, the ref was null,
+    // the assignment was skipped, and the frame stayed on the `about:blank` in
+    // its JSX — a stopwatch counting up over an empty box, on the one page
+    // built for judges. The frame is now always mounted (hidden while idle) and
+    // its src is driven by the effect below, keyed on the run counter, so a
+    // rerun reloads even though the URL string has not changed.
+    setRun((n) => n + 1);
+    setPhase("running");
   }, []);
 
   const reset = useCallback(() => {
@@ -123,8 +134,18 @@ export default function JudgePage() {
     setPhase("idle");
     setElapsed(0);
     setAck(null);
-    if (frame.current) frame.current.src = "about:blank";
   }, []);
+
+  /**
+   * Point the frame at the intake, after React has committed the phase change.
+   *
+   * Keyed on `run` as well as `phase` so pressing "Run it again" reloads the
+   * intake rather than leaving the previous run's receipt on screen.
+   */
+  useEffect(() => {
+    if (!frame.current) return;
+    frame.current.src = phase === "idle" ? "about:blank" : "/start";
+  }, [phase, run]);
 
   const copyScenario = useCallback(() => {
     void navigator.clipboard?.writeText(scenario.text).then(
@@ -263,22 +284,32 @@ export default function JudgePage() {
 
       <section>
         <h2 className="eyebrow">3. The product</h2>
-        {phase === "idle" ? (
+
+        {phase === "idle" && (
           <div className="card mt-2 flex min-h-40 items-center justify-center">
             <p className="max-w-xs text-center text-sm leading-relaxed text-muted">
               Press start and the real intake loads here, with the clock running.
             </p>
           </div>
-        ) : (
-          <div className="mt-2 overflow-hidden rounded-lg border border-line">
-            <iframe
-              ref={frame}
-              title="Golden Hour, running"
-              className="h-[70vh] min-h-125 w-full bg-ink"
-              src="about:blank"
-            />
-          </div>
         )}
+
+        {/*
+          Always mounted, hidden while idle, rather than rendered on demand.
+          A conditionally-rendered iframe has a null ref inside the click
+          handler that starts the run, which is exactly how this page shipped
+          with a stopwatch running over a frame that never loaded.
+        */}
+        <div
+          hidden={phase === "idle"}
+          className="mt-2 overflow-hidden rounded-lg border border-line"
+        >
+          <iframe
+            ref={frame}
+            title="Golden Hour, running"
+            className="h-[70vh] min-h-125 w-full bg-ink"
+            src="about:blank"
+          />
+        </div>
         <p className="mt-2 text-xs leading-relaxed text-faint">
           That frame is the shipped product, not a copy of it. It does not know it is being
           timed.{" "}

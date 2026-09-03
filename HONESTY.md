@@ -25,7 +25,7 @@ This is not a government service and must never be mistakable for one. No emblem
 | Thing | Status | Detail |
 |---|---|---|
 | Model extraction from a screenshot, SMS, or typed sentence | **Real** | A live, schema-constrained Gemini call. The response is never free-text parsed. |
-| UNREADABLE as a first-class value | **Real** | Enforced server-side in lib/validate.ts, not requested of the model. A value whose shape is wrong for its field is downgraded however confident the model was, and a downgrade produces UNREADABLE rather than an empty string. |
+| UNREADABLE as a first-class value | **Real** | Enforced server-side in lib/validate.ts, not requested of the model. A value whose shape is wrong for its field is downgraded however confident the model was, and a downgrade produces UNREADABLE rather than an empty string. You can watch it happen: the “A confident misread” demo case returns an eleven-digit reference at 0.93 confidence, the server refuses it on shape, and the receipt lists the field as sent blank. Until 3 September no demo could show this — every case’s blanks came from the model declining to read a field, which demonstrates the prompt behaving rather than the guarantee holding. |
 | The dropped-field list on the receipt | **Real** | Every field that was thrown away is named, with the reason it was thrown away. |
 | The acknowledgement number and its persistence | **Real** | Upstash Redis, 24-hour TTL. The receipt reads back what was actually stored. |
 | The acknowledgement number's authority | **Not real** | It is a receipt for a prototype, not a case number. It corresponds to nothing in any government system and no one is expecting it. |
@@ -33,7 +33,10 @@ This is not a government service and must never be mistakable for one. No emblem
 | The decay meter's elapsed time | **Real** | Computed from the fraud timestamp the user entered, never from page load. A six-day-old fraud reads six days. |
 | The recovery percentage the meter used to show | **Not real** | Removed rather than mocked. See below — it is the entry that matters most here. |
 | The interrupt gate | **Real** | A tested pure function over quoted signals. It fires only on an explicit ACTIVE verdict plus a hard signal the model could quote. |
-| The interrupt's false-positive rate | **Real, with limits** | Really measured, with real limits. 0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1330ms. Measured 2026-08-28. |
+| The interrupt's false-positive rate | **Real, with limits** | Really measured, with real limits. 0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median latency 2014ms on /api/extract, the route the intake actually calls. Measured 2026-09-03. The same 22 cases were also run through /api/triage, which uses a shorter prompt asking only this question. The two agreed on 22 of 22 decisions and returned identical verdicts on 22 of 22. Triage: 0/14 false positives, 0/8 false negatives, median 1214ms. |
+| The interrupt firing on a screenshot-only report | **Real** | A screenshot of a debit SMS carries no evidence about whether the caller is still on the line, so the intake's single model call cannot catch it. The confirm screen therefore has an optional description box, and what is typed there is triaged through the same gate. It never blocks the send button: if the packet is dispatched before triage returns, it is dispatched. |
+| The freeze packet as a bank would receive it | **Real** | lib/packet.ts projects the stored packet into a wire format, and the receipt renders exactly what that function returns rather than a description of it. Unread fields are absent from the payload and named under `unreadable`, so a hole cannot be read as a value. The triage signals, the confidence scores and the reporter’s free text are deliberately excluded. Nothing dispatches it — `dispatched` is a literal false in the payload. |
+| Accessibility | **Real, with limits** | Checked rather than asserted, on 3 September, and not by an expert. Every colour pair was measured: body text is 17–19:1, muted text 7.1–8.4:1, the amber mark 5.8:1 and the interrupt red 6.5:1. Two failures were found and fixed — the meter’s empty-state dash was 1.9:1, and one source line sat at 4.49:1 on a raised card. The meter no longer emits a heading above the page’s own h1, the interrupt announces itself, and the send button reports its busy state. What has not been done: no test with a real screen reader, and no audit by anyone who uses one. |
 | The portal comparison benchmark | **Not real** | Not measured. The portal column of data/portal-benchmark.json is empty, and /evidence says so rather than hiding it. Someone has to open cybercrime.gov.in and count the fields; a fabricated benchmark would discredit every honest thing next to it. |
 | The measured median completion time | **Not real** | Not yet measured. No unaided human run-throughs have been recorded. Demo replays and the automated journey are bucketed separately and excluded on purpose, because they serve a cached extraction and start the clock at the fixture click. |
 | The Hindi copy | **Real, with limits** | Present and unreviewed. No native speaker has read it. Every Hindi screen says so, and this page is deliberately English only. |
@@ -57,9 +60,11 @@ Source: [Rajya Sabha Unstarred Question 1349, 11 February 2026](https://www.mha.
 
 ## What the interrupt's 0% does not mean
 
-0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median triage latency 1330ms. Measured 2026-08-28.
+0% false positives on 14 COMPLETED cases (0/14). 0% false negatives on 8 ACTIVE cases (0/8). Median latency 2014ms on /api/extract, the route the intake actually calls. Measured 2026-09-03.
 
-Reproduce it with npm run eval. Every case runs through the real triage route, the real model call and the real gate; nothing is stubbed. The cases are in data/triage-eval.json and the raw result in data/triage-eval-result.json.
+The same 22 cases were also run through /api/triage, which uses a shorter prompt asking only this question. The two agreed on 22 of 22 decisions and returned identical verdicts on 22 of 22. Triage: 0/14 false positives, 0/8 false negatives, median 1214ms.
+
+Reproduce it with npm run eval. Every case runs through a real route, a real model call and the real gate; nothing is stubbed. The cases are in data/triage-eval.json and the raw result in data/triage-eval-result.json.
 
 A clean result invites more confidence than it has earned, so:
 
@@ -70,6 +75,10 @@ A clean result invites more confidence than it has earned, so:
 3. It measures English prose. Nothing here says what the gate does with Hinglish, with Hindi, or with a dictation transcript that has no punctuation — which is what a real user is most likely to give it.
 
 4. The false-negative result is the weaker of the two, not the stronger. The gate is built to miss rather than over-fire; that it missed nothing says the ACTIVE cases were written clearly, not that the gate is sensitive.
+
+5. Until 3 September this number was measured on /api/triage only, while the intake calls /api/extract — a different system prompt, asked alongside nine freeze fields. The write-up around it said the number described the shipped gate, and it did not, quite. It does now, and the older figure is not being quietly restated: the extraction path was re-run from scratch.
+
+6. Each figure is one run. The model is called at temperature 0, but that is not a guarantee of determinism — running the same 22 cases locally and against production on the same day produced the same decisions everywhere and one differing verdict (UNCLEAR against ENDED on a completed case, which leaves the gate shut either way). Treat a single clean run as evidence, not as a fixed property.
 
 ---
 

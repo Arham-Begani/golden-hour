@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     elapsed_ms?: unknown;
     lang?: unknown;
     interrupt_shown?: unknown;
+    description?: unknown;
     source?: unknown;
   };
 
@@ -69,6 +70,7 @@ export async function POST(request: Request) {
     run_kind: kind,
     lang: body.lang === "hi" ? "hi" : "en",
     interrupt_shown: body.interrupt_shown === true,
+    description: typeof body.description === "string" ? body.description.trim() : "",
   };
 
   await saveFreezePacket(packet);

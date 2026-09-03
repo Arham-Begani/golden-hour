@@ -189,6 +189,32 @@ export default function LandingPage() {
             <p className="mt-2 text-sm leading-relaxed">{landing.whyCaseBody}</p>
           </div>
         </div>
+
+        {/* The argument's strongest external support, moved up from four
+            sections down /evidence. The state already runs this sequence on
+            the helpline; the claim is only that the web route should match. */}
+        <div className="card-strong mt-4">
+          <h3 className="text-base font-semibold">{landing.alreadyHeading}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{landing.alreadyBody}</p>
+          <blockquote className="mt-2 border-l-2 border-line-strong pl-3 text-sm leading-relaxed text-muted">
+            &ldquo;{landing.alreadyQuote}&rdquo;
+          </blockquote>
+          <p className="mt-2 text-sm leading-relaxed">{landing.alreadyAfter}</p>
+          {/* Source next to the claim, never on a separate references page. */}
+          {/* text-muted, not text-faint: this block is card-strong (bg-raised),
+              where faint measures 4.49:1 and misses the 4.5:1 floor. */}
+          <p className="mt-2 text-xs leading-relaxed text-muted">
+            <a
+              href="https://cybercrime.gov.in/UploadMedia/instructions_citizenreportingcyberfrauds.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              {landing.alreadySource}
+            </a>{" "}
+            {landing.alreadySourceNote}
+          </p>
+        </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}
@@ -218,6 +244,39 @@ export default function LandingPage() {
             →
           </span>
         </Link>
+      </section>
+
+      {/* ----------------------------------------------------------------
+          The two pages a sceptical reader needs, which until now were
+          reachable only by typing the URL. /honesty answers the honesty
+          criterion and /judge is where the median above gets its data, and
+          neither is any use unlinked.
+          ---------------------------------------------------------------- */}
+
+      <section>
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          {landing.checkHeading}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{landing.checkBody}</p>
+
+        {/* Full width above the pair rather than a third column: the delta is
+            what this round is judged on, and three cards at this measure would
+            each be too narrow to hold a sentence. */}
+        <Link href="/changes" className="card card-interactive mt-4 block no-underline">
+          <p className="text-base font-medium">{landing.changesTitle}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted">{landing.changesBody}</p>
+        </Link>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <Link href="/judge" className="card card-interactive no-underline">
+            <p className="text-base font-medium">{landing.judgeTitle}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">{landing.judgeBody}</p>
+          </Link>
+          <Link href="/honesty" className="card card-interactive no-underline">
+            <p className="text-base font-medium">{landing.honestyTitle}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">{landing.honestyBody}</p>
+          </Link>
+        </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}

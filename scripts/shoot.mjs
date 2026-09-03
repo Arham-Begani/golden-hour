@@ -44,6 +44,7 @@ const PAGES = process.env.GH_PAGES
       ["evidence", "/evidence"],
       ["honesty", "/honesty"],
       ["judge", "/judge"],
+      ["changes", "/changes"],
     ];
 
 mkdirSync(OUT, { recursive: true });

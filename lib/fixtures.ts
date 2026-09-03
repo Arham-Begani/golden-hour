@@ -8,10 +8,12 @@ import { UNREADABLE } from "./schema";
  * exact same `validateExtraction` path as a live response, so what a judge
  * sees is the real pipeline with a cached first step, not a mock of it.
  *
- * The four cases are chosen deliberately. Two of them are the product's best
- * arguments: the blurred screenshot proves UNREADABLE is engineered rather
- * than claimed, and the six-day-old fraud proves the meter does not
- * manufacture urgency that isn't there.
+ * The cases are chosen deliberately. Three of them are the product's best
+ * arguments: the blurred screenshot proves the model will decline to read a
+ * field, the misread reference proves the SERVER refuses one the model was
+ * confident about — which is the stronger claim and the one no demo could
+ * show for most of this project's life — and the six-day-old fraud proves the
+ * meter does not manufacture urgency that isn't there.
  */
 
 const off = { present: false, evidence: "" };
@@ -140,6 +142,59 @@ export const FIXTURES: Fixture[] = [
       },
       summary:
         "Caller claiming to be from the CBI is still on the line and asking for a further transfer.",
+    },
+  },
+
+  {
+    id: "misread-reference",
+    label: "A confident misread",
+    purpose:
+      "The model returns a reference that looks right and is not. lib/validate.ts refuses it, and the receipt names what was dropped.",
+    /**
+     * The case the other four could not make.
+     *
+     * Every other fixture's holes exist because the *model* said UNREADABLE,
+     * which demonstrates the prompt behaving well. None of them exercised
+     * `lib/validate.ts`, which is the actual guarantee: the model can be
+     * confidently wrong and the server still refuses the value. The strongest
+     * argument in this codebase was the one thing no demo path could show.
+     *
+     * So this one hands the validator a UTR that is eleven digits at 0.93
+     * confidence — exactly what a model does with a cracked screen where one
+     * digit is obscured. It is not empty, not flagged, not low-confidence, and
+     * it is wrong. `wrong_shape` catches it on length, the field arrives at the
+     * confirm screen as a hole with the rejected value shown beneath it, and
+     * the receipt lists it as sent blank.
+     *
+     * Nothing here is stubbed to make that happen: the fixture is the raw model
+     * shape, and the same `validateExtraction` a live call goes through does the
+     * rest.
+     */
+    input:
+      "Dear Customer, Rs.31,200.00 debited from A/c XX8830 on 24-08-26 at 22:06:41 to VPA payments.desk77@examplebank (UPI Ref 5236123456 7). Not you? Call your bank. -Example Bank",
+    occurredMinutesAgo: 17,
+    raw: {
+      amount: field("31200.00", 0.96),
+      currency: field("INR", 0.99),
+      transaction_ref: field(UNREADABLE, 0.18),
+      // Eleven digits, high confidence. A UPI reference is twelve.
+      utr_or_upi_ref: field("52361234567", 0.93),
+      occurred_at: field("__OCCURRED_AT__", 0.92),
+      beneficiary_handle: field("payments.desk77@examplebank", 0.94),
+      beneficiary_name: field(UNREADABLE, 0.12),
+      victim_bank: field("Example Bank", 0.93),
+      source_account_last4: field("8830", 0.91),
+      payment_rail: field("UPI", 0.95),
+      fraud_category: field("UPI_PAYMENT_FRAUD", 0.8),
+      active_scam: {
+        remote_access_app: off,
+        screen_sharing: off,
+        caller_on_line: off,
+        verification_transfer_requested: off,
+        told_to_tell_nobody: off,
+        verdict: "ENDED",
+      },
+      summary: "Rs 31,200 left the account to a UPI handle the sender does not recognise.",
     },
   },
 

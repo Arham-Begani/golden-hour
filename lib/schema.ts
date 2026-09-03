@@ -190,6 +190,15 @@ export const FreezePacketSchema = z.object({
   run_kind: z.enum(["real", "demo"]).default("real"),
   lang: z.enum(["en", "hi"]).default("en"),
   interrupt_shown: z.boolean().default(false),
+  /**
+   * The optional sentence typed on the confirm screen.
+   *
+   * It exists for triage — a screenshot cannot say whether the caller is still
+   * on the line — but once typed it is also the first thing the statement half
+   * wants, so it is carried across and seeded there. Defaulted, so packets
+   * stored before this field existed still parse.
+   */
+  description: z.string().default(""),
 });
 
 export type FreezePacket = z.infer<typeof FreezePacketSchema>;

@@ -23,10 +23,19 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ ok: false, reason: "unknown_ack" }, { status: 404 });
   }
 
+  /**
+   * Seed the statement with whatever they typed on the confirm screen.
+   *
+   * Only when nothing has been saved against this acknowledgement yet — once
+   * the person has edited the statement, that is the statement, and re-seeding
+   * would overwrite their words with an older sentence of their own.
+   */
+  const stored = await getStatement(ack);
+
   return NextResponse.json({
     ok: true,
     packet,
-    statement: (await getStatement(ack)) ?? StatementSchema.parse({}),
+    statement: stored ?? StatementSchema.parse({ statement: packet.description ?? "" }),
   });
 }
 

@@ -46,14 +46,38 @@ export type Section = {
 const fp = evalResult.false_positive_rate_pct;
 const fn = evalResult.false_negative_rate_pct;
 
+/**
+ * The comparison between the two prompts, when the run produced one.
+ *
+ * Until 3 September the eval scored `/api/triage` only, while the intake calls
+ * `/api/extract`. Both compose the same TRIAGE_INSTRUCTION constant, and a test
+ * asserted that composition — but containment is not equivalence, and the
+ * shipped call asks the question with nine freeze fields in the same breath.
+ * The number was presented as describing the shipped gate and did not, quite.
+ * It does now, and the other path is reported beside it.
+ */
+const comparison = evalResult.comparison ?? null;
+
 /** The measured interrupt numbers, phrased once and used in both renderers. */
 export const EVAL_HEADLINE =
   `${fp}% false positives on ${evalResult.completed_cases} COMPLETED cases ` +
   `(${evalResult.false_positives}/${evalResult.completed_cases}). ` +
   `${fn}% false negatives on ${evalResult.active_cases} ACTIVE cases ` +
   `(${evalResult.false_negatives}/${evalResult.active_cases}). ` +
-  `Median triage latency ${evalResult.median_latency_ms}ms. ` +
+  `Median latency ${evalResult.median_latency_ms}ms on ${evalResult.route}, ` +
+  `the route the intake actually calls. ` +
   `Measured ${evalResult.measured_at.slice(0, 10)}.`;
+
+/** What the second path said, and whether it agreed. */
+export const EVAL_CROSS_CHECK = comparison
+  ? `The same ${comparison.compared} cases were also run through /api/triage, which uses a ` +
+    `shorter prompt asking only this question. The two agreed on ${comparison.agreed} of ` +
+    `${comparison.compared} decisions and returned identical verdicts on ` +
+    `${comparison.verdict_agreed} of ${comparison.compared}. ` +
+    `Triage: ${comparison.triage.false_positives}/${comparison.triage.completed_cases} false ` +
+    `positives, ${comparison.triage.false_negatives}/${comparison.triage.active_cases} false ` +
+    `negatives, median ${comparison.triage.median_latency_ms}ms.`
+  : "Only one path was scored on this run, so there is no cross-check to report.";
 
 export const TITLE = "What is real and what is not";
 
@@ -87,7 +111,7 @@ export const SECTIONS: Section[] = [
         thing: "UNREADABLE as a first-class value",
         status: "real",
         detail:
-          "Enforced server-side in lib/validate.ts, not requested of the model. A value whose shape is wrong for its field is downgraded however confident the model was, and a downgrade produces UNREADABLE rather than an empty string.",
+          "Enforced server-side in lib/validate.ts, not requested of the model. A value whose shape is wrong for its field is downgraded however confident the model was, and a downgrade produces UNREADABLE rather than an empty string. You can watch it happen: the “A confident misread” demo case returns an eleven-digit reference at 0.93 confidence, the server refuses it on shape, and the receipt lists the field as sent blank. Until 3 September no demo could show this — every case’s blanks came from the model declining to read a field, which demonstrates the prompt behaving rather than the guarantee holding.",
       },
       {
         thing: "The dropped-field list on the receipt",
@@ -130,7 +154,25 @@ export const SECTIONS: Section[] = [
       {
         thing: "The interrupt's false-positive rate",
         status: "partial",
-        detail: `Really measured, with real limits. ${EVAL_HEADLINE}`,
+        detail: `Really measured, with real limits. ${EVAL_HEADLINE} ${EVAL_CROSS_CHECK}`,
+      },
+      {
+        thing: "The interrupt firing on a screenshot-only report",
+        status: "real",
+        detail:
+          "A screenshot of a debit SMS carries no evidence about whether the caller is still on the line, so the intake's single model call cannot catch it. The confirm screen therefore has an optional description box, and what is typed there is triaged through the same gate. It never blocks the send button: if the packet is dispatched before triage returns, it is dispatched.",
+      },
+      {
+        thing: "The freeze packet as a bank would receive it",
+        status: "real",
+        detail:
+          "lib/packet.ts projects the stored packet into a wire format, and the receipt renders exactly what that function returns rather than a description of it. Unread fields are absent from the payload and named under `unreadable`, so a hole cannot be read as a value. The triage signals, the confidence scores and the reporter’s free text are deliberately excluded. Nothing dispatches it — `dispatched` is a literal false in the payload.",
+      },
+      {
+        thing: "Accessibility",
+        status: "partial",
+        detail:
+          "Checked rather than asserted, on 3 September, and not by an expert. Every colour pair was measured: body text is 17–19:1, muted text 7.1–8.4:1, the amber mark 5.8:1 and the interrupt red 6.5:1. Two failures were found and fixed — the meter’s empty-state dash was 1.9:1, and one source line sat at 4.49:1 on a raised card. The meter no longer emits a heading above the page’s own h1, the interrupt announces itself, and the send button reports its busy state. What has not been done: no test with a real screen reader, and no audit by anyone who uses one.",
       },
       {
         thing: "The portal comparison benchmark",
@@ -179,7 +221,8 @@ export const SECTIONS: Section[] = [
     heading: "What the interrupt's 0% does not mean",
     body: [
       EVAL_HEADLINE,
-      "Reproduce it with npm run eval. Every case runs through the real triage route, the real model call and the real gate; nothing is stubbed. The cases are in data/triage-eval.json and the raw result in data/triage-eval-result.json.",
+      EVAL_CROSS_CHECK,
+      "Reproduce it with npm run eval. Every case runs through a real route, a real model call and the real gate; nothing is stubbed. The cases are in data/triage-eval.json and the raw result in data/triage-eval-result.json.",
       "A clean result invites more confidence than it has earned, so:",
     ],
     points: [
@@ -187,6 +230,8 @@ export const SECTIONS: Section[] = [
       `${evalResult.total_cases} cases is a small sample. Zero false positives in ${evalResult.completed_cases} is consistent with a true rate of anything up to roughly 20% at 95% confidence. The honest reading is that no false positive was observed, not that they do not occur.`,
       "It measures English prose. Nothing here says what the gate does with Hinglish, with Hindi, or with a dictation transcript that has no punctuation — which is what a real user is most likely to give it.",
       "The false-negative result is the weaker of the two, not the stronger. The gate is built to miss rather than over-fire; that it missed nothing says the ACTIVE cases were written clearly, not that the gate is sensitive.",
+      "Until 3 September this number was measured on /api/triage only, while the intake calls /api/extract — a different system prompt, asked alongside nine freeze fields. The write-up around it said the number described the shipped gate, and it did not, quite. It does now, and the older figure is not being quietly restated: the extraction path was re-run from scratch.",
+      "Each figure is one run. The model is called at temperature 0, but that is not a guarantee of determinism — running the same 22 cases locally and against production on the same day produced the same decisions everywhere and one differing verdict (UNCLEAR against ENDED on a completed case, which leaves the gate shut either way). Treat a single clean run as evidence, not as a fixed property.",
     ],
   },
 

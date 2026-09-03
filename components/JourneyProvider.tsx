@@ -34,6 +34,15 @@ export type JourneyState = {
   source: "model" | "fixture" | "manual" | null;
   interruptShown: boolean;
   /**
+   * The optional sentence typed on the confirm screen.
+   *
+   * It lives here rather than in the confirm page's own state because typing it
+   * can send the user to /interrupt, and coming back re-mounts the page. Local
+   * state meant their words were gone when they returned — from the one screen
+   * whose entire job is to not make a frightened person repeat themselves.
+   */
+  description: string;
+  /**
    * When the clock started, persisted alongside the rest of the journey.
    *
    * It lived only in a ref until a refresh on /confirm was found to drop the
@@ -51,6 +60,7 @@ const EMPTY: JourneyState = {
   corrected: [],
   source: null,
   interruptShown: false,
+  description: "",
   startedAt: null,
 };
 

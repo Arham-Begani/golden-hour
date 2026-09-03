@@ -38,6 +38,10 @@ const CASES = [
   { label: "Blurred screenshot", slug: "blurred", expectInterrupt: false },
   { label: "Digital arrest, in progress", slug: "arrest", expectInterrupt: true },
   { label: "Six days old", slug: "old", expectInterrupt: false },
+  // The case that exercises lib/validate.ts rather than the prompt: a confident
+  // eleven-digit reference the server refuses on shape. Driven end to end so the
+  // "Dropped" chip and the blank on the receipt are asserted rather than assumed.
+  { label: "A confident misread", slug: "misread", expectInterrupt: false },
 ];
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -57,11 +61,11 @@ async function clickByText(page, text) {
 mkdirSync(OUT, { recursive: true });
 
 /**
- * Timings before the run, so we can prove afterwards that driving four demo
+ * Timings before the run, so we can prove afterwards that driving the demo
  * cases did not move the real distribution.
  *
  * Every case here goes through the demo strip, so the server's fixture
- * fingerprint should bucket all four as demo replays. That is a property of the
+ * fingerprint should bucket every one as a demo replay. That is a property of the
  * code rather than of this script — which is exactly why it is worth asserting.
  * If someone edits a fixture summary and the fingerprint stops matching, the
  * scripted runs quietly start counting toward the sixty-second claim, and

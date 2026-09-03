@@ -306,3 +306,31 @@ export function emptyExtraction(): Extraction {
 export function isMissing(field: ReadField | undefined): boolean {
   return !field || field.value === UNREADABLE || field.value.trim() === "";
 }
+
+/**
+ * The enum fields cannot hold UNREADABLE, so they carry a fallback instead.
+ *
+ * `validateEnumField` turns an unreadable payment rail into "UNKNOWN" and an
+ * unreadable category into "OTHER", because those are the only values the
+ * schema's enum permits. Both mean exactly what UNREADABLE means everywhere
+ * else — nothing was read — but `isMissing` sees a non-empty string and says
+ * the field is present.
+ */
+const ENUM_FALLBACK: Record<string, string> = {
+  payment_rail: "UNKNOWN",
+  fraud_category: "OTHER",
+};
+
+/**
+ * True when a freeze field holds nothing a bank could act on.
+ *
+ * Use this rather than `isMissing` anywhere a count is shown to the user. The
+ * receipt says "sent with N of 9 fields", and counting "UNKNOWN" as a sent
+ * payment rail made a completely empty packet report 1 of 9. On a screen whose
+ * whole argument is that it counts its holes honestly, that is the last number
+ * that should be generous.
+ */
+export function isMissingFreezeField(key: string, field: ReadField | undefined): boolean {
+  if (isMissing(field)) return true;
+  return ENUM_FALLBACK[key] === field!.value;
+}

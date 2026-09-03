@@ -71,13 +71,21 @@ both the amount and the fact that the caller is still on the line.
 **But `/api/triage` exists anyway**, for the case the single call cannot cover: a
 screenshot of a debit SMS contains no evidence about whether the attack is ongoing, and
 that signal only ever lives in the sentence the user types — which they often type second.
-Triage is available on its own for that path, and it is what the eval scores.
+
+**For a while, "second" was a place that did not exist.** This paragraph justified the
+route by describing a moment in the flow — the user typing a description after the
+extraction has already run — and there was nowhere in the UI for that to happen. The
+intake's textarea is submitted *with* the screenshot, in the same call. So a
+screenshot-only report could never fire the interrupt, and outside `scripts/eval.mjs` the
+route had no caller at all. Fixed on 3 September: the confirm screen carries an optional
+description box, and what is typed there is triaged through the same gate. See decision 12.
 
 The risk this creates is prompt drift: two calls, two copies of the triage wording, and an
-eval that measures a paragraph the product does not use. `lib/prompts.ts` resolves it —
-`TRIAGE_INSTRUCTION` is one constant, composed into both `EXTRACTION_INSTRUCTION` and
+eval that measures a paragraph the product does not use. `lib/prompts.ts` resolves half of
+it — `TRIAGE_INSTRUCTION` is one constant, composed into both `EXTRACTION_INSTRUCTION` and
 `TRIAGE_ONLY_INSTRUCTION`, and `lib/triage.test.ts` asserts the composition rather than
-trusting it.
+trusting it. Only half, because composition is not equivalence; the other half is
+measurement, and it is decision 6.
 
 ---
 
@@ -135,18 +143,38 @@ The limits of that number are in `HONESTY.md`, and they are substantial.
 
 ---
 
-## 6. The eval runs against a live server, not a mock
+## 6. The eval runs against a live server, and against both prompts
 
-**Chosen:** `scripts/eval.mjs` drives the real `/api/triage` route over HTTP, with real
-model calls.
+**Chosen:** `scripts/eval.mjs` drives the real routes over HTTP with real model calls, and
+scores **both** `/api/extract` and `/api/triage`, reporting the extraction path — the one
+the intake calls — as the headline.
 
 **Rejected:** Unit-testing the gate against recorded model outputs and calling that the
-eval.
+eval. **Also rejected, and this is the one that had actually shipped:** scoring
+`/api/triage` alone and describing the result as the shipped gate's rate.
 
 A mocked eval scores the gate, which is a pure function that already has unit tests. The
 number worth reporting is the one that includes the model's tense-reading — whether it can
 tell "he made me install AnyDesk, I uninstalled it" from "the app is still running". That
 only shows up in a live call.
+
+**Why one path was not enough.** The intake calls `/api/extract`, whose system instruction
+is `EXTRACTION_INSTRUCTION`; the eval called `/api/triage`, whose instruction is
+`TRIAGE_ONLY_INSTRUCTION`. Both compose the same `TRIAGE_INSTRUCTION`, and `triage.test.ts`
+asserts that — but `toContain` is containment, not equivalence. The shipped call asks the
+same question with nine freeze fields and possibly an image competing for the model's
+attention, and nothing measured what that does to the verdict. The reported figure was
+therefore a claim about a sibling of the shipped path, presented as a claim about the
+shipped path. That is precisely the kind of gap this file exists to not have.
+
+Both now run by default. The report carries the extraction numbers at the top level, the
+triage numbers beside them, and every case where the two disagree by name — at the decision
+level and, separately, at the verdict level, since two prompts can shut the same gate from
+different readings and counting only decisions would overstate how alike they are.
+
+Measured 3 September against production: 22/22 identical decisions, 22/22 identical
+verdicts, 0/14 false positives on both. The old claim turned out to be true. It had simply
+never been tested, which is a different thing, and `/honesty` now says so in those terms.
 
 The two layers are kept separate on purpose: `lib/triage.test.ts` pins the gate offline with
 no key and no network, and `npm run eval` measures the whole path. If the false-positive
@@ -290,3 +318,45 @@ the interrupt, and nothing else. The landing page's step-one node was originally
 accent and is now monochrome, emphasised with weight and contrast instead: a coloured node in
 a diagram teaches the reader that the colour means "look at this", and the interrupt needs it
 to mean "stop".
+
+---
+
+## 12. The description box is on the confirm screen, and it never blocks the send
+
+**Chosen:** An optional free-text box below the fields on `/confirm`. What is typed there
+is debounced and sent to `/api/triage`; if the gate fires, the report stops and the
+interrupt screen comes up.
+
+**Rejected:** A second model call in the intake's hot path. **Rejected:** making the send
+button wait for the triage response. **Rejected:** leaving it where it was, which was
+nowhere.
+
+The gap it closes is decision 3's: a screenshot of a debit SMS says nothing about whether
+the caller is still on the line, and the intake submits its textarea *with* the image in
+one call, so there was no later moment for that sentence to arrive. A screenshot-only
+report could not fire the interrupt at all, and `/api/triage` — built for exactly this —
+had no caller outside the eval.
+
+**Why the confirm screen and not the intake.** The intake is on the clock. Adding a second
+sequential model call there costs a second of sixty for a signal the first call has usually
+already read. The confirm screen is the first place the user is looking at something other
+than a spinner, and it is still before dispatch, which is the only deadline that matters
+for this.
+
+**Why it cannot block dispatch, even though blocking would catch more.** A missed interrupt
+costs one person an extra nudge. A send button that waits on a model call costs the
+sixty-second claim the entire product is built on, for everybody. So the call is
+fire-and-forget: if the packet goes before triage returns, it goes. This is the same
+asymmetry that sets the gate's threshold in decision 5, applied to latency instead of
+confidence.
+
+**Why there is no spinner.** Non-negotiable 6 allows one moving element, and on this screen
+it is the meter. A "checking…" line next to the send button would also read as a reason to
+wait, which is the opposite of the instruction the rest of the screen gives. The only thing
+that ever comes of this call is the interrupt screen; silence is the correct other outcome.
+
+**Consequence worth naming:** what the person types here is carried into the freeze packet
+as `description` and seeds the statement on `/report/[ack]`. Someone who described their
+situation under time pressure should not be asked to type it again on the unhurried screen.
+It seeds only when no statement has been saved yet — once they have edited it, that is
+theirs.
