@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useJourney } from "@/components/JourneyProvider";
+import { sampleSize } from "@/lib/timings";
 
 /**
  * The landing page.
@@ -230,10 +231,16 @@ export default function LandingPage() {
           className="card card-interactive mt-4 flex items-center justify-between gap-4 no-underline"
         >
           <div className="min-w-0">
-            {/* A median over one run is not a median. The label says so until
-                there is a distribution behind it. */}
+            {/* A median over a handful of runs is not a median. The label says
+                so until there is a distribution behind it, and the threshold is
+                the one /evidence uses for its caveat — read from lib/timings.ts
+                rather than decided here, because deciding it twice is how this
+                tile came to say "Median" while /evidence said "not yet a
+                distribution" about the same two runs. */}
             <p className="text-xs text-muted">
-              {timings && timings.count === 1 ? landing.measuredSingle : landing.measuredMedian}
+              {sampleSize(timings?.count) === "enough"
+                ? landing.measuredMedian
+                : landing.measuredSmall}
             </p>
             <p className="mt-0.5 text-2xl font-semibold tabular-nums">
               {median ?? (

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SOURCES, claimsFullySourced } from "@/lib/decay";
+import { isSmallSample, sampleSize } from "@/lib/timings";
 import benchmark from "@/data/portal-benchmark.json";
 
 /**
@@ -29,17 +30,17 @@ type Timings = {
 const seconds = (ms: number | null) => (ms === null ? "—" : `${(ms / 1000).toFixed(1)}s`);
 
 /**
- * Below this many runs, the numbers are shown with a caveat rather than as a
- * distribution.
+ * The threshold and the labelling rule now live in lib/timings.ts, because the
+ * landing tile needs the same answer and was giving a different one: this page
+ * caveated below five runs while the front door called two runs a median.
  *
- * The first real run landed on 3 September and this page immediately reported
- * "Median 49.5s / Fastest 49.5s / Slowest 49.5s / Under 60s 1/1" with no
- * qualification, because every branch here keyed off `count > 0`. A median of
- * one run is not a median, and "1/1" reads like a success rate. That is the
- * overstatement this whole page exists to argue against, committed by the page
- * itself, so the small-sample state is now explicit.
+ * The original reason for the threshold stands. The first real run landed on 3
+ * September and this page immediately reported "Median 49.5s / Fastest 49.5s /
+ * Slowest 49.5s / Under 60s 1/1" with no qualification, because every branch
+ * here keyed off `count > 0`. A median of one run is not a median, and "1/1"
+ * reads like a success rate — the overstatement this whole page exists to argue
+ * against, committed by the page itself.
  */
-const ENOUGH_RUNS = 5;
 
 export default function EvidencePage() {
   const [timings, setTimings] = useState<Timings | null>(null);
@@ -85,7 +86,7 @@ export default function EvidencePage() {
           time, not the task.
         </p>
 
-        {timings && timings.count > 0 && timings.count < ENOUGH_RUNS && (
+        {timings && isSmallSample(timings.count) && (
           <p className="mt-4 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
             <strong>
               {timings.count === 1
@@ -101,9 +102,18 @@ export default function EvidencePage() {
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {/* "Median" is a lie at n=1, so it is not used at n=1. */}
+          {/* "Median" is a lie at n=1 and a stretch below ENOUGH_RUNS, so it is
+              used at neither. The caveat above carries the explanation; the
+              label just stops asserting the thing the caveat is retracting. */}
           <Stat
-            label={timings && timings.count === 1 ? "The one run" : "Median"}
+            label={
+              {
+                none: "Median",
+                single: "The one run",
+                small: "Middle run",
+                enough: "Median",
+              }[sampleSize(timings?.count)]
+            }
             value={seconds(timings?.median_ms ?? null)}
           />
           <Stat label="Fastest" value={seconds(timings?.fastest_ms ?? null)} />
@@ -172,7 +182,49 @@ export default function EvidencePage() {
           </div>
         )}
 
-        <div className="mt-4 overflow-x-auto">
+        {/*
+          Two presentations of one set of rows.
+
+          The table is 32rem at its narrowest and a 360px phone gives it 20.5,
+          so on the width this design commits to it scrolled sideways inside
+          its own container — and the column that went off the edge first was
+          ours. A judge on a phone was being shown the portal's empty column
+          and having to swipe to find Golden Hour's. The comparison is the
+          argument; it should not need a gesture.
+
+          Below sm the rows stack, in the same hairline list /honesty and
+          /changes use, so it reads as a sibling of those pages rather than as
+          a new component. From sm up the table fits and stays a table, because
+          a table is the better read once both columns are visible at once.
+        */}
+        <ul className="mt-4 flex flex-col gap-px overflow-hidden rounded-lg border border-line bg-line sm:hidden">
+          {benchmark.rows.map((row) => (
+            <li key={row.metric} className="bg-surface p-4">
+              <p className="text-sm font-medium leading-snug">{row.metric}</p>
+              <dl className="mt-3 flex flex-col gap-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt className="text-xs text-muted">cybercrime.gov.in</dt>
+                  <dd className="text-sm tabular-nums">
+                    <PortalValue row={row} />
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt className="text-xs text-muted">Golden Hour</dt>
+                  <dd className="text-sm tabular-nums">
+                    <GoldenValue row={row} />
+                  </dd>
+                </div>
+              </dl>
+              {row.goldenHourNote && (
+                <p className="mt-2.5 border-t border-line pt-2.5 text-xs leading-relaxed text-faint">
+                  {row.goldenHourNote}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-4 hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[32rem] border-collapse text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">
@@ -188,18 +240,10 @@ export default function EvidencePage() {
                     {row.metric}
                   </th>
                   <td className="py-3 pr-3 tabular-nums">
-                    {row.portal === null ? (
-                      <span className="text-faint">not yet counted</span>
-                    ) : (
-                      String(row.portal)
-                    )}
+                    <PortalValue row={row} />
                   </td>
                   <td className="py-3 tabular-nums">
-                    {row.goldenHour === null ? (
-                      <span className="text-faint">see measured</span>
-                    ) : (
-                      String(row.goldenHour)
-                    )}
+                    <GoldenValue row={row} />
                     {row.goldenHourNote && (
                       <span className="mt-0.5 block text-xs font-normal text-faint">
                         {row.goldenHourNote}
@@ -319,6 +363,25 @@ export default function EvidencePage() {
       </section>
     </div>
   );
+}
+
+/**
+ * One benchmark row, as the JSON actually types it.
+ *
+ * The two cell renderers below exist so the stacked and tabular presentations
+ * cannot disagree about what an unfilled row says. "Not yet counted" appearing
+ * on one and a blank on the other is exactly the drift this page argues against.
+ */
+type BenchmarkRow = (typeof benchmark.rows)[number];
+
+function PortalValue({ row }: { row: BenchmarkRow }) {
+  if (row.portal === null) return <span className="text-faint">not yet counted</span>;
+  return <>{String(row.portal)}</>;
+}
+
+function GoldenValue({ row }: { row: BenchmarkRow }) {
+  if (row.goldenHour === null) return <span className="text-faint">see measured</span>;
+  return <>{String(row.goldenHour)}</>;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
