@@ -78,6 +78,12 @@ const FIXED: Entry[] = [
   },
   {
     found:
+      "The front page then did the same thing again, with its own number. When the first real runs landed, /evidence learned that a handful of runs is not a distribution and started showing a caveat below five. The landing tile had only ever been taught about the case of exactly one — so at two runs it went back to reading “Median time to dispatch”, while the page one tap away said two runs “is not yet a distribution”. The same figure, described more confidently on the screen a reader reaches first.",
+    did: "The threshold and the labelling rule moved into one module that both pages read, so they cannot drift apart again. Below five runs neither of them uses the word median, and neither does the tile at zero.",
+    check: { label: "Compare the two", href: "/evidence" },
+  },
+  {
+    found:
       "The honesty page was unreachable. /honesty and /judge were linked from nowhere — not the header, not the footer, not the landing page. A disclosure nobody can navigate to is not a disclosure.",
     did: "Both are in the footer on every screen and on the landing page.",
     check: { label: "What is real and what is not", href: "/honesty" },
@@ -110,6 +116,12 @@ const FIXED: Entry[] = [
     found:
       "The receipt counted a blank as sent. An unread payment method is stored as “unknown”, which is not a value a bank can use, but the count treated it as one — so an entirely empty packet reported one of nine fields sent.",
     did: "Both the confirm screen and the receipt now treat those placeholders as the holes they are. On the screen whose argument is that it counts its holes honestly, that count should not have been the generous one.",
+  },
+  {
+    found:
+      "The comparison table hid its own column on a phone. It is 32rem across at its narrowest and a 360px screen gives it 20.5, so it scrolled sideways inside its own container — and the column that went over the edge was Golden Hour's. The page's central comparison needed a swipe to see half of, on the width this design commits to.",
+    did: "The rows stack below the small breakpoint, so both columns are on screen at once, and stay a table above it where both fit anyway. The comparison is the argument; it should not have needed a gesture.",
+    check: { label: "See it at phone width", href: "/evidence" },
   },
   {
     found:

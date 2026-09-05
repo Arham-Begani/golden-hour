@@ -755,3 +755,68 @@ three passes were 1, 0, 1, and the exit code uses the worst pass rather than the
 than what people actually take of a cracked screen at midnight, and 40/40 on synthetic
 images is not 40/40 on those. This is the first thing I would attack next, and it needs
 either real donated screenshots or a much nastier generator.
+
+---
+
+## Step 11 - the site disagreeing with itself about its own number - 2026-09-05
+
+Two days out, and the remaining work is measurement a human has to take. What was left to
+build was whatever the site was still getting wrong about itself.
+
+### The front page called two runs a median
+
+Step 9 taught `/evidence` that a small sample is not a distribution: below five runs it
+shows a caveat, and at exactly one it labels the stat "The one run" rather than "Median".
+The landing tile got the same treatment in the same commit - but only for the case of
+exactly one, because at the time there was exactly one run.
+
+The second real run landed and the tile went straight back to reading **"Median time to
+dispatch"**, while `/evidence`, one tap away, said two runs "is not yet a distribution".
+
+This is the `"about fifty facts"` defect a second time and it is worth naming as such: the
+front page asserting what the evidence page refuses, found in ninety seconds by anyone who
+opens both. The first instance was a number nobody counted. This one is a number we
+measured correctly and then described two ways, which is not better.
+
+**The cause was that the rule lived in two places.** `ENOUGH_RUNS` was a private constant
+in `app/evidence/page.tsx` and the tile had its own inline `count === 1`. `lib/timings.ts`
+now owns the threshold and a `sampleSize()` that returns `none | single | small | enough`,
+and both pages ask it. Not `lib/store.ts`, which owns the other timing constants but
+imports the Redis client - that would put the store in the browser bundle. Not
+`lib/decay.ts`, whose clock is the victim's rather than ours.
+
+The tile at zero runs was also saying "Median time to dispatch / Not yet measured". Only
+`enough` gets the word now.
+
+### The comparison table hid our own column on a phone
+
+`/evidence` renders the portal benchmark as a table with `min-w-[32rem]` inside
+`overflow-x-auto`. A 360px screen gives it 20.5rem. So on the width this design explicitly
+commits to, the table scrolled sideways inside its container - and the column that went
+over the edge first was **Golden Hour's**. A judge on a phone saw the metric, saw the
+portal's empty column, and had to swipe to reach the numbers the page exists to show.
+
+The screenshot check never caught it because it does not: `scripts/shoot.mjs` fails on the
+*page* scrolling sideways, and this scrolled inside a container that was doing exactly what
+it was told to. It took looking at the rendered image.
+
+Below `sm` the rows now stack in the same hairline list `/honesty` and `/changes` use, so
+both columns are on screen at once; above it the table stays a table, because a table is
+the better read once both columns fit. Two presentations, one set of cell renderers, so
+they cannot disagree about what an unfilled row says.
+
+### What was deliberately not done
+
+**Anything else to the UI.** `PLAN_R2.md` §3 rules out a new visual direction and the
+reasoning holds harder two days out than it did five: an hour spent on the design is an
+hour not spent on the two measurements that are actually missing, and anything shipped this
+weekend gets no real testing before submission. The intake and confirm screens - the path
+that is actually timed - were looked at and left alone.
+
+### Uncertain
+
+**Whether the stacked comparison survives the portal column being filled.** Every row's
+portal value is currently "not yet counted", which is short. A counted row might carry a
+figure and a qualifier, and the stacked layout puts label and value on one line with
+`justify-between`. If the counting happens, look at this page again at 360px before
+assuming it still reads.
