@@ -12,37 +12,46 @@ Golden Hour is a web app for the first hour after online financial fraud in Indi
 
 Today a victim is sent to cybercrime.gov.in, which asks them to pick a category, register,
 and wait for an OTP — often while the scammer is still on the phone — then complete the
-whole police complaint before it accepts anything.
+police complaint before it accepts anything.
 
-Two jobs are merged into one form. A bank needs a handful of facts to freeze an account,
-in minutes; an investigation needs everything else, over weeks. The government already
-splits them on the phone — the 1930 helpline takes a short list of facts, issues an
-acknowledgement number, and asks for the full complaint against it within 24 hours. The
-website does not.
+Two jobs are merged into one form. A bank needs a handful of facts to freeze an account, in
+minutes; an investigation needs everything else, over weeks. The government already splits
+them: the 1930 helpline takes a short list, issues an acknowledgement number, and asks for
+the full complaint within 24 hours. The website does not.
 
-So Golden Hour sends the nine facts a bank needs first. You upload a screenshot of the
-debit alert, a model extracts the fields, you correct what is wrong and send. No login, no
-OTP, no required field — a freeze request is never blocked for being incomplete.
+So Golden Hour sends the nine facts a bank needs first. You upload a screenshot of the debit
+alert, a model extracts the fields, you correct what is wrong and send. No login, no OTP, no
+required field — a freeze request is never blocked for being incomplete.
 
-Two things make it trustworthy, not just fast. The model may not guess: every field is
-re-validated server-side, anything failing is marked UNREADABLE rather than sent, and the
-receipt names what was dropped. And if the extraction shows the scam is still running, the
-flow stops and tells you to hang up.
+The model may not guess. Every field is re-validated server-side; anything that fails is
+marked UNREADABLE rather than sent, and the receipt names it. Across 75 fields it was right
+74 times, inventing nothing from a screenshot. The miss: a dictated handle came back as a
+different, well-formed account. Shape checks cannot catch that; /honesty says so.
 
-The speed claim is measured from real runs, demo replays excluded. Where we could not
-source a number, we deleted it — /evidence and /honesty say which.
+If the extraction shows the scam is still running, the flow stops and says to hang up.
+
+Timings are published with their sample size. Where I could not source a number, I deleted
+it.
 
 ---
 
 ## Before you paste
 
-- **"we" in the last line** — switch to "I" if you are submitting solo.
-- **The portal's field count is deliberately not stated.** An earlier draft said "around
-  fifty fields", which nobody counted — and `data/portal-benchmark.json` and `/evidence`
-  both refuse to guess that exact figure. Asserting it here while the evidence page
-  declines to is the one contradiction a reviewer gets for free. Put a number back only
-  after you have opened the portal and counted, and then put the same number on the
-  landing page, in `data/portal-benchmark.json` and in the video.
+- **"I" throughout** — switch to "we" if you are submitting with a teammate. Every other
+  document in the repository (`BUILD_LOG.md`, `DECISIONS.md`, `MENTORS.md`) is written in
+  the first person singular, so this matches them by default.
+- **The portal's field count is still deliberately absent.** An earlier draft said "around
+  fifty fields", which nobody counted, and it has been removed from here, the landing page
+  and the video script. `data/portal-benchmark.json` and `/evidence` both refuse to guess
+  it. Put a number back only after you have opened the portal and counted — and then put the
+  same number in all four places at once.
+- **Check the last line against the live site before pasting.** It says timings are
+  published with their sample size, which is true at any count; but if `/api/timings` still
+  reports fewer than five real runs on submission day, the front page will be showing a
+  caveat rather than a median, and you should know that before a judge tells you.
+- **The 74-of-75 figure is the worst of three passes**, not the best. If you re-run
+  `npm run eval:extract --repeat 3` before submitting and it moves, change the number here
+  to whatever the new worst pass says.
 
 ---
 
