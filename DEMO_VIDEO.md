@@ -194,16 +194,27 @@ time, drop them — the words carry it alone.
 
 # Before you record
 
-- [ ] **Deploy your latest work and re-check it.** (The old note here said the live site
-      was missing the landing page and `/start`. It is not — both have been live since
-      28 August. Verify rather than trust either note.)
+- [ ] **Deploy your latest work, then open the live URL and look.** Don't trust this file,
+      or any note in it, about what is currently deployed.
 - [ ] `/api/health` shows `deploy_ready: true`, no warnings.
+- [ ] **Open `/judge` on the phone you are filming with.** It is the page the submission
+      hands reviewers as the guided run, and its frame is the one part of this project
+      that has only ever been checked in a desktop browser.
 - [ ] A **real** payment screenshot. Blur the digits if you want; don't fabricate one.
 - [ ] Do one timed run and write down `R`. Budget minute one off it.
 - [ ] Phone on Do Not Disturb — one banner ruins Clip B.
 - [ ] Practise on `?demo=1`. Those runs don't count toward your measured time.
 - [ ] Know where `/changes` is. If anyone asks what is new since Round 1, that is the answer
       and it is one link.
+
+**Check what the site will say about your number before you narrate it.** Below five
+recorded runs, the landing tile and `/evidence` both drop the word *median* and show a
+small-sample caveat instead — deliberately, because a median over two runs is not a median.
+
+So if you film with fewer than five real runs on record, the front page reads **"Time to
+dispatch"** next to a caveat, not a median. Don't say "our median is…" over a screen that
+is refusing to call it one. Getting past five is one afternoon of runs, and it is worth
+doing *before* you film so minute one can point at a real distribution.
 
 ---
 
