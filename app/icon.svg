@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    The same mark SiteChrome draws next to the wordmark: one filled dot in
+    --color-mark on the page background. Not a logo, and deliberately not a new
+    piece of design - the palette is rationed to the meter and the interrupt,
+    and a favicon is not either of those.
+  -->
+  <rect width="32" height="32" rx="7" fill="#0a0a0b"/>
+  <circle cx="16" cy="16" r="6" fill="#c58419"/>
+</svg>
