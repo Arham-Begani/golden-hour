@@ -54,6 +54,12 @@ const OPEN: Entry[] = [
 const FIXED: Entry[] = [
   {
     found:
+      "The honesty page was the least honest page on the site. It called the sixty-second claim “fully demonstrable” while the evidence page said it should not be read as proven. It described the portal as a “fourteen-minute form”, a duration nobody has timed, on a site that refuses to guess the portal's field count two clicks away. And it stated that no human run-throughs had been recorded while /evidence was displaying two of them.",
+    did: "All three removed. The claim now says the sixty seconds is measured rather than asserted, the portal is described by what it asks for rather than how long it takes, and the run entry no longer restates a count it cannot keep current — it points at the page that can. Of everything found this round, an overstatement here was the most expensive, because this is the page a reader checks to find out whether the rest is posture.",
+    check: { label: "Read it and check it against the evidence", href: "/honesty" },
+  },
+  {
+    found:
       "The most important path in the product had never been measured. The interrupt — a supporting feature — had a rigorous evaluation, 22 labelled cases and five disclosed limits. Extraction, which is the thing a person actually comes here to do, had none, and the screenshot path that the front page leads with had never been run once. The project measured its second-most important feature and not its most important one.",
     did: "There is now an extraction evaluation over generated screenshots and text in English, Hinglish, Hindi and an unpunctuated dictation transcript. Across three passes: 74 of 75 fields correct, and the screenshot path 40 of 40 with nothing invented — including three images where a field was cut out entirely, so any value returned for it could not have been read.",
     check: { label: "The numbers and their limits", href: "/honesty" },

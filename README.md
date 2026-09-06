@@ -221,8 +221,10 @@ None of these may be filled in by a model.
    than hiding the empty column. A fabricated benchmark would discredit every other
    honest thing on the site.
 
-2. **The measured median has no real runs yet.** `/evidence` reads "not yet measured"
-   until humans have done unaided run-throughs. Demo replays and `npm run journey` are
+2. **There are real runs, but not enough of them to be a median.** Below five, `/evidence`
+   and the landing page both drop the word and show a small-sample caveat instead; the live
+   count is on `/evidence` and is deliberately not restated here, because a figure copied
+   into a file goes stale and this one already did. Demo replays and `npm run journey` are
    recorded separately and excluded on purpose — they serve a cached extraction and start
    the clock at the fixture click, so they measure review time, not the task. Whatever
    the real median turns out to be is what the site claims; if it lands above 60s, the

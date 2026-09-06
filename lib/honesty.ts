@@ -121,7 +121,7 @@ export const SECTIONS: Section[] = [
     heading: "The headline claim",
     body: [
       "Golden Hour does not freeze anyone's money. There is no bank integration, no connection to CFCFRMS, no connection to the National Cyber Crime Reporting Portal, and no connection to any police force or government system. Nothing submitted here reaches anybody.",
-      "What it claims is narrower and fully demonstrable: a complete, dispatchable freeze packet in under sixty seconds — the small set of facts a beneficiary bank needs to place a hold, assembled while the money is still recoverable instead of trapped behind a fourteen-minute form.",
+      "What it claims is narrower: a complete, dispatchable freeze packet — the small set of facts a beneficiary bank needs to place a hold — assembled and sent before the police complaint is started, rather than collected at the end of one. The sixty-second figure is measured, not asserted: /evidence publishes every recorded run with its sample size, and says so plainly when there are too few of them to mean anything.",
       "This is not a government service and must never be mistakable for one. No emblem, no national colours, no gov.in styling. If you are in the middle of a fraud right now, call 1930 or use cybercrime.gov.in. Those are the real routes and they are linked from every screen on this site.",
     ],
   },
@@ -222,9 +222,9 @@ export const SECTIONS: Section[] = [
       },
       {
         thing: "The measured median completion time",
-        status: "not-real",
+        status: "partial",
         detail:
-          "Not yet measured. No unaided human run-throughs have been recorded. Demo replays and the automated journey are bucketed separately and excluded on purpose, because they serve a cached extraction and start the clock at the fixture click.",
+          "Recorded, but not yet a distribution. Real runs are timed and published in full, slow ones included; demo replays and the automated journey are bucketed separately and excluded on purpose, because they serve a cached extraction and start the clock at the fixture click. Below five recorded runs neither /evidence nor the landing page will use the word median. The live count is on /evidence rather than typed here — until 6 September this entry read “no unaided human run-throughs have been recorded” while /evidence was displaying two of them, which is what a number hand-copied into a file does.",
       },
       {
         thing: "The Hindi copy",
