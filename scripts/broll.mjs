@@ -43,6 +43,35 @@ const VIEWPORT = { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true
 mkdirSync(OUT, { recursive: true });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * ffmpeg is required, not optional, and it is worth failing on it up front.
+ *
+ * puppeteer's page.screencast() spawns ffmpeg itself, so without it the script
+ * throws mid-take with a spawnSync ENOENT stack that says nothing about what
+ * to install. The Chrome check above already fails fast for the same reason;
+ * this one was missing.
+ */
+try {
+  execFileSync("ffmpeg", ["-version"], { stdio: "ignore" });
+} catch {
+  console.error(
+    "No ffmpeg on PATH. page.screencast() spawns it, so recording cannot start.\n" +
+      "  winget install Gyan.FFmpeg   (then reopen the shell)\n" +
+      "For a still instead of motion, scripts/shoot.mjs needs neither.",
+  );
+  process.exit(2);
+}
+
+/**
+ * Which clips to record, so a shoot can take the one shot it is missing
+ * without re-recording the set — and, more importantly, without running the
+ * `run` clip, which writes a timing. Same shape as GH_PAGES in shoot.mjs.
+ *
+ *   GH_CLIPS='["dropped-chip"]' node scripts/broll.mjs
+ */
+const ONLY = process.env.GH_CLIPS ? new Set(JSON.parse(process.env.GH_CLIPS)) : null;
+const wanted = (name) => !ONLY || ONLY.has(name);
+
 const browser = await puppeteer.launch({
   executablePath: CHROME,
   headless: true,
@@ -51,6 +80,7 @@ const browser = await puppeteer.launch({
 
 /** Record `drive` to `<name>.mp4`. */
 async function record(name, setup, drive) {
+  if (!wanted(name)) return;
   const page = await browser.newPage();
   await page.setViewport(VIEWPORT);
   await setup(page);
@@ -245,6 +275,38 @@ await record(
     await wait(2000);
     await scrollTo(page, 1350, 2400);
     await wait(2200);
+  },
+);
+
+/**
+ * The shot minute two is built around, and the one this script was missing.
+ *
+ * `confirm-unreadable` below uses the Blurred case, whose holes exist because
+ * the *model* said UNREADABLE. That demonstrates the prompt behaving well,
+ * which is not the claim. The claim is that the server refuses a confident
+ * wrong value, and only "A confident misread" exercises it: an eleven-digit
+ * reference at 0.93 where a real one is twelve, refused on shape, with the
+ * rejected value printed underneath.
+ *
+ * Scrolls slowly and stops on the chip rather than passing it — this is a
+ * two-second cutaway and the editor needs a still moment to land on.
+ */
+await record(
+  "dropped-chip",
+  async (page) => {
+    await page.goto(`${BASE}/start?demo=1`, { waitUntil: "networkidle2" });
+    await wait(600);
+    await clickByText(page, "confident misread");
+    await until(page, () => location.pathname === "/confirm", "the confirm screen");
+    await wait(900);
+  },
+  async (page) => {
+    await wait(1800);
+    // Down to the reference field, then hold on the Dropped chip.
+    await scrollTo(page, 620, 2600);
+    await wait(3200);
+    await scrollTo(page, 900, 1800);
+    await wait(2600);
   },
 );
 
