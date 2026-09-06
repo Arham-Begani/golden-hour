@@ -39,9 +39,9 @@ type Entry = {
 const OPEN: Entry[] = [
   {
     found:
-      "The sixty-second claim still has no human runs behind it. The harness that records them was broken for the whole of Round 1, so the distribution is empty and the landing page reads “Not yet measured”.",
-    did: "The harness works now, so the number can finally be earned. Until somebody sits down with a phone and does the task unaided, it stays blank — filling it with scripted runs would be the exact fabrication this project refuses everywhere else.",
-    check: { label: "See the empty distribution", href: "/evidence" },
+      "The sixty-second claim is not proven yet. Real runs have started landing, but there are too few of them to be a distribution, and below five the site will not call the figure a median — on the landing page or on the evidence page.",
+    did: "The harness that records them was broken for the whole of Round 1, which is why there were none at all to argue about; it works now, so the number is being earned rather than asserted. Every run is kept, including the slow ones: the distribution already contains a run that came in over sixty seconds, and it stays in and is counted against the claim. Filling the rest with scripted runs would be the exact fabrication this project refuses everywhere else.",
+    check: { label: "See the runs, and how many there are", href: "/evidence" },
   },
   {
     found:
@@ -54,9 +54,9 @@ const OPEN: Entry[] = [
 const FIXED: Entry[] = [
   {
     found:
-      "The honesty page was the least honest page on the site. It called the sixty-second claim “fully demonstrable” while the evidence page said it should not be read as proven. It described the portal as a “fourteen-minute form”, a duration nobody has timed, on a site that refuses to guess the portal's field count two clicks away. And it stated that no human run-throughs had been recorded while /evidence was displaying two of them.",
-    did: "All three removed. The claim now says the sixty seconds is measured rather than asserted, the portal is described by what it asks for rather than how long it takes, and the run entry no longer restates a count it cannot keep current — it points at the page that can. Of everything found this round, an overstatement here was the most expensive, because this is the page a reader checks to find out whether the rest is posture.",
-    check: { label: "Read it and check it against the evidence", href: "/honesty" },
+      "The two pages that exist to state the project's limits were the ones overstating. The honesty page called the sixty-second claim “fully demonstrable” while the evidence page said it should not be read as proven; described the portal as a “fourteen-minute form”, a duration nobody has timed; and said no human run-throughs had been recorded while the evidence page was displaying two of them. The evidence page opened by calling the claim “measured against the same task on the live portal” — a comparison it refuses to make four sections further down its own page, because nobody has counted the portal.",
+    did: "All four removed. Both pages now say the sixty seconds is measured rather than asserted and point at the runs and their sample size; the portal is described by what it asks for instead of how long it takes; and the run entry no longer restates a count it cannot keep current. Of everything found this round these were the most expensive, because these are the pages a reader checks to find out whether the rest is posture.",
+    check: { label: "Read them and check them against each other", href: "/honesty" },
   },
   {
     found:

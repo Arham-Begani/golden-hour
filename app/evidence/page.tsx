@@ -58,9 +58,16 @@ export default function EvidencePage() {
     <div className="flex flex-col gap-8 pb-8">
       <section>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">The claim</h1>
+        {/*
+          This used to end "measured against the same task on the live portal",
+          inherited from the concept doc. Nobody has measured the task on the
+          live portal — the Compared section below says so in as many words,
+          four sections down the same page. The claim statement was asserting
+          the comparison the page itself declines to make.
+        */}
         <p className="mt-3 text-lg leading-relaxed">
-          A complete, dispatchable freeze packet in under sixty seconds, measured against
-          the same task on the live portal.
+          A complete, dispatchable freeze packet in under sixty seconds — measured rather
+          than asserted, and published below with every run recorded and the number of them.
         </p>
 
         <div className="card-strong mt-4">
