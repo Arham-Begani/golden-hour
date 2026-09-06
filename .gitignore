@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local screenshot output from scripts/shoot.mjs and scripts/journey.mjs
 shots/
+
+# demo footage from scripts/broll.mjs — regenerable, and megabytes of it
+broll/

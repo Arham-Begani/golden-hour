@@ -87,7 +87,19 @@ async function record(name, setup, drive) {
   await wait(700); // settle and hydrate before the first frame
 
   const webm = join(OUT, `${name}.webm`);
-  const recorder = await page.screencast({ path: webm });
+  /*
+     scale, not deviceScaleFactor.
+
+     The viewport's deviceScaleFactor sharpens screenshots but screencast
+     ignores it — it captures at the CSS size, so this was writing 390x844
+     video. Upscaled to fill a 1080-tall frame that is visibly soft, which is
+     a poor way to show a design built for a small screen.
+
+     Recording at 3 gives 1170x2532: taller than 1080, so an editor scales it
+     down rather than up, and the phone layout is preserved because the CSS
+     viewport is still 390 and the sm: breakpoint never fires.
+  */
+  const recorder = await page.screencast({ path: webm, scale: 3 });
 
   const started = Date.now();
   await drive(page);
@@ -260,6 +272,55 @@ await record("run", goto(`${BASE}/`), async (page) => {
 /* Supporting clips. None of these makes a timing claim.                       */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The whole flow, through the demo path — intake, confirm, send, receipt.
+ *
+ * Two differences from the `run` clip above, and both are the point.
+ *
+ * It serves a cached extraction, so it needs no model key and runs anywhere.
+ * And /api/freeze fingerprints it as a demo replay, so the timing it writes
+ * lands in the demo bucket and cannot reach the distribution behind the
+ * sixty-second claim. The `run` clip cannot say either of those things, which
+ * is why it prints a warning and this one does not.
+ *
+ * What that costs: the Time taken on the receipt is this script's pacing, not
+ * a person doing the task. Fine as footage to cut under a voiceover. Not
+ * evidence, and not to be narrated as the measured number.
+ */
+await record(
+  "run-demo",
+  goto(`${BASE}/start?demo=1`),
+  async (page) => {
+    await wait(2200);
+
+    await clickByText(page, "Clean bank SMS");
+    await until(page, () => location.pathname === "/confirm", "the confirm screen");
+    await wait(2000);
+
+    // Read down the fields the way somebody checking them would.
+    await scrollTo(page, 420, 2200);
+    await wait(1600);
+    await scrollTo(page, 860, 2200);
+    await wait(1600);
+
+    // Correct one field, so the screen is shown being used rather than watched.
+    const field = "input[type='text'], input[inputmode='text']";
+    if (await page.$(field)) {
+      await page.click(field, { clickCount: 3 });
+      await page.type(field, "rahulk.9821@okaxis", { delay: 55 });
+      await wait(1500);
+    }
+
+    await scrollTo(page, 20_000, 1900); // down to the send button
+    await wait(1100);
+    await clickByText(page, "Send freeze request");
+    await until(page, () => location.pathname.startsWith("/receipt/"), "the receipt");
+    await wait(3400);
+    await scrollTo(page, 560, 2400);
+    await wait(2400);
+  },
+);
+
 await record(
   "interrupt",
   async (page) => {
@@ -346,4 +407,9 @@ await record("landing", goto(`${BASE}/`), async (page) => {
 
 await browser.close();
 console.log(`\ndone -> ${OUT}/`);
-console.log("The run wrote a real timing. Clear gh:timings:real before it counts.");
+// Only the `run` clip goes through the live intake and lands in the real
+// bucket. This used to print unconditionally, which told you to go clearing
+// production keys after a session that had recorded nothing but demo replays.
+if (wanted("run")) {
+  console.log("The run wrote a real timing. Clear gh:timings:real before it counts.");
+}
