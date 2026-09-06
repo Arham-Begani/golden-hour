@@ -62,7 +62,20 @@ scores nothing.
 > I resubmit on Monday the 7th — one line by Sunday is worth more to me than a considered
 > reply on Tuesday.
 
-### 3. On where the remaining effort goes — for a senior engineer
+### 3. On where the remaining effort goes — ~~for a senior engineer~~ **superseded, do not send**
+
+**Overtaken by events on 6 September.** It asked how to spend "four days" choosing between
+depth and evidence. There is one day left, the choice was made in favour of evidence, and
+both halves of it have moved: the extraction eval covered the depth side, and real runs are
+now landing. Asking it now spends a mentor's reply on a decision that is already made and
+already shipped.
+
+Kept rather than deleted, because the answer to "what did you ask and what happened" is
+part of what this file is for. If you have a senior engineer's attention today, send
+**question 5** instead — it is the only one whose answer can still change the submission.
+
+<details>
+<summary>The original question</summary>
 
 > Four days left. Two things I could spend them on:
 >
@@ -72,9 +85,8 @@ scores nothing.
 >
 > I have been assuming evidence beats depth, because an unproven headline number is the
 > first thing a reviewer will poke. **Would you spend it the same way?**
->
-> I resubmit on Monday the 7th — one line by Sunday is worth more to me than a considered
-> reply on Tuesday.
+
+</details>
 
 ### 4. On the honesty posture — for anyone who has judged before
 
