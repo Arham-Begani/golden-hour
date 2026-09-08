@@ -74,6 +74,7 @@ Vercel project environment.
 | Extraction | `lib/extract.ts` | One call returns the freeze fields *and* the interrupt signals |
 | Anti-hallucination | `lib/validate.ts` | Shape + confidence checks that force `UNREADABLE` |
 | The clock | `lib/decay.ts` | Elapsed time and band, from the user's own timestamp. No percentage — see below |
+| What the runs may be called | `lib/timings.ts` | Whether there are enough of them for "median", and whether they are one distribution at all. Both pages ask it; neither decides |
 | Interrupt gate | `lib/interrupt.ts` | Conservative: `ACTIVE` **and** a quoted hard signal |
 | Store | `lib/store.ts` | Upstash, or in-memory for local dev. 24h TTL |
 | Demo cases | `lib/fixtures.ts` | Cached extractions, run through the real validation path |
@@ -221,14 +222,30 @@ None of these may be filled in by a model.
    than hiding the empty column. A fabricated benchmark would discredit every other
    honest thing on the site.
 
-2. **There are real runs, but not enough of them to be a median.** Below five, `/evidence`
-   and the landing page both drop the word and show a small-sample caveat instead; the live
-   count is on `/evidence` and is deliberately not restated here, because a figure copied
-   into a file goes stale and this one already did. Demo replays and `npm run journey` are
-   recorded separately and excluded on purpose — they serve a cached extraction and start
-   the clock at the fixture click, so they measure review time, not the task. Whatever
-   the real median turns out to be is what the site claims; if it lands above 60s, the
-   claim changes, not the data.
+2. **There are enough real runs for a median, and they are not one distribution.** They
+   arrived in two groups with a gap between them wider than every other gap put together,
+   so `lib/timings.ts` refuses the word and `/evidence` shows both groups instead. Two
+   rules govern that word and both live in one module, because the landing tile and
+   `/evidence` have already disagreed about it once: below five runs neither uses it, and
+   above five neither uses it while the sample is split. The live figures are on
+   `/evidence` and are deliberately not restated here — a number copied into a file goes
+   stale, and this one already did.
+
+   **Part of the gap was the stopwatch.** Until 8 September the clock started when the
+   chosen image came back from the file picker, not when the person tapped *Add a
+   screenshot* — so the time spent finding the debit alert was outside the measurement, on
+   the input path the product leads with. Fixed in `app/start/page.tsx`; it makes recorded
+   times longer, and it means the five existing runs are undercounted and not comparable
+   with later ones.
+
+   **The rest of the gap is still open.** Runs recorded before 8 September were stored as
+   bare durations, so the site cannot say what else distinguishes the groups; a run by
+   someone who knows what the form wants is not the same task as a run by someone meeting
+   it cold. Runs from 8 September carry a timestamp, how the fields were produced, and how
+   many the person corrected. Demo replays and
+   `npm run journey` are recorded separately and excluded on purpose — they serve a cached
+   extraction and start the clock at the fixture click, so they measure review time, not
+   the task. If the real figure lands above 60s, the claim changes, not the data.
 
 3. **The Hindi in `lib/i18n.ts` has not been read by a native speaker.** It reads well —
    idiomatic register, correct nuqta — but it is unverified, and the product says so on

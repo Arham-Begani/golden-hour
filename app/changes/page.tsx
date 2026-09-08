@@ -39,8 +39,8 @@ type Entry = {
 const OPEN: Entry[] = [
   {
     found:
-      "The sixty-second claim is not proven yet. Real runs have started landing, but there are too few of them to be a distribution, and below five the site will not call the figure a median — on the landing page or on the evidence page.",
-    did: "The harness that records them was broken for the whole of Round 1, which is why there were none at all to argue about; it works now, so the number is being earned rather than asserted. Every run is kept, including the slow ones: the distribution already contains a run that came in over sixty seconds, and it stays in and is counted against the claim. Filling the rest with scripted runs would be the exact fabrication this project refuses everywhere else.",
+      "The sixty-second claim is not proven yet, and the runs that exist do not yet answer it. There are now enough of them for the word median, and they arrived in two groups too far apart for one to mean anything — so the site shows both groups and prints no median. What is missing is not more runs but the reason for the gap: the runs recorded before 8 September were stored as bare durations, with no note of when they happened or whether the person corrected anything before sending.",
+    did: "The harness that records them was broken for the whole of Round 1, which is why there were none at all to argue about; it works now, so the number is being earned rather than asserted. Every run is kept, including the slow ones: the distribution contains a run that came in over sixty seconds, and it stays in and is counted against the claim. Runs from 8 September carry their provenance, so the next time the sample splits the site can say why. Filling the rest with scripted runs would be the exact fabrication this project refuses everywhere else.",
     check: { label: "See the runs, and how many there are", href: "/evidence" },
   },
   {
@@ -87,6 +87,18 @@ const FIXED: Entry[] = [
       "The front page then did the same thing again, with its own number. When the first real runs landed, /evidence learned that a handful of runs is not a distribution and started showing a caveat below five. The landing tile had only ever been taught about the case of exactly one — so at two runs it went back to reading “Median time to dispatch”, while the page one tap away said two runs “is not yet a distribution”. The same figure, described more confidently on the screen a reader reaches first.",
     did: "The threshold and the labelling rule moved into one module that both pages read, so they cannot drift apart again. Below five runs neither of them uses the word median, and neither does the tile at zero.",
     check: { label: "Compare the two", href: "/evidence" },
+  },
+  {
+    found:
+      "The stopwatch behind the headline claim did not start when the person started. Tapping “Add a screenshot” opened the file picker without starting the clock — the clock started when the file came back. So the time spent hunting for the debit alert in a gallery, on the input path the product leads with and the video opens on, was outside the measurement. Dictation had the same shape: tapping the button was free, and only the finished transcript started it.",
+    did: "Both now start the clock on the tap. The measured times get longer and the sixty-second claim gets harder to meet, which is the correct direction — the provider's own comment says timing from page load would flatter the number, and this was flattering it in the same way one screen further in. It also means the five runs already on record are undercounted by an unknown amount, most likely the three fastest ones, and /evidence says so next to them rather than leaving the split unexplained.",
+    check: { label: "Read what the runs do and do not show", href: "/evidence" },
+  },
+  {
+    found:
+      "Then it happened a third time, and having enough runs is what caused it. The fifth real run landed, the sample cleared the threshold above, and both pages started reporting “Median 12.4s” over runs of 7.7, 9.4, 12.4, 49.5 and 64.5 seconds. Those are two groups with a thirty-seven-second hole in the middle, and the median was sitting in the hole — describing neither group, and quietly underselling the sixty-second claim by a factor of five while appearing to support it. Every rule the site had was about how many runs there were. None was about whether they were the same thing.",
+    did: "The rule is now in the code rather than in a reader's judgement: if the widest gap between neighbouring runs is wider than every other gap put together, with at least two runs each side, the sample is two groups and neither page prints a median for it. The tile is removed rather than relabelled — the same treatment the unsourceable recovery percentage got. Both groups are shown with their ranges, and the page states plainly that it cannot yet account for the gap, because the runs were recorded as bare numbers. That last part is the actual defect: the site could publish a distribution it had no way to explain.",
+    check: { label: "See both groups", href: "/evidence" },
   },
   {
     found:

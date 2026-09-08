@@ -215,9 +215,12 @@ If either costs you time, drop it. The words carry it alone.
 
 # Before you record
 
-- [ ] **Get past five real runs first.** Below five, the landing page and `/evidence` both
-      drop the word *median* and show a small-sample caveat instead. As of writing there
-      are three, and one of them is over sixty seconds.
+- [ ] **Know what the site is currently saying about its own timings.** There are now five
+      real runs, and they fall into two groups too far apart to average — roughly 8–12s and
+      roughly 50–64s — so `/evidence` shows both groups and prints no median, and the
+      landing tile shows the span. One run is over sixty seconds and stays in. Adding runs
+      in the middle of the gap is what would turn this back into one distribution; adding
+      more fast ones will not.
 - [ ] **Deploy your latest work, then open the live URL and look.** Don't trust this file
       about what is deployed.
 - [ ] `/api/health` shows `deploy_ready: true`, no warnings.
@@ -233,18 +236,23 @@ If either costs you time, drop it. The words carry it alone.
 
 # The one thing that could sink you
 
-**Every real run you record counts in the median on `/evidence`.** Film Clip B six times and
-all six are in that number.
+**Every real run you record lands on `/evidence`, in public.** Film Clip B six times and all
+six are on that page.
 
-- **Don't use your fastest take while the site shows a slower one.** Anyone can open
-  `/evidence` and see the gap. That is the exact dishonesty this project is built against.
-- **Keep every take.** If your video run is 41 seconds and the median is 52, that's fine —
-  and saying so is a better answer than a curated number.
+- **Don't use your fastest take while the site shows slower ones.** Anyone can open
+  `/evidence` and see the whole distribution, one dot per run. That is the exact dishonesty
+  this project is built against.
+- **Keep every take.** If your video run is 41 seconds and the page shows runs at 64, that's
+  fine — and saying so out loud is a better answer than a curated number.
+- **A run in the 15–45s range is worth more than a fast one right now.** The five recorded
+  runs sit in two clumps with a thirty-seven-second hole between them, which is why the page
+  refuses to print a median. Runs that land in the hole are the ones that make it one
+  distribution again.
 - **Practice runs on `?demo=1` don't count.** Use them freely.
 
 ## If the run is over a minute
 
-One of the three runs on record already is. If your median lands above sixty seconds,
+One of the five runs on record already is. If the figure lands above sixty seconds,
 **change the claim, not the data** — on the landing page, in the 250 words, and in minute
 one. Say the real number out loud in the video.
 

@@ -106,5 +106,6 @@ look like decoration.
 | Claim | Where | Status |
 |---|---|---|
 | Field count on cybercrime.gov.in before first submit | `/evidence` | see `data/portal-benchmark.json` |
-| Median seconds to a dispatchable packet | `/evidence` | measured from real runs only; reads "not yet measured" until humans have done some |
+| Median seconds to a dispatchable packet | `/evidence` | measured from real runs only, and not stated as a median: the five recorded runs are two groups too far apart to average, so both groups are shown and no middle value is printed. See `lib/timings.ts` |
+| Why the recorded runs fall into two groups | `/evidence` | unexplained. Runs before 8 September were stored as bare durations with no provenance; later ones carry it |
 | Hindi copy | `lib/i18n.ts` | not reviewed by a native speaker; labelled as such in the product |

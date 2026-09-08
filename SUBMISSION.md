@@ -46,9 +46,11 @@ it.
   it. Put a number back only after you have opened the portal and counted — and then put the
   same number in all four places at once.
 - **Check the last line against the live site before pasting.** It says timings are
-  published with their sample size, which is true at any count; but if `/api/timings` still
-  reports fewer than five real runs on submission day, the front page will be showing a
-  caveat rather than a median, and you should know that before a judge tells you.
+  published with their sample size, which is true at any count. As of 8 September there are
+  five real runs and they fall into two groups — roughly 8–12s and roughly 50–64s — so the
+  site shows both groups and prints no median, and the landing tile shows the span rather
+  than a middle value. If a judge asks about the gap, the answer is on `/evidence` and it is
+  *we did not record enough to tell you*, not a guess. Know that before they ask.
 - **The 74-of-75 figure is the worst of three passes**, not the best. If you re-run
   `npm run eval:extract --repeat 3` before submitting and it moves, change the number here
   to whatever the new worst pass says.

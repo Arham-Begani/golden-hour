@@ -820,3 +820,165 @@ portal value is currently "not yet counted", which is short. A counted row might
 figure and a qualifier, and the stacked layout puts label and value on one line with
 `justify-between`. If the counting happens, look at this page again at 360px before
 assuming it still reads.
+
+---
+
+## Step 12 - having enough runs is what broke it - 2026-09-08
+
+The resubmission is behind us. This step is not new capability; it is the site still being
+wrong about itself, found by looking at the live deployment rather than at the code.
+
+### The threshold worked, and that is how the number got worse
+
+`/api/timings` on production: five real runs, at 7.7, 9.4, 12.4, 49.5 and 64.5 seconds.
+Five is `ENOUGH_RUNS`, so both the landing tile and `/evidence` crossed it together and
+began reporting **"Median 12.4s"**.
+
+Look at the five numbers. Three of them are around ten seconds and two are around a
+minute, with a thirty-seven-second hole in the middle. 12.4s is the third of five, and it
+sits at the top edge of the fast group describing nothing on the other side of the gap. A
+person meeting this form for the first time is somewhere in that hole. Nobody in the
+sample is.
+
+Two ways this costs us, and the second is the one that matters:
+
+- It **undersells the claim while appearing to support it.** The headline is sixty seconds
+  and the front page was answering with twelve, which reads either as a claim badly
+  calibrated against its own data or as runs that were not the task.
+- It is **this project's defect for the third time.** "About fifty facts" was a number
+  nobody counted. The landing tile calling two runs a median was a number described two
+  ways. This is a number standing in for two different things. Every rule the site had was
+  about *how many* runs there were; none was about whether they were the same activity.
+
+### The rule, and why it is a stated heuristic
+
+`splitSample` in `lib/timings.ts`: if the widest gap between neighbouring runs is wider
+than every other gap put together, with at least two runs on each side of it, the sample
+is two groups and no median is printed for it. On the production five the widest gap is
+37.0s and the rest total 19.8s, so it fires.
+
+Both halves of that rule earn their place. Without the width test any sorted list has a
+widest gap. Without the two-a-side test a single straggler suppresses a median that
+correctly describes the other four - one slow run is a slow run, and the strip plot
+already shows it.
+
+It is a heuristic and says so, in the same words `ENOUGH_RUNS` uses. A mixture model over
+five points would be a more sophisticated way of saying something five points cannot
+support, and the rule as written can be checked by hand against the dots the page already
+draws.
+
+The median tile is **removed** at a split rather than relabelled. Relabelling leaves the
+misleading number on screen wearing a hedge. This is the treatment the recovery percentage
+got in step 7, and for the same reason.
+
+### The defect underneath the defect
+
+The site could publish a distribution it had no way to explain. `recordTiming` stored an
+integer: no timestamp, no note of whether the fields came from the model or were typed,
+no count of what the person corrected before sending. So `/evidence` can show two groups
+and cannot say what separates them, and the honest version of that page has to admit it in
+those words.
+
+Runs from today carry all three, taken from the request that was already arriving - nothing
+new is asked of the person filing. The old entries stay as bare integers and
+`parseTimingEntry` reads both shapes, which is now the most load-bearing untested function
+in the repo made tested: it stands between 200 Redis values and everything `/evidence`
+says, and `Number("")` is `0`, which would have published a zero-second run as the site's
+best time.
+
+### What was deliberately not done
+
+**The portal count and the mentor answers.** Both are still open, both are work a human has
+to do, and neither is a model's to fill in. They are the two largest remaining gaps and
+this step does not touch them.
+
+**Backfilling provenance onto the five existing runs.** It would be a guess about which
+were which, on exactly the numbers the page is arguing about. The pre-split
+`gh:timings` key was left alone in step 9 for this reason and the reasoning has not
+changed.
+
+### Uncertain
+
+**Whether a reader reads the split as rigour or as an excuse.** It is the same question
+`/honesty` raises about itself. The case for it is that the alternative was a front page
+answering "twelve seconds" to a claim of sixty and hoping nobody asked which runs those
+were. The case against is that a project two clicks deep in caveats starts to look like it
+is managing expectations rather than clearing them. Nobody outside has read this yet.
+
+---
+
+## Step 13 - the stopwatch started late - 2026-09-08
+
+Step 12 said the site could show two groups of runs and not account for them. Reading the
+intake afterwards produced an account, and it is worse than the reading offered there.
+
+### The clock did not start when the person started
+
+`app/start/page.tsx`. The upload button's handler was `onClick={() => fileInput.current
+?.click()}` and nothing else. `markStart()` lived in `pickFile`, which does not run until
+the OS picker has closed and handed back a file.
+
+So the sequence for the path this product leads with was: tap **Add a screenshot** →
+[gallery opens, person scrolls looking for the debit alert: N seconds, unmeasured] →
+select → clock starts.
+
+`markStart` is idempotent and its own comment reads: *"The clock starts when the user first
+does something, not when the page loaded. Timing from page load would flatter the number."*
+Tapping the button is the user first doing something. The measurement was flattering the
+number by the same mechanism the comment forbids, one screen further in.
+
+Dictation had the same shape and a smaller cost: tapping **Dictate** was free and only the
+finished transcript started the clock, so the time spent speaking was outside the run.
+
+Both now mark the start on the tap.
+
+### What that does to the five runs already on record
+
+They are undercounted by an unknown amount, and the three in the fast group are the ones
+most likely to be affected, because a run that begins with a screenshot is exactly the run
+that spends time in the picker. That does not explain the whole 37-second gap and it is
+not offered as if it did - `/evidence` names it as part of the gap and leaves the rest
+open.
+
+The runs are **not deleted**. They were honestly recorded under a definition that turned
+out to be wrong, which is a different thing from a bad measurement, and a distribution
+that loses its inconvenient half is not evidence. What changes is what the page says about
+them: these five measured something slightly narrower than the claim is about, and they
+are not comparable with anything recorded after today.
+
+The direction of the fix is the point. It makes the headline claim **harder** to meet.
+Every previous change to this number has made it harder to meet - keeping the run that
+came in over sixty seconds, excluding demo replays, refusing the median across a split
+sample - and a measurement that only ever moves one way under scrutiny is one worth
+believing.
+
+### While in there - the UI
+
+Three changes, all on the timed path, none of them a new visual direction. `PLAN_R2.md` §3
+ruled that out before the resubmission and the reasoning held; it does not hold for the
+week after it, when the live site is what a reviewer opens.
+
+**The `Dropped` chip now looks like what it is.** It rendered identically to `Edited` and
+`Low confidence` - same border, same muted text - and the three do not mean remotely the
+same thing. Two are bookkeeping. The third is the server having refused a confident wrong
+answer, which is the strongest claim this product makes and the shot the video's second
+minute is built around. It gets border and text weight, in the only currency this palette
+allows. No colour: amber is the meter's and red is the interrupt's.
+
+**The rejected value is legible.** It sat inside the explanatory sentence at `text-xs`,
+which made the actual evidence - the eleven digits the model returned - the smallest thing
+in the row. It is now on its own line in a bordered monospace block at `text-sm`.
+
+**The holes summary moved inside the field card.** "3 fields unreadable. Send anyway." is a
+statement about the list directly above it, and it was floating in a second bordered
+rectangle of its own, reading as an unrelated aside. It is now that card's footer.
+
+**Add a screenshot** got the weight its position in the flow already claimed: it is the
+first thing the video shows and it was set smaller than the textarea below it.
+
+### Uncertain
+
+**Whether the fast group survives the fix.** Nobody has done a timed run since it landed.
+If the next few runs come in around 20-30 seconds the split closes on its own and the
+claim is met with room; if they come in over sixty, the claim changes. Both are fine and
+only one of them is currently written down anywhere.
