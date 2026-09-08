@@ -14,32 +14,41 @@ Q1. WHAT PROBLEM DOES YOUR PROJECT SOLVE?
 
 --- LONG ---
 
-After online financial fraud in India, the first hour is what decides whether the
-money comes back - a bank can freeze the beneficiary account before the balance
-is moved onward. But cybercrime.gov.in merges two jobs with completely different
-deadlines: the bank's, which is minutes, and the police investigation's, which is
-weeks. It asks you to pick a category, register, and wait for an OTP - often
-while the scammer is still on the phone - then complete the full complaint before
-it accepts anything. The urgent half is trapped behind the slow one.
+Someone loses money to a UPI scam at 9:14 at night. By 9:16 they know. A
+beneficiary bank can still place a hold on the account the money went to - but
+only while the money is still sitting in it, before it is split across mule
+accounts and moved onward.
 
-Golden Hour splits the report in two and sends the urgent half first: a nine-field
-freeze packet, with no login, no OTP, and no required field. A freeze request is
-never blocked for being incomplete. The police statement is collected afterwards,
-unhurried, against the same acknowledgement number.
+They are sent to cybercrime.gov.in, which asks them to pick a category, register,
+and wait for an OTP - often on the same phone the scammer may still be calling -
+and then to complete the full police complaint before it will accept anything.
 
-This is not a new idea. It is the sequence the government already runs on the 1930
-helpline, which takes a short list of facts, issues an acknowledgement number, and
-asks for the full complaint within 24 hours. The website just does not work that
-way.
+Two jobs are merged into one form. A bank needs a handful of facts within minutes.
+An investigation needs everything else over weeks. The portal paces both at the
+speed of the slower one, so the urgent half is trapped behind the slow one. It is
+an information-architecture problem, not a technology one: the form was designed
+as police intake and then asked to also be an emergency stop button, and nobody
+re-sequenced it when that second job arrived.
+
+Golden Hour splits the report in two and sends the urgent half first - a nine-field
+freeze packet with no login, no OTP and no required field, because a freeze
+request should never be blocked for being incomplete. The statement is collected
+afterwards, unhurried, against the same acknowledgement number.
+
+The sequence is not my invention. The 1930 helpline already works this way: a short
+list of facts, a system-generated acknowledgement number, then the full complaint
+on the portal within 24 hours. The website simply never adopted it.
 
 --- SHORT ---
 
-India's cyber fraud portal makes victims pick a category, register, and wait for
-an OTP - often while the scammer is still on the line - before it accepts
-anything. It merges the bank's job, which takes minutes, with the police
-investigation's, which takes weeks, and paces both at the slower one. Golden Hour
-sends the bank's half first: nine fields, no login, no required field. The 1930
-helpline already works this way; the website does not.
+Someone loses money to a UPI scam at 9:14 at night; by 9:16 they know. A bank can
+still freeze the account the money went to, but only while it is still sitting
+there. Instead they are sent to cybercrime.gov.in to pick a category, register,
+and wait for an OTP - often on the same phone the scammer may still be calling -
+and to finish the whole police complaint before anything is accepted. Two jobs
+with different deadlines are merged into one form, paced at the slower one. Golden
+Hour sends the bank's half first: nine fields, no login, no required field. The
+1930 helpline already works this way; the website does not.
 
 
 ================================================================================
@@ -48,37 +57,49 @@ Q2. WHAT SPECIFIC FEATURE DID YOU BUILD OR IMPROVE FOR ROUND 2?
 
 --- LONG ---
 
-The rule that the model is not allowed to guess - and, for Round 2, the evidence
-that it holds.
+The guarantee that the model may not guess - and this round, the work that turned
+it from a claim into something you can watch and check.
 
-The rule already existed: every field the model reads is re-validated server-side,
-and anything whose shape is wrong for the field it claims to be is marked
-UNREADABLE rather than sent, however confident the model was. The stakes are
-asymmetric, which is the whole reason: a missing transaction ID means a bank works
-with what it has, but a wrong one means it freezes the wrong account while the
-real one empties.
+The rule: every field the model reads is re-validated on the server, and anything
+whose shape is wrong for the field it claims to be is marked UNREADABLE rather
+than sent, however confident the model was. The stakes are asymmetric, which is
+the whole reason. A missing transaction ID means a bank works with what it has. A
+wrong one means it freezes the wrong account while the real one empties.
 
-What was missing was proof. Round 2 added an extraction evaluation - 75 fields
-across generated screenshots and text, of which 74 were correct, and 40 of 40 from
-screenshots with nothing invented. That is the worst of three passes, not the
-best. It also added a demo case where you can watch the server refuse a confident
-wrong value, because until then every blank in the product came from the model
-declining to read something, which demonstrates the prompt behaving well rather
-than the guarantee actually holding.
+Round 2 is where that stopped being an assertion. Three things were built:
 
-One value still escaped: a dictated "fastcart dot pay at samplebank" came back as
-a different but perfectly well-formed account, which shape checking cannot catch.
-That is published on /honesty rather than left out.
+An extraction evaluation, which did not exist before. 75 fields across generated
+screenshots and text: 74 correct, and 40 of 40 read from screenshots with nothing
+invented - the worst of three passes, not the best. The screenshots are generated
+by a script that writes the answer key from the same object that draws the image,
+so a case cannot disagree with its own ground truth. Fields whose expected answer
+is UNREADABLE are cut out of the image entirely, so a value returned for one is an
+invention with no argument available.
+
+A demo case you can watch it happen in. Every blank in the product used to come
+from the model declining to read a field, which demonstrates the prompt behaving
+well rather than the guarantee holding. One case now returns an eleven-digit
+reference at 93% confidence where a real one is twelve digits. The server refuses
+it on shape, and the screen shows you the value it threw away. A test fails if
+that case ever stops being refused.
+
+And the failure, published. A dictated "fastcart dot pay at samplebank" came back
+as a different but perfectly well-formed account. Shape checking cannot catch that
+and never will. It is on /honesty, next to everything else this does not do yet -
+along with what changed since Round 1, on /changes, and the measured timings with
+their sample size, on /evidence. All three are reachable from the live link
+without an account.
 
 --- SHORT ---
 
 Server-side validation - the model may not guess. Every field is re-checked for
 shape and marked UNREADABLE rather than sent wrong, because a missing transaction
-ID is survivable and a wrong one freezes the wrong account. Round 2 added the
-measurement: 75 fields, 74 correct, 40 of 40 from screenshots with nothing
-invented (worst of three passes), plus a demo case where you can watch the server
-refuse a confident misread. One value still escaped a shape check, and that is on
-/honesty.
+ID is survivable and a wrong one freezes the wrong account. Round 2 built the
+proof: an extraction eval that did not exist before (75 fields, 74 correct, 40 of
+40 from screenshots with nothing invented - the worst of three passes, not the
+best), and a demo case where you can watch the server refuse an eleven-digit
+reference the model was 93% sure of. One value still escaped a shape check, and
+that is published on /honesty rather than left out.
 
 
 ================================================================================
@@ -88,6 +109,14 @@ NOTES BEFORE YOU PASTE
 1. Q2 deliberately matches minute two of the video. A judge who reads the form and
    then watches should hear the same answer twice. Do not swap in a different
    feature here.
+
+1b. Q1 does not say the first hour "decides whether the money comes back", and an
+   earlier draft of this file did. That is a magnitude claim, and /evidence
+   explicitly refuses to draw one: the MHA was asked in Parliament for recovery
+   against losses and the answer does not contain the word "recovered". What is
+   sourced is the mechanism - a bank can hold the account while the money is still
+   in it. Claiming more in the form than the site claims about itself is the one
+   inconsistency that would cost you everything else.
 
 2. "Worst of three passes, not the best" is worth leaving in. Most people quote
    their best run; saying which one you quoted is the cheapest credibility in the
