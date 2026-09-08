@@ -6,13 +6,22 @@
 
 **The brief changed for Phase 2. This script is written to the new one.**
 
-> **Minute 1** — the problem you are solving, and a demonstration of your project in action.
-> **Minute 2** — **one specific feature** you have built or improved that differentiates your
-> project. Rather than covering the entire build, focus on this one thing: why it matters,
-> and what makes your approach distinct.
+The brief, verbatim from the Build What Moves India Phase 2 email:
+
+> For Phase 2, pitch your project through a 2-minute video:
 >
-> "This round, we will be assessing how clearly you tell the story of your build alongside
-> the quality of the build itself."
+> **Minute 1:** Tell us what problem you are solving and show your project in action.
+>
+> **Minute 2:** Focus on one specific feature you improved or built. Show us why it matters
+> and what makes your approach unique.
+>
+> We will also look at how well you tell the story of your build, alongside the quality of
+> the build itself. Make those two minutes count.
+
+An earlier version of this file paraphrased that and set the paraphrase in quotation marks,
+including a "rather than covering the entire build" line the email does not contain. The
+reading was right and the attribution was not, which is not a distinction this repository
+gets to be relaxed about.
 
 **What that changes.** The previous script's minute two was three decisions at twenty
 seconds each. That is now explicitly the wrong shape — *"rather than covering the entire

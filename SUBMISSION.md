@@ -1,5 +1,23 @@
 # Submission — project summary
 
+**Deadline: 8 September, 22:00.** Not the 7th — `MENTORS.md` and `PLAN_R2.md` were written
+against a wrong date and the questions in `MENTORS.md` went out saying Monday. The email is
+the authority.
+
+What the form requires, from the Phase 2 email:
+
+- [ ] **The latest version of the project.** Deployed, not just committed — the live link is
+      what gets opened, and Vercel serves whatever `main` last pushed. Push before filming,
+      so the video and the site cannot disagree.
+- [ ] **A live public project link that opens without requesting access** —
+      `https://golden-hour-kappa.vercel.app`. Open it in a private window and confirm.
+- [ ] **A public 2-minute video link that opens without requesting access.** Unlisted is
+      fine; "anyone with the link can view" is not the default on every host — check it in a
+      private window too.
+- [ ] **The exact email address you registered with.**
+- [ ] **Your teammate's registered email, if this is a team.** One response for the project.
+      If it is a team, also switch the summary below from "I" to "we".
+
 Paste-ready answers for the submission form. Word counts are for the 250-word cap.
 
 ---
