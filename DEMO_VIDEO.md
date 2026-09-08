@@ -95,10 +95,15 @@ of the same sentence — the same rule `lib/timings.ts` exists to enforce about 
 
 ## What to film
 
-**Clip A — the portal · ~8 seconds**
+**Clip A — the portal · ~10 seconds**
 cybercrime.gov.in on your phone. The category dropdown, the register prompt, then scroll the
 form so its length passes. **Do not submit anything** — filing a fake report to a live
 government system is a false police complaint.
+
+> Ten seconds, not the twenty-five the old script implied. The opening used to run four
+> paragraphs over a clip specified at eight, which never fitted and pushed the finished
+> video past 2:15 once `R` grew. The problem statement is two sentences now and the rest of
+> the argument plays over the run — see `SCRIPT.md`.
 
 **Clip B — the run · ONE UNBROKEN TAKE**
 
@@ -114,7 +119,10 @@ Fumble it? Delete and start over. Never fix this one with an edit.
 | Switch to | When you hear |
 |---|---|
 | Clip A | *(the start)* |
-| Clip B | "So: send the bank's half first." |
+| Clip B | "Pick a category. Register. Wait for an OTP." — cut on the last word |
+
+Everything after that line is spoken over the run, including the pivot and the 1930
+sentence. The run has the dead air to carry it and Clip A does not.
 
 ---
 
@@ -144,12 +152,17 @@ total ≈ (10s problem over Clip A) + R + (3s holding the receipt) + 63s
 | `R` | Total | Verdict |
 |---|---|---|
 | 35s | ~1:51 | Fits with room |
-| 45s | ~2:01 | Trim the two phrases above → ~1:55 |
-| 55s | ~2:11 | Trim minute two **and** cut the problem to one sentence |
+| 45s | ~2:01 | Trim the two phrases in minute two → ~1:55 |
+| 55s | ~2:11 | Trim minute two **and** drop the 1930 sentence → ~2:00. Tight |
 | 65s | ~2:21 | See *If the run is over a minute* |
 
 Work this out with your real `R` **before** you record minute two, so you know which
 version of it you are recording.
+
+The problem statement is already down to two sentences and there is nothing left to take
+out of it, so at high `R` the 1930 line is the next thing to go — reluctantly, because it
+is the best sentence in the minute. Clip A cannot be cut below about eight seconds either;
+the portal has to be on screen long enough to be recognised as the portal.
 
 **Then stop.** Don't summarise, don't thank anyone, don't say "and that's Golden Hour." Cut
 on the last word.
@@ -258,9 +271,9 @@ next to the words you would be changing.
 Cut in this order. Stop as soon as you fit.
 
 1. **The cutaways in minute two**
-2. **The portal (Clip A)** — drop to one sentence over a single still of the form
-3. **"Real ones are twelve"** and **"Blank passes every check after it"** in minute two
-4. **The problem statement** — down to the first two sentences
+2. **"Real ones are twelve"** and **"Blank passes every check after it"** in minute two
+3. **The 1930 sentence** in minute one — the best line you have, which is why it is third
+4. **Clip A** — down to a single still of the form, held while you speak
 
 **Never cut:** the run itself, or any of it. And never cut the last beat of minute two —
 the escape is the whole reason this feature was chosen.

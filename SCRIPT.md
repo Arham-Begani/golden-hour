@@ -15,31 +15,68 @@ sentence.
 
 Voice recorded first, screen recording laid under it. **No face.**
 
-> Someone loses money to a UPI scam at 9:14 at night. By 9:16 they know.
->
-> This is where they're told to go. Pick a category. Register. Wait for an OTP — on the
-> phone the scammer may still be calling.
->
-> A bank needs a handful of facts to freeze the account. The portal wants the whole police
-> complaint before it takes one.
->
-> So: send the bank's half first.
+### Over Clip A — the portal · ~10 seconds
 
-**— Stop talking. Let the run play. —**
+> Nine fourteen at night. The money's gone, and by nine sixteen they know.
+>
+> This is where they're sent. Pick a category. Register. Wait for an OTP.
+
+**— cut to the run. Keep talking over it. —**
+
+> On the same phone the scammer may still be calling.
+>
+> A bank needs a handful of facts to freeze the account. This wants the whole police
+> complaint first.
+>
+> So — the bank's half, first.
+
+**— silence. Let the screenshot go in. —**
 
 > A screenshot of the debit alert. That's the whole first step.
 
-**— silence, about 8 seconds —**
+**— silence, about 6 seconds —**
 
 > Nine fields. None of them required.
 
+**— silence, about 5 seconds —**
+
+> And this isn't my idea. The helpline already works this way — short list,
+> acknowledgement number, full complaint within twenty-four hours. Just not the website.
+
 **— silence until the receipt appears —**
 
-> Acknowledgement number. Time taken, on screen. Six of nine fields — and it names the
-> three that are missing.
+> Acknowledgement number. Time taken, on screen. Six of nine — and it names the three
+> it's missing.
 
-**102 words · roughly 38 seconds of speech.** The rest of the minute is the run playing
-under the silences. Say the last line *as* the receipt lands, not before.
+**133 words · roughly 48 seconds of speech**, spread across the whole minute. Only the
+first 27 words play over Clip A; everything else rides over the run, in the gaps.
+
+### What changed, and why
+
+**Clip A shrank from ~25 seconds of narration to ~10.** The old opening put four
+paragraphs over a clip specified as eight seconds long. It never fitted, and with `R`
+now larger it pushed the whole video past 2:15. The problem statement is now two
+sentences and the rest of the argument moved onto the run — which was sitting in silence
+with budget to spare.
+
+**The 1930 line is new, and it is the most valuable sentence in the minute.** The first
+objection any judge has to this project is *who are you to redesign a government portal.*
+The answer is that the government already runs this exact sequence on the phone and simply
+never brought it to the web — it is on `/evidence` under "The sequence already exists" and
+it was nowhere in the video. It costs eleven seconds of dead air that was already dead.
+
+> **If you are asked to source it:** the MHA/I4C instruction sheet for reporting financial
+> cyber fraud through 1930 — short list of facts, system-generated acknowledgement number,
+> full complaint on cybercrime.gov.in within 24 hours. The PDF is marked "For Delhi Only",
+> which is a limit of that document rather than of the argument. Say *"the helpline already
+> works this way"*, which is what the document supports. Don't upgrade it to "the
+> government mandates this nationally."
+
+**"Nine fourteen", not "9:14".** You are reading it aloud; write it the way you say it.
+
+**"A handful of facts", not "nine facts".** Nine is *this product's* count of freeze
+fields. What a bank actually requires is not a number anyone here has counted, and the
+README makes that distinction explicitly. Don't collapse it on camera.
 
 ### The one number you do not choose
 
@@ -51,6 +88,36 @@ If it reads nine of nine, say:
 
 which sets up minute two anyway. Narrating a number the screen contradicts is the single
 easiest way to lose the credit this whole project is built to earn.
+
+---
+
+# Record it in your own voice
+
+Not a synthetic one, and the reason is not sentiment.
+
+- **Minute two is your face and your voice.** A generated minute one puts a seam right
+  down the middle of a two-minute video, and it is audible.
+- **This project deleted a statistic it could not source and publishes its own failures.**
+  Narrating that with a synthetic voice is a contradiction a sharp judge will enjoy
+  pointing out, and it costs more than a clean read gains.
+- **The round is scored on how clearly you tell the story of your build.** That is a person
+  talking.
+
+### The timing is easier than it looks
+
+The worry is real and the fix is in the order you record, which is why minute one says
+*voice first*:
+
+1. **Record the voice alone.** No video, no pressure, as many takes as you want. It is
+   about 48 seconds of speech — a cheap thing to redo.
+2. **Do the run separately**, one unbroken take, and don't narrate while filming it.
+3. **Lay the run under the voice** and stretch or trim the silences until they meet.
+
+You are never performing to a stopwatch. The only fixed duration in the whole video is the
+run itself, and that one is fixed on purpose.
+
+**An accent is not a defect.** A slightly imperfect real voice reads as a person who built
+something. A flawless synthetic one reads as a person who did not want to be heard.
 
 ---
 
