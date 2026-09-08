@@ -161,11 +161,26 @@ function Intake() {
         ) : (
           <button
             type="button"
-            onClick={() => fileInput.current?.click()}
-            className="card-interactive flex min-h-16 w-full flex-col items-start justify-center rounded-lg border border-dashed border-line-strong bg-surface px-4 py-3 text-left"
+            /**
+             * The clock starts here, not when the file comes back.
+             *
+             * `pickFile` marks the start, and it does not run until the OS
+             * picker has closed — so every second spent hunting for the debit
+             * alert in a gallery was outside the measurement. On the input path
+             * this product leads with, that is the difference between timing
+             * the task and timing the part of it that happens after the hard
+             * bit. It flattered the number in exactly the way the comment on
+             * `markStart` says not to, and it is the most likely reason the
+             * recorded runs arrived in a fast group and a slow one.
+             */
+            onClick={() => {
+              markStart();
+              fileInput.current?.click();
+            }}
+            className="card-interactive flex min-h-20 w-full flex-col items-start justify-center rounded-lg border border-dashed border-line-strong bg-surface px-4 py-4 text-left"
           >
-            <span className="text-base font-medium">{copy.intake.upload}</span>
-            <span className="text-sm text-muted">{copy.intake.uploadHint}</span>
+            <span className="text-lg font-semibold">{copy.intake.upload}</span>
+            <span className="mt-0.5 text-sm text-muted">{copy.intake.uploadHint}</span>
           </button>
         )}
         <p className="mt-1.5 text-xs text-faint">{copy.intake.uploadNote}</p>
@@ -200,7 +215,13 @@ function Intake() {
         {dictation.supported && (
           <button
             type="button"
-            onClick={dictation.toggle}
+            // Same reason as the upload button: the transcript callback marks
+            // the start, and it does not fire until they have finished
+            // speaking. Tapping the button is the interaction.
+            onClick={() => {
+              markStart();
+              dictation.toggle();
+            }}
             aria-pressed={dictation.listening}
             className={`mt-2 min-h-11 rounded-lg border px-4 text-sm ${
               dictation.listening
