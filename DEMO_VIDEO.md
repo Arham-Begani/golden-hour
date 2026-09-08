@@ -1,5 +1,9 @@
 # Demo video — 2 minutes
 
+> **The words are in [`SCRIPT.md`](./SCRIPT.md).** That is the page you hold while
+> recording. This one is the production plan: what to film, the arithmetic, the checklist,
+> and which footage has gone stale.
+
 **The brief changed for Phase 2. This script is written to the new one.**
 
 > **Minute 1** — the problem you are solving, and a demonstration of your project in action.
@@ -81,39 +85,13 @@ Voice first, then lay the screen recording under it. No face.
 
 ## What to say
 
-> Someone loses money to a UPI scam at 9:14 at night. By 9:16 they know.
->
-> This is where they're told to go. Pick a category. Register. Wait for an OTP — on the
-> phone the scammer may still be calling.
->
-> A bank needs a handful of facts to freeze the account. The portal wants the whole police
-> complaint before it takes one.
->
-> So: send the bank's half first.
+**[`SCRIPT.md` § Minute one](./SCRIPT.md#minute-one--the-problem-and-the-thing-working).**
+102 words, roughly 38 seconds of speech; the rest of the minute is the run playing under
+the silences. It carries the warning about the "six of nine" line, which is the one number
+in the video you do not get to choose.
 
-*(Stop talking. Let the run play.)*
-
-> A screenshot of the debit alert. That's the whole first step.
-
-*(silence — about 8 seconds)*
-
-> Nine fields. None of them required.
-
-*(silence until the receipt appears)*
-
-> Acknowledgement number. Time taken, on screen. Six of nine fields — and it names the
-> three that are missing.
-
-> ⚠️ **The "six of nine" is the one line here that is not yours to choose.** It depends on
-> your screenshot and what the model could read off it, and the receipt prints the real
-> figure. Do your run first, look at the receipt, and say *that* number. If it reads
-> "8 of 9 fields", say eight and one. If it reads nine of nine, say *"all nine — and when
-> it can't read one, it says so instead of guessing,"* which sets up minute two anyway.
-> Narrating a number the screen contradicts is the single easiest way to lose the credit
-> this whole project is built to earn.
-
-**102 words**, roughly 38 seconds of speech. The rest of the minute is the run playing under
-the silences. Say the last line as the receipt lands, not before.
+The words live in one file so that this one and that one cannot end up holding two versions
+of the same sentence — the same rule `lib/timings.ts` exists to enforce about a number.
 
 ## What to film
 
@@ -150,31 +128,9 @@ where mine still fails.* The last beat is the one that will be remembered.
 
 ## What to say
 
-> Everyone this round used a model to fill in a form. So did I. What's different is what
-> happens when it's wrong.
->
-> Ask a model to say "unreadable" when it can't read something and it usually will. That's
-> a request, not a guarantee. Mine handed back a transaction reference — eleven digits,
-> ninety-three percent confident. Real ones are twelve.
->
-> So nothing the model reads is trusted. The server checks every field's shape again and
-> refuses anything that doesn't fit, however confident the model was. A refused field comes
-> back as "unreadable", never blank. Blank passes every check after it.
->
-> That matters because the stakes aren't symmetric. A missing transaction ID means the bank
-> works with what it has. A wrong one means the bank freezes the wrong account while the
-> real one empties.
->
-> Then I measured it. Seventy-five fields, seventy-four right. From screenshots, forty out
-> of forty, nothing invented.
->
-> One escaped. Someone dictating said "fastcart dot pay at samplebank", and the model wrote
-> a different account — a perfectly well-formed one. Shape checking can't catch that. So
-> it's on the honesty page.
-
-**180 words**, roughly 63 seconds at a measured pace. If you need seconds back, cut *"Real
-ones are twelve"* (the number lands without it) and *"Blank passes every check after it."*
-Each is about three seconds, and losing both brings this to about 57.
+**[`SCRIPT.md` § Minute two](./SCRIPT.md#minute-two--one-feature-told-as-a-story).**
+180 words, roughly 63 seconds at a measured pace, with the two phrases to cut if you need
+seconds back — about 57 without them.
 
 ## Will it fit? Do this arithmetic before you film
 
@@ -220,13 +176,8 @@ If either costs you time, drop it. The words carry it alone.
 
 ## Delivery notes
 
-- **Don't read this off the screen.** Learn the five beats and say the rest in your own
-  words. Reading to camera is obvious and costs more than a perfect sentence gains.
-- **Say "transaction ID", not "UTR". Say "the model", not "Gemini" or "the LLM".** The
-  script avoids the jargon; don't put it back in on the day.
-- **Slow down on the last beat.** Most people claim their thing works. Almost nobody
-  finishes by showing you the case where theirs doesn't.
-- **One take per beat is fine.** Nobody sees a cut on a talking head that holds still.
+**[`SCRIPT.md` § Delivery](./SCRIPT.md#delivery).** Learn the beats rather than reading
+them, keep the jargon out, slow down on the last one, and cut on the last word.
 
 ---
 
@@ -294,14 +245,11 @@ six are on that page.
 
 ## If the run is over a minute
 
-One of the five runs on record already is. If the figure lands above sixty seconds,
-**change the claim, not the data** — on the landing page, in the 250 words, and in minute
-one. Say the real number out loud in the video.
-
-A project that says "I claimed sixty seconds, measured it honestly, and it came in at
-sixty-four" is telling a better story about its build than one that claimed sixty and got
-it. That is the round's stated criterion, and this is the one place you can meet it that
-nobody else can fake.
+One of the five runs on record already is, and the 8 September clock fix makes it likelier
+still. **Change the claim, not the data** — on the landing page, in the 250 words, and in
+minute one. The reasoning is in
+[`SCRIPT.md` § If your run comes in over a minute](./SCRIPT.md#if-your-run-comes-in-over-a-minute),
+next to the words you would be changing.
 
 ---
 
@@ -325,6 +273,6 @@ Time the final edit. If it lands at 2:01, it's over. Leave 3–5 seconds of head
 
 - **Film the demo on a real phone, upright.** The design is built for a small screen.
 - **Plain speaking voice.** No hype, no "imagine a world where."
-- **No music during the run.** The silence is the point.
-- **Don't read out text that's on screen.** Let people read it.
-- **Subtitles.** Most people watch without sound.
+
+The rest — no music under the run, don't read out what is on screen, subtitles — is with
+the words in [`SCRIPT.md` § Delivery](./SCRIPT.md#delivery).
