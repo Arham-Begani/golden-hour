@@ -149,6 +149,12 @@ const en = {
     measuredSmall: "Time to dispatch",
     measuredNone: "Not yet measured",
     measuredRuns: (n: number) => `${n} recorded ${n === 1 ? "run" : "runs"}`,
+    /**
+     * Shown when the runs are two groups rather than one, so the tile above is
+     * a span and not a median. /evidence carries the explanation; this line
+     * exists so the front door does not imply a distribution it does not have.
+     */
+    measuredSplitRuns: (n: number) => `${n} recorded runs, in two separate groups`,
 
     /**
      * The two pages that answer the two questions a sceptical reader has, and
@@ -475,6 +481,7 @@ const hi: Dict = {
     measuredSmall: "भेजने में लगा समय",
     measuredNone: "अभी मापा नहीं गया",
     measuredRuns: (n: number) => `${n} दर्ज रन`,
+    measuredSplitRuns: (n: number) => `${n} दर्ज रन, दो अलग समूहों में`,
 
     checkHeading: "ख़ुद जाँचिए",
     checkBody: "इनमें से किसी के लिए भी आपको हमारी बात मान लेने की ज़रूरत नहीं है।",

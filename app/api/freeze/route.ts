@@ -73,8 +73,29 @@ export async function POST(request: Request) {
     description: typeof body.description === "string" ? body.description.trim() : "",
   };
 
+  /**
+   * What the run can later be explained by.
+   *
+   * `source` is normalised against the fingerprint rather than trusted: a
+   * client claiming "model" over a summary the server recognises as a fixture
+   * is a demo replay whatever it says about itself, and recording its own claim
+   * would put a fixture run in the list labelled as real work.
+   *
+   * `corrected` is the count of fields the person changed before sending, which
+   * is the cheapest available signal for whether a run was somebody doing the
+   * task or somebody who already knew the answer.
+   */
+  const source =
+    kind === "demo"
+      ? ("fixture" as const)
+      : body.source === "model" || body.source === "manual"
+        ? body.source
+        : null;
+
   await saveFreezePacket(packet);
-  if (timingRecorded) await recordTiming(elapsed, kind);
+  if (timingRecorded) {
+    await recordTiming(elapsed, kind, { source, corrected: packet.corrected.length });
+  }
 
   return NextResponse.json({
     ok: true,

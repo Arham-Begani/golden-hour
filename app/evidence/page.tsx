@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SOURCES, claimsFullySourced } from "@/lib/decay";
-import { isSmallSample, sampleSize } from "@/lib/timings";
+import { describeSample, isSmallSample, type SplitSample } from "@/lib/timings";
 import benchmark from "@/data/portal-benchmark.json";
 
 /**
@@ -23,6 +23,10 @@ type Timings = {
   slowest_ms: number | null;
   under_60s: number;
   runs: number[];
+  /** Two groups rather than one, when the runs say so. Null is the ordinary case. */
+  split: SplitSample | null;
+  /** How many of the runs carry enough provenance to be explained, not just reported. */
+  provenance: { recorded: number; corrected: number; unknown: number };
   /** Demo replays, counted but never mixed into the claim above. */
   demo: { count: number; median_ms: number | null; runs: number[] };
 };
@@ -53,6 +57,14 @@ export default function EvidencePage() {
   }, []);
 
   const sourced = claimsFullySourced();
+
+  /**
+   * Read from the runs rather than the count, because whether these are one
+   * population is a question about the values. `split` is the case where there
+   * are enough runs for the word "median" and no honest place to put it.
+   */
+  const size = describeSample(timings?.runs);
+  const split = size === "split" ? timings?.split ?? null : null;
 
   return (
     <div className="flex flex-col gap-8 pb-8">
@@ -87,8 +99,8 @@ export default function EvidencePage() {
         <h2 className="text-xl font-semibold">Measured</h2>
         <p className="mt-1 text-sm text-muted">
           Every recorded <strong>human</strong> run from first interaction to dispatch,
-          unfiltered. The median includes the slow ones; a best-case number would not mean
-          anything. Demo replays are counted separately and excluded — they serve a cached
+          unfiltered and slow runs included; a best-case number would not mean anything.
+          Demo replays are counted separately and excluded — they serve a cached
           extraction and start their clock at the fixture click, so they measure review
           time, not the task.
         </p>
@@ -108,21 +120,77 @@ export default function EvidencePage() {
           </p>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {/* "Median" is a lie at n=1 and a stretch below ENOUGH_RUNS, so it is
-              used at neither. The caveat above carries the explanation; the
-              label just stops asserting the thing the caveat is retracting. */}
-          <Stat
-            label={
-              {
-                none: "Median",
-                single: "The one run",
-                small: "Middle run",
-                enough: "Median",
-              }[sampleSize(timings?.count)]
-            }
-            value={seconds(timings?.median_ms ?? null)}
-          />
+        {split && timings && (
+          <div className="mt-4 rounded-lg border border-line-strong bg-raised px-4 py-3 text-sm leading-relaxed">
+            <p>
+              <strong>
+                {timings.count} runs recorded, and they are not one distribution.
+              </strong>{" "}
+              They fall into two groups {seconds(split.gapMs)} apart — a gap wider than
+              every other gap between neighbouring runs put together. The middle value
+              lands inside that gap, where no run happened, so this page does not print it.
+              A median that describes neither half of its own sample is worse than no
+              median.
+            </p>
+
+            <dl className="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-6">
+              <Group label="Faster group" runs={split.faster} />
+              <Group label="Slower group" runs={split.slower} />
+            </dl>
+
+            <p className="mt-3">
+              <strong>Part of the gap is a bug in this page&rsquo;s own stopwatch.</strong>{" "}
+              Until 8 September the clock did not start when someone tapped{" "}
+              <em>Add a screenshot</em> — it started when the file came back from the
+              picker. So every second spent finding the debit alert in a gallery sat
+              outside the measurement, on the input path this product leads with. Runs
+              that began with a screenshot are undercounted by an unknown amount, and the
+              three fastest are the ones most likely to be affected. That is fixed, and
+              fixing it makes the recorded times longer.
+            </p>
+
+            <p className="mt-2">
+              {timings.provenance.unknown > 0 && (
+                <>
+                  {timings.provenance.unknown === timings.count
+                    ? "Every one of these runs was also stored as a bare duration"
+                    : `${timings.provenance.unknown} of these runs were also stored as bare durations`}
+                  , with nothing attached — no timestamp, and no record of whether the
+                  person corrected a single field before sending.{" "}
+                </>
+              )}
+              So the rest of the gap stays open: a run by someone who already knows what
+              the form wants is not the same task as a run by someone meeting it cold, and
+              this site did not write down which was which. Runs recorded from now on
+              carry that. The honest position is that these five measured something
+              slightly different from what the claim is about, and the runs that settle it
+              have not been done yet.
+            </p>
+          </div>
+        )}
+
+        <div
+          className={`mt-4 grid grid-cols-2 gap-3 ${split ? "sm:grid-cols-3" : "sm:grid-cols-4"}`}
+        >
+          {/* "Median" is a lie at n=1, a stretch below ENOUGH_RUNS, and at a
+              split it names a number that sits between the two groups and
+              describes neither — so at a split the tile is removed rather than
+              relabelled. The same move the recovery percentage got: a figure
+              that cannot be honestly stated is deleted, not softened. */}
+          {!split && (
+            <Stat
+              label={
+                {
+                  none: "Median",
+                  single: "The one run",
+                  small: "Middle run",
+                  enough: "Median",
+                  split: "Median",
+                }[size]
+              }
+              value={seconds(timings?.median_ms ?? null)}
+            />
+          )}
           <Stat label="Fastest" value={seconds(timings?.fastest_ms ?? null)} />
           <Stat label="Slowest" value={seconds(timings?.slowest_ms ?? null)} />
           <Stat
@@ -389,6 +457,29 @@ function PortalValue({ row }: { row: BenchmarkRow }) {
 function GoldenValue({ row }: { row: BenchmarkRow }) {
   if (row.goldenHour === null) return <span className="text-faint">see measured</span>;
   return <>{String(row.goldenHour)}</>;
+}
+
+/**
+ * One side of a split sample.
+ *
+ * A range and a count rather than a group median: with two or three runs in a
+ * group, a median is the same overstatement one level down, and the whole point
+ * of this block is that the page stopped making it.
+ */
+function Group({ label, runs }: { label: string; runs: number[] }) {
+  const span =
+    runs.length === 1
+      ? seconds(runs[0])
+      : `${seconds(runs[0])}–${seconds(runs[runs.length - 1])}`;
+
+  return (
+    <div className="flex items-baseline justify-between gap-3 sm:flex-col sm:items-start sm:gap-0.5">
+      <dt className="eyebrow">
+        {label} · {runs.length} {runs.length === 1 ? "run" : "runs"}
+      </dt>
+      <dd className="text-base font-semibold tabular-nums">{span}</dd>
+    </div>
+  );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

@@ -45,7 +45,7 @@ export const storeBackend = redis ? "upstash" : "memory";
 
 type Entry = { value: unknown; expiresAt: number };
 const memory = new Map<string, Entry>();
-const memoryTimings: Record<RunKind, number[]> = { real: [], demo: [] };
+const memoryTimings: Record<RunKind, TimingEntry[]> = { real: [], demo: [] };
 
 function memoryGet<T>(key: string): T | null {
   const entry = memory.get(key);
@@ -136,28 +136,134 @@ export async function getStatement(ack: string): Promise<Statement | null> {
 /* Dispatch timings — the measured half of the claim                          */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * One recorded run.
+ *
+ * Until 8 September this list held bare integers, and that turned out to be the
+ * expensive kind of shortcut. Five real runs arrived in two obvious clusters —
+ * three around ten seconds, two around a minute — and the site had recorded
+ * nothing that could tell anyone why. It could not say when they happened, or
+ * whether the person had corrected a single field before sending. A number with
+ * no provenance can be published honestly but it cannot be *explained*, and the
+ * explanation is the part a reader actually wants.
+ *
+ * Every field here is observed server-side from the request that was already
+ * arriving. Nothing is inferred, and nothing new is asked of the person filing.
+ */
+export type TimingEntry = {
+  /** First interaction to dispatch. */
+  ms: number;
+  /** When it was recorded. Null for the entries written before this existed. */
+  at: string | null;
+  /**
+   * How the fields got there: extracted by the model, typed by hand, or served
+   * from a fixture. Null for entries that predate this field.
+   */
+  source: "model" | "manual" | "fixture" | null;
+  /** How many fields the person corrected before sending. Null if unrecorded. */
+  corrected: number | null;
+};
+
+/** What a caller may attach to a run. Absent fields are recorded as unknown, never as zero. */
+export type TimingProvenance = {
+  source?: TimingEntry["source"];
+  corrected?: number | null;
+};
+
+/**
+ * Parse whatever is on the list, old shape or new.
+ *
+ * Three things can come back: an integer from before 8 September, the same
+ * integer as a string, or a JSON entry. Upstash deserialises JSON for us when
+ * it can, so the object arrives either parsed or as text. An entry that cannot
+ * be read as any of those is dropped rather than coerced — a run that cannot be
+ * read is not a fast run, the same rule `/api/freeze` applies to a lost clock.
+ */
+export function parseTimingEntry(raw: unknown): TimingEntry | null {
+  const bare = (ms: unknown): TimingEntry | null => {
+    const value = Number(ms);
+    return Number.isFinite(value) && value > 0
+      ? { ms: value, at: null, source: null, corrected: null }
+      : null;
+  };
+
+  if (typeof raw === "number") return bare(raw);
+
+  let value = raw;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed.startsWith("{")) return bare(trimmed);
+    try {
+      value = JSON.parse(trimmed);
+    } catch {
+      return null;
+    }
+  }
+
+  if (!value || typeof value !== "object") return null;
+  const entry = value as Record<string, unknown>;
+  const ms = Number(entry.ms);
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+
+  const source = entry.source;
+  const corrected = Number(entry.corrected);
+
+  return {
+    ms,
+    at: typeof entry.at === "string" ? entry.at : null,
+    source:
+      source === "model" || source === "manual" || source === "fixture" ? source : null,
+    corrected: Number.isFinite(corrected) && corrected >= 0 ? corrected : null,
+  };
+}
+
 /** Record how long one run took from first interaction to dispatch. */
-export async function recordTiming(elapsedMs: number, kind: RunKind): Promise<void> {
+export async function recordTiming(
+  elapsedMs: number,
+  kind: RunKind,
+  provenance: TimingProvenance = {},
+): Promise<void> {
   if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
+
+  const entry: TimingEntry = {
+    ms: elapsedMs,
+    at: new Date().toISOString(),
+    source: provenance.source ?? null,
+    corrected:
+      typeof provenance.corrected === "number" && provenance.corrected >= 0
+        ? provenance.corrected
+        : null,
+  };
+
   const key = timingsKey(kind);
   const cap = capFor(kind);
   if (redis) {
-    await redis.lpush(key, elapsedMs);
+    await redis.lpush(key, JSON.stringify(entry));
     await redis.ltrim(key, 0, cap - 1);
     return;
   }
-  memoryTimings[kind].unshift(elapsedMs);
+  memoryTimings[kind].unshift(entry);
   memoryTimings[kind].length = Math.min(memoryTimings[kind].length, cap);
 }
 
-/** Every recorded run of one kind. The evidence page shows the distribution, not a boast. */
-export async function getTimings(kind: RunKind): Promise<number[]> {
+/**
+ * Every recorded run of one kind, newest first, with whatever provenance it
+ * carries. The evidence page shows the distribution, not a boast.
+ */
+export async function getTimingEntries(kind: RunKind): Promise<TimingEntry[]> {
   const cap = capFor(kind);
   if (redis) {
-    const raw = await redis.lrange<number | string>(timingsKey(kind), 0, cap - 1);
-    return raw.map(Number).filter((n) => Number.isFinite(n) && n > 0);
+    const raw = await redis.lrange<unknown>(timingsKey(kind), 0, cap - 1);
+    return raw
+      .map(parseTimingEntry)
+      .filter((entry): entry is TimingEntry => entry !== null);
   }
   return [...memoryTimings[kind]];
+}
+
+/** The durations alone, for callers that only plot them. */
+export async function getTimings(kind: RunKind): Promise<number[]> {
+  return (await getTimingEntries(kind)).map((entry) => entry.ms);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useJourney } from "@/components/JourneyProvider";
-import { sampleSize } from "@/lib/timings";
+import { describeSample, type SplitSample } from "@/lib/timings";
 
 /**
  * The landing page.
@@ -29,7 +29,12 @@ import { sampleSize } from "@/lib/timings";
  * the interrupt needs it to mean "stop".
  */
 
-type Timings = { count: number; median_ms: number | null };
+type Timings = {
+  count: number;
+  median_ms: number | null;
+  runs: number[];
+  split: SplitSample | null;
+};
 
 export default function LandingPage() {
   const { copy } = useJourney();
@@ -56,10 +61,29 @@ export default function LandingPage() {
     };
   }, []);
 
-  const median =
-    timings && timings.count > 0 && timings.median_ms !== null
-      ? `${(timings.median_ms / 1000).toFixed(1)}${copy.common.seconds}`
-      : null;
+  /**
+   * What the runs are, asked of the module that owns the answer.
+   *
+   * Read from the runs and not the count, because a sample can have enough
+   * observations for the word "median" and still have no honest place to put
+   * one — see `splitSample`. Deciding that here rather than there is how this
+   * tile came to disagree with /evidence the last time.
+   */
+  const size = describeSample(timings?.runs);
+  const asSeconds = (ms: number) => `${(ms / 1000).toFixed(1)}${copy.common.seconds}`;
+
+  /**
+   * A split shows the span across both groups rather than the middle of them.
+   * The middle of a split sample sits in the gap, where nothing was measured.
+   */
+  const headline =
+    size === "split" && timings?.split
+      ? `${asSeconds(timings.split.faster[0])}–${asSeconds(
+          timings.split.slower[timings.split.slower.length - 1],
+        )}`
+      : timings && timings.count > 0 && timings.median_ms !== null
+        ? asSeconds(timings.median_ms)
+        : null;
 
   return (
     <div className="flex flex-col gap-10 pb-6">
@@ -238,17 +262,19 @@ export default function LandingPage() {
                 tile came to say "Median" while /evidence said "not yet a
                 distribution" about the same two runs. */}
             <p className="text-xs text-muted">
-              {sampleSize(timings?.count) === "enough"
-                ? landing.measuredMedian
-                : landing.measuredSmall}
+              {size === "enough" ? landing.measuredMedian : landing.measuredSmall}
             </p>
             <p className="mt-0.5 text-2xl font-semibold tabular-nums">
-              {median ?? (
+              {headline ?? (
                 <span className="text-lg font-medium text-faint">{landing.measuredNone}</span>
               )}
             </p>
             {timings && timings.count > 0 && (
-              <p className="mt-0.5 text-xs text-faint">{landing.measuredRuns(timings.count)}</p>
+              <p className="mt-0.5 text-xs text-faint">
+                {size === "split"
+                  ? landing.measuredSplitRuns(timings.count)
+                  : landing.measuredRuns(timings.count)}
+              </p>
             )}
           </div>
           <span aria-hidden className="shrink-0 text-muted">
