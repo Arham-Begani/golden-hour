@@ -1,0 +1,135 @@
+GOLDEN HOUR - PHASE 2 SUBMISSION FORM
+Build What Moves India. Deadline 8 September, 22:00.
+
+Plain text on purpose - paste straight into the form, no markdown to strip.
+Two versions of each answer. Use the long one unless the field is cramped.
+
+Every figure below was re-verified on 8 September: 128 unit tests, production
+build, and the live deployment at golden-hour-kappa.vercel.app.
+
+
+================================================================================
+Q1. WHAT PROBLEM DOES YOUR PROJECT SOLVE?
+================================================================================
+
+--- LONG ---
+
+After online financial fraud in India, the first hour is what decides whether the
+money comes back - a bank can freeze the beneficiary account before the balance
+is moved onward. But cybercrime.gov.in merges two jobs with completely different
+deadlines: the bank's, which is minutes, and the police investigation's, which is
+weeks. It asks you to pick a category, register, and wait for an OTP - often
+while the scammer is still on the phone - then complete the full complaint before
+it accepts anything. The urgent half is trapped behind the slow one.
+
+Golden Hour splits the report in two and sends the urgent half first: a nine-field
+freeze packet, with no login, no OTP, and no required field. A freeze request is
+never blocked for being incomplete. The police statement is collected afterwards,
+unhurried, against the same acknowledgement number.
+
+This is not a new idea. It is the sequence the government already runs on the 1930
+helpline, which takes a short list of facts, issues an acknowledgement number, and
+asks for the full complaint within 24 hours. The website just does not work that
+way.
+
+--- SHORT ---
+
+India's cyber fraud portal makes victims pick a category, register, and wait for
+an OTP - often while the scammer is still on the line - before it accepts
+anything. It merges the bank's job, which takes minutes, with the police
+investigation's, which takes weeks, and paces both at the slower one. Golden Hour
+sends the bank's half first: nine fields, no login, no required field. The 1930
+helpline already works this way; the website does not.
+
+
+================================================================================
+Q2. WHAT SPECIFIC FEATURE DID YOU BUILD OR IMPROVE FOR ROUND 2?
+================================================================================
+
+--- LONG ---
+
+The rule that the model is not allowed to guess - and, for Round 2, the evidence
+that it holds.
+
+The rule already existed: every field the model reads is re-validated server-side,
+and anything whose shape is wrong for the field it claims to be is marked
+UNREADABLE rather than sent, however confident the model was. The stakes are
+asymmetric, which is the whole reason: a missing transaction ID means a bank works
+with what it has, but a wrong one means it freezes the wrong account while the
+real one empties.
+
+What was missing was proof. Round 2 added an extraction evaluation - 75 fields
+across generated screenshots and text, of which 74 were correct, and 40 of 40 from
+screenshots with nothing invented. That is the worst of three passes, not the
+best. It also added a demo case where you can watch the server refuse a confident
+wrong value, because until then every blank in the product came from the model
+declining to read something, which demonstrates the prompt behaving well rather
+than the guarantee actually holding.
+
+One value still escaped: a dictated "fastcart dot pay at samplebank" came back as
+a different but perfectly well-formed account, which shape checking cannot catch.
+That is published on /honesty rather than left out.
+
+--- SHORT ---
+
+Server-side validation - the model may not guess. Every field is re-checked for
+shape and marked UNREADABLE rather than sent wrong, because a missing transaction
+ID is survivable and a wrong one freezes the wrong account. Round 2 added the
+measurement: 75 fields, 74 correct, 40 of 40 from screenshots with nothing
+invented (worst of three passes), plus a demo case where you can watch the server
+refuse a confident misread. One value still escaped a shape check, and that is on
+/honesty.
+
+
+================================================================================
+NOTES BEFORE YOU PASTE
+================================================================================
+
+1. Q2 deliberately matches minute two of the video. A judge who reads the form and
+   then watches should hear the same answer twice. Do not swap in a different
+   feature here.
+
+2. "Worst of three passes, not the best" is worth leaving in. Most people quote
+   their best run; saying which one you quoted is the cheapest credibility in the
+   whole form.
+
+3. Do not turn "nine fields" into "the nine facts a bank requires". Nine is this
+   project's count of its own freeze fields. What a bank actually requires is not
+   a number anyone here has counted, and /evidence refuses to guess it.
+
+4. The 1930 claim is sourced to the MHA/I4C instruction sheet for reporting
+   financial cyber fraud, which is marked "For Delhi Only". "The helpline already
+   works this way" is what that document supports. Do not upgrade it to a national
+   mandate.
+
+5. If this is a team entry, switch "I" to "we" in the 250-word summary in
+   SUBMISSION.md as well, and include your teammate's registered email.
+
+
+================================================================================
+THE REST OF THE FORM
+================================================================================
+
+Live project link:
+  https://golden-hour-kappa.vercel.app
+  Open it in a private window first and confirm it loads without any access
+  request. Verified live and healthy on 8 September - /api/health reports
+  deploy_ready true with no warnings.
+
+Video link:
+  Must be public. Unlisted is fine, "anyone with the link can view" is not the
+  default on every host - check it in a private window too.
+
+Consumer test login credentials:
+  Not required - no login. All screens are public.
+
+  Longer version if there is room: the project has no login; every screen,
+  including the full reporting flow, is reachable without an account. This is
+  deliberate - the existing portal makes victims register and wait for an OTP
+  before it accepts anything, often while the scammer is still on the phone, and
+  removing that step is central to the project. Reviewers wanting a guided run can
+  open /judge - a scenario, a stopwatch, and the live product on one screen, no
+  setup. /changes lists what was fixed since Round 1, and what is still open.
+
+Registered email:
+  Use the exact address you signed up with.
