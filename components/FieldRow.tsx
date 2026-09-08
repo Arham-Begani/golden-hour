@@ -53,9 +53,15 @@ export function FieldRow({
           {copy.fields[name]}
         </label>
 
+        {/* Three chips that used to look identical and do not mean remotely
+            the same thing. "Edited" is bookkeeping and "Low confidence" is a
+            caveat; "Dropped" is the server having refused a confident wrong
+            answer, which is the single strongest claim this product makes
+            about itself. It gets the weight, in the only currency this palette
+            allows — border and text tone, never colour. */}
         <span className="flex shrink-0 items-center gap-1.5 text-xs">
           {edited && <Chip>{copy.confirm.edited}</Chip>}
-          {downgrade && <Chip>{copy.confirm.dropped}</Chip>}
+          {downgrade && <Chip strong>{copy.confirm.dropped}</Chip>}
           {!missing && !edited && field.confidence < CONFIDENCE_SHOWN_BELOW && (
             <Chip>{copy.confirm.lowConfidence}</Chip>
           )}
@@ -73,24 +79,36 @@ export function FieldRow({
       />
 
       {(downgrade || (missing && showHint)) && (
-        <p id={`${id}-note`} className="mt-1.5 text-xs leading-relaxed text-faint">
+        <div id={`${id}-note`} className="mt-1.5">
           {downgrade ? (
             <>
-              {copy.confirm.droppedWhy}{" "}
-              <span className="font-mono text-muted">“{downgrade.original}”</span>
+              <p className="text-xs leading-relaxed text-muted">{copy.confirm.droppedWhy}</p>
+              {/* The rejected value on its own line rather than inside the
+                  sentence. It is the evidence — the thing the model actually
+                  said, kept and shown instead of quietly discarded — and at
+                  text-xs inline it was the smallest element in the row. */}
+              <p className="mt-1.5 rounded border border-line bg-raised px-2 py-1.5 font-mono text-sm break-all text-text">
+                {downgrade.original}
+              </p>
             </>
           ) : (
-            copy.confirm.unreadableHint
+            <p className="text-xs leading-relaxed text-faint">{copy.confirm.unreadableHint}</p>
           )}
-        </p>
+        </div>
       )}
     </div>
   );
 }
 
-function Chip({ children }: { children: React.ReactNode }) {
+function Chip({ children, strong = false }: { children: React.ReactNode; strong?: boolean }) {
   return (
-    <span className="rounded border border-line bg-raised px-1.5 py-0.5 text-muted">
+    <span
+      className={`rounded border px-1.5 py-0.5 ${
+        strong
+          ? "border-line-strong bg-raised font-medium text-text"
+          : "border-line bg-raised text-muted"
+      }`}
+    >
       {children}
     </span>
   );

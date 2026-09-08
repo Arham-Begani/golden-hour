@@ -288,7 +288,11 @@ export default function ConfirmPage() {
         </label>
       </fieldset>
 
-      <div className="rounded-xl border border-line bg-surface px-4">
+      {/* The summary lives inside this card rather than in a second box below
+          it. It is a statement about these fields — "nine unreadable, send
+          anyway" — and floating it in its own bordered rectangle made the
+          product's central promise look like an unrelated aside. */}
+      <div className="overflow-hidden rounded-xl border border-line bg-surface px-4">
         {EDITABLE.map(({ key, inputMode }, index) => (
           <FieldRow
             key={key}
@@ -306,11 +310,13 @@ export default function ConfirmPage() {
             onChange={(value) => edit(key, value)}
           />
         ))}
-      </div>
 
-      <p className="rounded-lg border border-line bg-surface px-4 py-3 text-sm text-muted">
-        {holes > 0 ? copy.confirm.holes(holes) : copy.confirm.complete}
-      </p>
+        {/* No border-top: the last FieldRow is no longer `last-child`, so it
+            keeps its own border-bottom and already draws this separator. */}
+        <p className="-mx-4 bg-raised px-4 py-3 text-sm text-muted">
+          {holes > 0 ? copy.confirm.holes(holes) : copy.confirm.complete}
+        </p>
+      </div>
 
       {/* Optional, and deliberately quiet. No spinner and no status line: the
           only thing that ever comes of this is the interrupt screen, and a
