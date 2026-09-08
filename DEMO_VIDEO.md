@@ -51,6 +51,18 @@ person doing a real task, or it is not evidence of anything.
 Minute one is budgeted around one number and only you know it. Do one real run on your
 phone and read **Time taken** off the receipt. That is `R`.
 
+> **`R` will be bigger than it used to be, on purpose.** Until 8 September the clock did
+> not start until the file picker handed back your screenshot, so the time spent finding
+> the debit alert in your gallery was free. It is not free any more — the clock starts when
+> you tap **Add a screenshot**. That is the honest measurement and it is the one the claim
+> has to survive.
+>
+> Practical consequence: **have the screenshot ready to hand** before you start filming, the
+> way a real victim would have the bank SMS on the screen they were just looking at. Do not
+> hunt for it on camera. That is not gaming the number — it is the realistic case, and the
+> unrealistic one is a person who has forgotten where their own debit alert is. But whatever
+> the clock says, say *that*.
+
 | If `R` is… | Minute one is |
 |---|---|
 | ~35s | 12s problem over Clip A · 35s run · ~10s spare for the receipt to hold |
@@ -195,8 +207,13 @@ underneath and cut back to your face straight after.
   confirm screen, using the **"A confident misread"** demo case at `/start?demo=1`. The
   chip reads *Dropped*, the line under it reads *"The model read this, but it isn't shaped
   like a real value, so it was dropped rather than sent wrong,"* and the rejected value
-  `52361234567` sits underneath in monospace. **This is the single strongest two seconds
-  available to you** — the guarantee happening, not being described.
+  `52361234567` sits underneath in its own monospace box. **This is the single strongest
+  two seconds available to you** — the guarantee happening, not being described.
+
+  This shot was re-cut on 8 September and the old take is wrong: the chip used to look
+  identical to the *Edited* and *Low confidence* chips next to it, and the rejected value
+  was inline at the smallest size on the row. Both now carry weight. **Do not use footage
+  recorded before 8 September** — it under-sells the one frame this minute exists for.
 - On *"it's on the honesty page"* → `/honesty`, the row about the escape.
 
 If either costs you time, drop it. The words carry it alone.
@@ -210,6 +227,31 @@ If either costs you time, drop it. The words carry it alone.
 - **Slow down on the last beat.** Most people claim their thing works. Almost nobody
   finishes by showing you the case where theirs doesn't.
 - **One take per beat is fine.** Nobody sees a cut on a talking head that holds still.
+
+---
+
+# Every clip recorded before 8 September is stale
+
+Four commits on 8 September changed every screen the video shows. `broll/` was recorded on
+the 6th, so all of it is wrong except one file.
+
+| Clip | Status |
+|---|---|
+| `broll/cut/clip-a.mp4` — cybercrime.gov.in | **Still good.** It films the government portal, which none of this touched |
+| `dropped-chip.mp4`, `cut/cutaway-dropped-chip.mp4` | **Re-shoot.** Old chip treatment. This is the shot minute two is built around |
+| `evidence.mp4` | **Re-shoot.** Shows a median the live site no longer prints. A clip that contradicts the live page is the worst thing this project could ship |
+| `landing.mp4` | **Re-shoot.** The tile now shows a span, not a median |
+| `run-demo.mp4`, `golden-hour-demo.mp4`, `cut/minute-1*.mp4` | **Re-shoot.** Old confirm screen — separate holes box, old chip, smaller upload card |
+| `interrupt.mp4` | Unchanged by the 8 September work, but re-shoot with the set for consistent grade |
+
+Regenerate the screen recordings with `node scripts/broll.mjs http://localhost:3100 broll`
+against a **local** production server. Needs Chrome and **ffmpeg** on `PATH`
+(`winget install Gyan.FFmpeg`, then reopen the shell) — `page.screencast()` spawns ffmpeg
+and the script exits early without it.
+
+**These are b-roll and cutaways only.** None of them is minute one. The run in the
+submitted video is you, on your phone, in one take — see *What "the run" means* above. A
+scripted screencast has a scripted duration, and the number on the receipt is the claim.
 
 ---
 
