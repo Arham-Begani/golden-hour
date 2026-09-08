@@ -126,12 +126,11 @@ something. A flawless synthetic one reads as a person who did not want to be hea
 **Straight to camera.** Know the five beats and say the rest in your own words. Reading to
 camera is obvious and costs more than a perfect sentence gains.
 
-The arc: *everyone did the easy version → the easy version is a request, not a guarantee →
-here is what I did instead → here is why the stakes are asymmetric → here is where mine
-still fails.* The last beat is the one that will be remembered.
+The arc: *here is the feature → asking a model is not the same as guaranteeing, and mine
+proved it → here is what I built instead → here is why the stakes are asymmetric → here is
+where it still fails.* The last beat is the one that will be remembered.
 
-> Everyone this round used a model to fill in a form. So did I. What's different is what
-> happens when it's wrong.
+> The one feature I want to show you is what happens when the model gets it wrong.
 >
 > Ask a model to say "unreadable" when it can't read something and it usually will. That's
 > a request, not a guarantee. Mine handed back a transaction reference — eleven digits,
@@ -139,11 +138,10 @@ still fails.* The last beat is the one that will be remembered.
 >
 > So nothing the model reads is trusted. The server checks every field's shape again and
 > refuses anything that doesn't fit, however confident the model was. A refused field comes
-> back as "unreadable", never blank. Blank passes every check after it.
+> back as "unreadable", never blank — blank passes every check after it.
 >
-> That matters because the stakes aren't symmetric. A missing transaction ID means the bank
-> works with what it has. A wrong one means the bank freezes the wrong account while the
-> real one empties.
+> The stakes aren't symmetric. A missing transaction ID means the bank works with what it
+> has. A wrong one means the bank freezes the wrong account while the real one empties.
 >
 > Then I measured it. Seventy-five fields, seventy-four right. From screenshots, forty out
 > of forty, nothing invented.
@@ -152,14 +150,28 @@ still fails.* The last beat is the one that will be remembered.
 > a different account — a perfectly well-formed one. Shape checking can't catch that. So
 > it's on the honesty page.
 
-**180 words · roughly 63 seconds at a measured pace.**
+**177 words · roughly 62 seconds at a measured pace.**
+
+### Why this does not open on anyone else
+
+It used to start *"Everyone this round used a model to fill in a form. So did I. What's
+different is what happens when it's wrong."*
+
+Two things wrong with that, and the tone is the smaller one. It is **a claim about 249
+projects nobody has opened** — the same defect as "about fifty facts", said out loud in the
+one place there is no footnote to qualify it. And it spends the opening seconds on other
+people's work when the brief asked about yours.
+
+The replacement motivates the feature with **your own model failing**, which is stronger
+and costs nothing: the eleven-digit reference is a thing that actually happened in this
+build, not a guess about somebody else's. Nothing else in the minute changed.
 
 ### If you need seconds back
 
-Cut these two. About three seconds each; losing both brings this to roughly 57.
+Cut these two. About three seconds each; losing both brings this to roughly 56.
 
 - *"Real ones are twelve."* — the number lands without it
-- *"Blank passes every check after it."*
+- *"— blank passes every check after it."*
 
 ---
 

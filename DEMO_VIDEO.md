@@ -139,9 +139,14 @@ sentence. The run has the dead air to carry it and Clip A does not.
 
 **Straight to camera. Know the arc, don't read it.**
 
-The arc, in five beats: *everyone did the easy version → the easy version is a request, not
-a guarantee → here is what I did instead → here is why the stakes are asymmetric → here is
-where mine still fails.* The last beat is the one that will be remembered.
+The arc, in five beats: *here is the feature → asking a model is not the same as
+guaranteeing, and mine proved it → here is what I built instead → here is why the stakes
+are asymmetric → here is where it still fails.* The last beat is the one that will be
+remembered.
+
+It no longer opens by comparing the build to the rest of the round. That line was a claim
+about 249 projects nobody has opened, which is the "about fifty facts" defect said out loud
+where no footnote can reach it — see `SCRIPT.md` for the full reasoning.
 
 ## What to say
 
@@ -280,7 +285,7 @@ next to the words you would be changing.
 Cut in this order. Stop as soon as you fit.
 
 1. **The cutaways in minute two**
-2. **"Real ones are twelve"** and **"Blank passes every check after it"** in minute two
+2. **"Real ones are twelve"** and **"— blank passes every check after it"** in minute two
 3. **The 1930 sentence** in minute one — the best line you have, which is why it is third
 4. **Clip A** — down to a single still of the form, held while you speak
 
